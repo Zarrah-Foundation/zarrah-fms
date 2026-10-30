@@ -1,5 +1,5 @@
 from django.db.models import Sum
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from finance.models import Expense, FinancialSummary, Income, MonthlyFinancialSummary
@@ -54,12 +54,37 @@ def _get_dates_from_instance(instance):
     return dt.year, dt.month
 
 
+def _period(dt):
+    if dt is None:
+        return None
+    return dt.year, dt.month
+
+
+@receiver(pre_save, sender=Income)
+@receiver(pre_save, sender=Expense)
+def remember_previous_period(sender, instance, **kwargs):
+    """Remember the previous month so moving a row does not leave a stale total."""
+    if not instance.pk:
+        instance._previous_period = None
+        return
+    field = "received_date" if sender is Income else "expense_date"
+    previous = sender.objects.filter(pk=instance.pk).values_list(field, flat=True).first()
+    instance._previous_period = _period(previous)
+
+
+def _recompute_period(year, month):
+    _recompute_year(year)
+    _recompute_month(year, month)
+
+
 @receiver(post_save, sender=Income)
 @receiver(post_save, sender=Expense)
 def recompute_on_save(sender, instance, **kwargs):
     year, month = _get_dates_from_instance(instance)
-    _recompute_year(year)
-    _recompute_month(year, month)
+    _recompute_period(year, month)
+    previous = getattr(instance, "_previous_period", None)
+    if previous and previous != (year, month):
+        _recompute_period(*previous)
 
 
 @receiver(post_delete, sender=Income)

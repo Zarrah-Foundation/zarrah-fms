@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db import transaction
+from django.db import IntegrityError, connection, transaction
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -30,17 +30,70 @@ STATUS_LOOKUP_MAX_PER_HOUR = 5
 def generate_member_id():
     year = timezone.now().year
     prefix = f"ZF-{year}-"
-    last = (
-        Member.objects.filter(member_id__startswith=prefix)
-        .order_by("-member_id")
-        .values_list("member_id", flat=True)
-        .first()
-    )
+    qs = Member.objects.filter(member_id__startswith=prefix)
+    if connection.features.has_select_for_update:
+        qs = qs.select_for_update()
+    last = qs.order_by("-member_id").values_list("member_id", flat=True).first()
     if last:
         seq = int(last.split("-")[-1]) + 1
     else:
         seq = 1
     return f"{prefix}{seq:05d}"
+
+
+def _create_member(**kwargs):
+    """Insert a Member, retrying if two approvals take the same member ID."""
+    from members.transitions import TransitionError
+
+    last_error = None
+    for _ in range(5):
+        try:
+            with transaction.atomic():
+                kwargs["member_id"] = generate_member_id()
+                return Member.objects.create(**kwargs)
+        except IntegrityError as exc:
+            last_error = exc
+            if "member_id" not in str(exc):
+                raise
+    raise TransitionError("Could not allocate a unique member ID. Please try again.") from last_error
+
+
+def _account_for_applicant(application, *, temp_password):
+    """Return ``(user, created_new_account)`` for an approved applicant."""
+    from members.transitions import TransitionError
+
+    account_email = application.email or f"member.{application.phone}@members.zarrah.local"
+    existing = User.objects.filter(email__iexact=account_email).first()
+    if existing:
+        if Member.objects.filter(user=existing).exists():
+            if application.email:
+                raise TransitionError("An account with this email is already a member.")
+            raise TransitionError(
+                "A login already exists for this phone number. Add an email address before approving."
+            )
+        updates = []
+        if existing.role in (Role.DONOR, Role.MEMBER):
+            existing.role = Role.MEMBER
+            updates.append("role")
+        if not existing.is_active:
+            existing.is_active = True
+            updates.append("is_active")
+        if not existing.is_active_member:
+            existing.is_active_member = True
+            updates.append("is_active_member")
+        if updates:
+            updates.append("updated_at")
+            existing.save(update_fields=updates)
+        return existing, False
+
+    user = User.objects.create_user(
+        email=account_email,
+        password=temp_password,
+        name=application.full_name,
+        role=Role.MEMBER,
+        email_verified=timezone.now() if application.email else None,
+    )
+    return user, True
 
 
 def generate_temp_password(length=12):
@@ -73,25 +126,15 @@ def approve_application(application, reviewer, *, membership_type=None, skip_sta
     # from their phone number so a login account can still be created; the
     # admin/reviewer must then set a real email or communicate the temporary
     # password to the member directly.
-    account_email = application.email or f"member.{application.phone}@members.zarrah.local"
+    user, created_account = _account_for_applicant(application, temp_password=temp_password)
 
-    user = User.objects.create_user(
-        email=account_email,
-        password=temp_password,
-        name=application.full_name,
-        role=Role.MEMBER,
-        email_verified=timezone.now() if application.email else None,
-    )
-
-    member_id = generate_member_id()
     present_address = application.present_address
     if application.permanent_same_as_present:
         permanent_address = present_address
     else:
         permanent_address = application.permanent_address
 
-    member = Member.objects.create(
-        member_id=member_id,
+    member = _create_member(
         user=user,
         membership_type=membership_type,
         first_name=first_name,
@@ -130,15 +173,24 @@ def approve_application(application, reviewer, *, membership_type=None, skip_sta
     login_url = f"{settings.SITE_URL}/login/"
     if application.email:
         foundation = SiteSettings.load().localized_name("en")
+        if created_account:
+            credentials = (
+                f"Email: {application.email}\n"
+                f"Temporary password: {temp_password}\n\n"
+                f"Please log in at {login_url} and change your password.\n\n"
+            )
+        else:
+            credentials = (
+                f"Your existing account ({application.email}) is now linked to this membership. "
+                f"Log in at {login_url} with your current password.\n\n"
+            )
         send_email(
             subject=f"Welcome to {foundation}",
             message=(
                 f"Dear {application.full_name},\n\n"
                 f"Your membership application has been approved.\n"
-                f"Member ID: {member_id}\n"
-                f"Email: {application.email}\n"
-                f"Temporary password: {temp_password}\n\n"
-                f"Please log in at {login_url} and change your password.\n\n"
+                f"Member ID: {member.member_id}\n"
+                f"{credentials}"
                 f"{foundation}"
             ),
             recipient_list=[application.email],
@@ -196,8 +248,14 @@ def create_member_manual(*, first_name, last_name, phone, district, present_addr
     Prefer admin application form + transition_application for new work.
     Kept for backward compatibility with any remaining callers.
     """
+    from members.transitions import TransitionError
+
     temp_password = generate_temp_password()
     account_email = email or f"member.{phone}@members.zarrah.local"
+    if User.objects.filter(email__iexact=account_email).exists():
+        if email:
+            raise TransitionError("A login account with this email already exists.")
+        raise TransitionError("A login already exists for this phone number. Enter an email address.")
     full_name = (f"{first_name} {last_name}").strip()
 
     user = User.objects.create_user(
@@ -208,8 +266,7 @@ def create_member_manual(*, first_name, last_name, phone, district, present_addr
         email_verified=timezone.now() if email else None,
     )
 
-    member = Member.objects.create(
-        member_id=generate_member_id(),
+    member = _create_member(
         user=user,
         membership_type=membership_type,
         first_name=first_name,

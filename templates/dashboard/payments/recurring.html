@@ -5,7 +5,12 @@
 {% block dashboard_content %}
 <div class="dash-page-header"><div><h1 class="dash-page-title">{% trans "Recurring Payments" %}</h1>
 <p class="text-sm text-ink-light">{% trans "Donation subscriptions and membership Autopay (separate systems)." %}</p></div>
-<a href="{% url 'dashboard-recurring' %}" class="btn-secondary btn-sm">{% trans "Donation admin detail" %}</a></div>
+<div class="flex flex-wrap gap-2">
+{% if can_configure %}
+<a href="{% url 'dashboard-payments-recurring-setup' %}" class="btn-secondary btn-sm">{% trans "Recurring setup" %}</a>
+{% endif %}
+<a href="{% url 'dashboard-recurring' %}" class="btn-secondary btn-sm">{% trans "Donation admin detail" %}</a>
+</div></div>
 <form method="get" class="mb-4 flex flex-wrap gap-2">
   <input class="form-input max-w-xs" name="q" value="{{ q }}" placeholder="{% trans 'Search donor…' %}">
   <select name="status" class="form-input max-w-xs"><option value="">{% trans "All statuses" %}</option>{% for v,l in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>

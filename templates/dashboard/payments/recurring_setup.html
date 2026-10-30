@@ -1,0 +1,94 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Recurring Payment Setup" %}{% endblock %}
+{% block topbar_title %}{% trans "Recurring Payment Setup" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "Recurring Payment Setup" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Provider readiness for automatic payments. Secrets are write-only and are not shown on this page." %}</p>
+  </div>
+  <a href="{% url 'dashboard-payments-recurring' %}" class="btn-secondary btn-sm">{% trans "Subscription list" %}</a>
+</div>
+
+<div class="mb-6 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
+  <strong>LIVE VALIDATION PENDING</strong> —
+  {% trans "A connection test does not create a payment. New recurring subscriptions stay closed until a provider is configured and checkout rules allow it." %}
+</div>
+
+<div class="space-y-6">
+  {% for card in cards %}
+  <article class="rounded-card border border-border/60 bg-surface p-5">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-semibold">{{ card.title }}</h2>
+        <p class="mt-1 max-w-3xl text-sm text-ink-light">{{ card.summary }}</p>
+      </div>
+      {% if card.configure_pk %}
+      <a class="btn-secondary btn-sm" href="{% url card.configure_url_name card.configure_pk %}">{% trans "Configure" %}</a>
+      {% else %}
+      <a class="btn-secondary btn-sm" href="{% url 'dashboard-payment-methods' %}">{% trans "Payment methods" %}</a>
+      {% endif %}
+    </div>
+
+    <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+      <div><dt class="text-xs text-ink-light">{% trans "One-time" %}</dt><dd class="font-medium">{{ card.one_time_state }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Recurring" %}</dt><dd class="font-medium">{{ card.recurring_state }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Refund" %}</dt><dd class="font-medium">{{ card.refund_state }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Cancellation" %}</dt><dd class="font-medium">{{ card.cancel_state }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Connection" %}</dt><dd class="font-medium">{{ card.connection_state }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Environment" %}</dt><dd class="font-medium">{{ card.environment }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Credential source" %}</dt><dd class="font-medium">{{ card.credential_source|default:"—" }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Store ID" %}</dt><dd class="font-medium">{{ card.store_id_masked|default:"—" }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "SALT key stored" %}</dt><dd class="font-medium">{% if card.has_salt %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Plan reference" %}</dt><dd class="font-medium">{{ card.plan_refer|default:"—" }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Merchant recurring approval" %}</dt><dd class="font-medium">{% if card.merchant_recurring_enabled %}{% trans "Confirmed in admin" %}{% else %}{% trans "Not confirmed" %}{% endif %}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Accepting new subscriptions" %}</dt><dd class="font-medium">{% if card.accepting_new_subscriptions %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Last connection test" %}</dt><dd class="font-medium">{{ card.last_test_status|default:"—" }}{% if card.last_tested_at %} · {{ card.last_tested_at|date:"j M Y H:i" }}{% endif %}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Recurring authorization verified" %}</dt><dd class="font-medium">{% if card.recurring_auth_verified_at %}{{ card.recurring_auth_verified_at|date:"j M Y H:i" }}{% else %}—{% endif %}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Recurring settlement verified" %}</dt><dd class="font-medium">{% if card.recurring_charge_verified_at %}{{ card.recurring_charge_verified_at|date:"j M Y H:i" }}{% else %}—{% endif %}</dd></div>
+    </dl>
+
+    {% if card.accepting_new_reason %}
+    <p class="mt-3 text-sm text-ink-light">{{ card.accepting_new_reason }}</p>
+    {% endif %}
+    {% if card.last_test_message %}
+    <p class="mt-2 text-sm text-ink-light">{{ card.last_test_message }}</p>
+    {% endif %}
+
+    {% if card.ipn_url or card.one_time_ipn_url %}
+    <div class="mt-4 text-sm">
+      <p class="text-xs uppercase text-ink-light">{% trans "Callback / IPN" %}</p>
+      {% if card.one_time_ipn_url %}<p class="mt-1 break-all">{% trans "One-time IPN" %}: {{ card.one_time_ipn_url }}</p>{% endif %}
+      {% if card.ipn_url %}<p class="mt-1 break-all">{% trans "Recurring IPN" %}: {{ card.ipn_url }}</p>{% endif %}
+      {% if card.membership_ipn_url %}<p class="mt-1 break-all">{% trans "Membership fee IPN" %}: {{ card.membership_ipn_url }}</p>{% endif %}
+    </div>
+    {% endif %}
+
+    <h3 class="mt-5 text-sm font-semibold">{% trans "Setup checklist" %}</h3>
+    <ol class="mt-2 space-y-1 text-sm">
+      {% for item in card.checklist %}
+      <li>{% if item.done %}✓{% else %}○{% endif %} {{ item.step }}. {{ item.label }}</li>
+      {% endfor %}
+    </ol>
+
+    {% if card.merchant_must_supply %}
+    <h3 class="mt-5 text-sm font-semibold">{% trans "Still required from the merchant" %}</h3>
+    <ul class="mt-2 list-disc pl-5 text-sm text-ink-light">
+      {% for item in card.merchant_must_supply %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if card.notes %}
+    <ul class="mt-4 list-disc pl-5 text-xs text-ink-light">
+      {% for note in card.notes %}<li>{{ note }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if card.test_available %}
+    <p class="mt-4 text-xs text-ink-light">{% trans "Open Configure and run the connection test. That test calls the validation endpoint with a dummy reference and does not create a donation, membership payment, or income row." %}</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

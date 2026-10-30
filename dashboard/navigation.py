@@ -37,9 +37,11 @@ NAV = [
         "items": [
             {"icon": "bi-speedometer2", "label": "Overview", "url": "dashboard-payments", "module": "payments", "action": "view"},
             {"icon": "bi-credit-card", "label": "Payment Methods", "url": "dashboard-payment-methods", "module": "payment_methods", "action": "view"},
+            {"icon": "bi-sliders2", "label": "Recurring Payment Setup", "url": "dashboard-payments-recurring-setup", "module": "payments", "action": "configuration"},
             {"icon": "bi-arrow-repeat", "label": "Recurring Payments", "url": "dashboard-payments-recurring", "module": "payments", "action": "recurring_view"},
             {"icon": "bi-heart", "label": "Donations", "url": "dashboard-donations", "module": "donations", "action": "view"},
             {"icon": "bi-cash-stack", "label": "Membership Fees", "url": "dashboard-membership-fees", "module": "membership_fees", "action": "view"},
+            {"icon": "bi-person-plus", "label": "Registration Fees", "url": "dashboard-payments-registration-fees", "module": "payments", "action": "view"},
             {"icon": "bi-receipt", "label": "Transactions", "url": "dashboard-payments-transactions", "module": "payments", "action": "transactions_view"},
             {"icon": "bi-arrow-counterclockwise", "label": "Refunds", "url": "dashboard-payments-refunds", "module": "payments", "action": "refunds_view"},
             {"icon": "bi-broadcast", "label": "Webhooks / IPN", "url": "dashboard-payments-webhooks", "module": "payments", "action": "webhooks"},

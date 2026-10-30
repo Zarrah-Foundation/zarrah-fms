@@ -10,9 +10,12 @@
     <h1 class="dash-page-title">{% trans "Payment Management" %}</h1>
     <p class="mt-1 text-sm text-ink-light">{% trans "Gateway health, recurring status, and operational controls." %}</p>
   </div>
-  {% if can_configure %}
-  <a href="{% url 'dashboard-payments-settings' %}" class="btn-secondary btn-sm">{% trans "Settings" %}</a>
-  {% endif %}
+  <div class="flex flex-wrap gap-2">
+    {% if can_configure %}
+    <a href="{% url 'dashboard-payments-recurring-setup' %}" class="btn-secondary btn-sm">{% trans "Recurring setup" %}</a>
+    <a href="{% url 'dashboard-payments-settings' %}" class="btn-secondary btn-sm">{% trans "Settings" %}</a>
+    {% endif %}
+  </div>
 </div>
 
 <div class="mb-6 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
@@ -22,21 +25,91 @@
 
 <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
   <div class="rounded-card border border-border/60 bg-surface p-4">
-    <p class="text-xs uppercase text-ink-light">{% trans "Transactions completed" %}</p>
+    <p class="text-xs uppercase text-ink-light">{% trans "Today's donations" %}</p>
+    <p class="text-2xl font-semibold">৳{{ metrics.donations_today_total|floatformat:0 }}</p>
+    <p class="text-xs text-ink-light">{{ metrics.donations_today_count }} {% trans "completed" %}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "This month's donations" %}</p>
+    <p class="text-2xl font-semibold">৳{{ metrics.donations_month_total|floatformat:0 }}</p>
+    <p class="text-xs text-ink-light">{{ metrics.donations_month_count }} {% trans "completed" %}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Pending transactions" %}</p>
+    <p class="text-2xl font-semibold">{{ txn_stats.pending }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Completed transactions" %}</p>
     <p class="text-2xl font-semibold">{{ txn_stats.completed }}</p>
   </div>
   <div class="rounded-card border border-border/60 bg-surface p-4">
-    <p class="text-xs uppercase text-ink-light">{% trans "Active recurring" %}</p>
+    <p class="text-xs uppercase text-ink-light">{% trans "Failed transactions" %}</p>
+    <p class="text-2xl font-semibold">{{ txn_stats.failed }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Outstanding membership fees" %}</p>
+    <p class="text-2xl font-semibold">৳{{ metrics.outstanding_fees_total|floatformat:0 }}</p>
+    <p class="text-xs text-ink-light">{{ metrics.outstanding_fees_count }} {% trans "open periods" %}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Registration fees collected" %}</p>
+    <p class="text-2xl font-semibold">৳{{ metrics.registration_collected_total|floatformat:0 }}</p>
+    <p class="text-xs text-ink-light"><a class="text-primary hover:underline" href="{% url 'dashboard-payments-registration-fees' %}">{{ metrics.registration_collected_count }} {% trans "completed" %}</a></p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Active recurring donations" %}</p>
     <p class="text-2xl font-semibold">{{ sub_stats.active }}</p>
   </div>
   <div class="rounded-card border border-border/60 bg-surface p-4">
-    <p class="text-xs uppercase text-ink-light">{% trans "Due / overdue" %}</p>
-    <p class="text-2xl font-semibold">{{ due_count }}</p>
+    <p class="text-xs uppercase text-ink-light">{% trans "Active membership Autopay" %}</p>
+    <p class="text-2xl font-semibold">{{ metrics.autopay_active }}</p>
   </div>
   <div class="rounded-card border border-border/60 bg-surface p-4">
-    <p class="text-xs uppercase text-ink-light">{% trans "Open refunds" %}</p>
+    <p class="text-xs uppercase text-ink-light">{% trans "Failed recurring attempts" %}</p>
+    <p class="text-2xl font-semibold">{{ metrics.failed_recurring_charges }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Pending refunds" %}</p>
     <p class="text-2xl font-semibold">{{ refunds_open }}</p>
   </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Processed refunds" %}</p>
+    <p class="text-2xl font-semibold">{{ metrics.refunds_processed }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Webhook / IPN failures" %}</p>
+    <p class="text-2xl font-semibold">{{ webhook_failed }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Due recurring donations" %}</p>
+    <p class="text-2xl font-semibold">{{ due_count }}</p>
+  </div>
+</div>
+
+<h2 class="mb-4 text-lg font-semibold">{% trans "Provider configuration status" %}</h2>
+<div class="mb-8 overflow-x-auto rounded-card border border-border/60 bg-surface">
+  <table class="w-full min-w-[720px] border-collapse text-sm">
+    <thead>
+      <tr class="border-b border-border/60 text-left">
+        <th class="px-3 py-2">{% trans "Provider" %}</th>
+        <th class="px-3 py-2">{% trans "One-time" %}</th>
+        <th class="px-3 py-2">{% trans "Recurring" %}</th>
+        <th class="px-3 py-2">{% trans "Connection" %}</th>
+        <th class="px-3 py-2">{% trans "New subscriptions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for card in setup_cards %}
+      <tr class="border-b border-border/40">
+        <td class="px-3 py-2 font-medium">{{ card.title }}</td>
+        <td class="px-3 py-2">{{ card.one_time_state }}</td>
+        <td class="px-3 py-2">{{ card.recurring_state }}</td>
+        <td class="px-3 py-2">{{ card.connection_state }}</td>
+        <td class="px-3 py-2">{% if card.accepting_new_subscriptions %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 <h2 class="mb-4 text-lg font-semibold">{% trans "Gateway health" %}</h2>

@@ -56,6 +56,16 @@ urlpatterns = [
         name="dashboard-payments-recurring",
     ),
     path(
+        "payments/recurring/setup/",
+        views_payments.payments_recurring_setup,
+        name="dashboard-payments-recurring-setup",
+    ),
+    path(
+        "payments/registration-fees/",
+        views_payments.payments_registration_fees,
+        name="dashboard-payments-registration-fees",
+    ),
+    path(
         "payments/webhooks/",
         views_payments.payments_webhooks,
         name="dashboard-payments-webhooks",

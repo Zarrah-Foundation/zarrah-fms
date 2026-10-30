@@ -5,9 +5,12 @@
 {% block dashboard_content %}
 <div class="dash-page-header"><h1 class="dash-page-title">{% trans "Transactions" %}</h1></div>
 <form method="get" class="mb-4 flex flex-wrap gap-2">
-  <input class="form-input max-w-xs" name="q" value="{{ q }}" placeholder="{% trans 'Search…' %}">
+  <input class="form-input max-w-xs" name="q" value="{{ q }}" placeholder="{% trans 'Reference, name, or gateway id' %}">
+  <input class="form-input max-w-[11rem]" type="date" name="date_from" value="{{ date_from }}" aria-label="{% trans 'From date' %}">
+  <input class="form-input max-w-[11rem]" type="date" name="date_to" value="{{ date_to }}" aria-label="{% trans 'To date' %}">
   <select name="status" class="form-input max-w-xs"><option value="">{% trans "All statuses" %}</option>{% for v,l in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
   <select name="purpose" class="form-input max-w-xs"><option value="">{% trans "All purposes" %}</option><option value="DONATION" {% if purpose == "DONATION" %}selected{% endif %}>Donation</option><option value="MEMBERSHIP_FEE" {% if purpose == "MEMBERSHIP_FEE" %}selected{% endif %}>Membership fee</option><option value="MEMBERSHIP_REG" {% if purpose == "MEMBERSHIP_REG" %}selected{% endif %}>Registration</option></select>
+  <select name="gateway" class="form-input max-w-xs"><option value="">{% trans "All providers" %}</option>{% for v,l in gateway_choices %}<option value="{{ v }}" {% if gateway == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
   <button class="btn-secondary btn-sm">{% trans "Filter" %}</button>
 </form>
 <div class="overflow-x-auto rounded-card border border-border/60 bg-surface">

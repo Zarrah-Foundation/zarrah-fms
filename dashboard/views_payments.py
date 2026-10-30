@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Q, Sum
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -21,6 +23,11 @@ from donations.models import (
     RefundStatus,
     SubscriptionStatus,
     Transaction,
+)
+from donations.payment_center import (
+    operational_metrics,
+    purpose_capability_rows,
+    recurring_setup_cards,
 )
 from donations.payment_ops import log_payment_event
 from donations.provider_capabilities import all_provider_health, provider_capability_matrix
@@ -42,39 +49,23 @@ def _can(request, module, action):
 @require_action("payments", "view")
 def payments_overview(request):
     health = all_provider_health()
-    now = timezone.now()
-    txn_stats = Transaction.objects.aggregate(
-        total=Count("id"),
-        completed=Count("id", filter=Q(status=DonationStatus.COMPLETED)),
-        failed=Count("id", filter=Q(status=DonationStatus.FAILED)),
-        pending=Count("id", filter=Q(status=DonationStatus.PENDING)),
-    )
-    sub_stats = DonationSubscription.objects.aggregate(
-        active=Count("id", filter=Q(status=SubscriptionStatus.ACTIVE)),
-        failed=Count("id", filter=Q(status=SubscriptionStatus.PAYMENT_FAILED)),
-        suspended=Count("id", filter=Q(status=SubscriptionStatus.SUSPENDED)),
-    )
-    due = DonationSubscription.objects.filter(
-        status=SubscriptionStatus.ACTIVE, next_billing__lte=now
-    ).count()
-    webhook_failed = GatewayWebhookEvent.objects.filter(
-        processing_status="FAILED"
-    ).count()
-    refunds_open = RefundRequest.objects.filter(status=RefundStatus.REQUESTED).count()
+    metrics = operational_metrics()
     settings_obj = PaymentSystemSettings.load()
     return render(
         request,
         "dashboard/payments/overview.html",
         {
             "providers": health,
-            "txn_stats": txn_stats,
-            "sub_stats": sub_stats,
-            "due_count": due,
-            "webhook_failed": webhook_failed,
-            "refunds_open": refunds_open,
+            "metrics": metrics,
+            "txn_stats": metrics["txn_stats"],
+            "sub_stats": metrics["sub_stats"],
+            "due_count": metrics["due_count"],
+            "webhook_failed": metrics["webhook_failed"],
+            "refunds_open": metrics["refunds_pending"],
             "payment_settings": settings_obj,
             "live_validation_pending": True,
             "can_configure": _can(request, "payments", "configuration"),
+            "setup_cards": recurring_setup_cards(),
         },
     )
 
@@ -124,6 +115,16 @@ def payments_settings(request):
     )
 
 
+def _parse_filter_date(raw: str):
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    try:
+        return datetime.date.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
 @login_required
 @require_action("payments", "transactions_view")
 def payments_transactions(request):
@@ -132,12 +133,16 @@ def payments_transactions(request):
     status = request.GET.get("status") or ""
     purpose = request.GET.get("purpose") or ""
     gateway = request.GET.get("gateway") or ""
+    date_from = _parse_filter_date(request.GET.get("date_from") or "")
+    date_to = _parse_filter_date(request.GET.get("date_to") or "")
     if q:
         qs = qs.filter(
             Q(tran_id__icontains=q)
             | Q(cus_name__icontains=q)
             | Q(cus_email__icontains=q)
             | Q(bank_tran_id__icontains=q)
+            | Q(val_id__icontains=q)
+            | Q(session_id__icontains=q)
         )
     if status:
         qs = qs.filter(status=status)
@@ -145,6 +150,10 @@ def payments_transactions(request):
         qs = qs.filter(purpose=purpose)
     if gateway:
         qs = qs.filter(gateway=gateway)
+    if date_from:
+        qs = qs.filter(created_at__date__gte=date_from)
+    if date_to:
+        qs = qs.filter(created_at__date__lte=date_to)
     page = Paginator(qs, 25).get_page(request.GET.get("page"))
     return render(
         request,
@@ -156,7 +165,10 @@ def payments_transactions(request):
             "status": status,
             "purpose": purpose,
             "gateway": gateway,
+            "date_from": date_from.isoformat() if date_from else "",
+            "date_to": date_to.isoformat() if date_to else "",
             "status_choices": DonationStatus.choices,
+            "gateway_choices": PaymentMethod.choices,
             "can_refund": _can(request, "payments", "refunds_request"),
         },
     )
@@ -260,6 +272,7 @@ def payments_recurring(request):
             "status_choices": SubscriptionStatus.choices,
             "autopays": autopays,
             "type_filter": "donation",
+            "can_configure": _can(request, "payments", "configuration"),
         },
     )
 
@@ -374,6 +387,49 @@ def payments_logs(request):
 
 
 @login_required
+@require_action("payments", "configuration")
+def payments_recurring_setup(request):
+    """Administrator control center for recurring provider readiness.
+
+    Shows configuration and verification state only. Secret fields stay write-only
+    on the payment-method configure form and are not rendered here.
+    """
+    return render(
+        request,
+        "dashboard/payments/recurring_setup.html",
+        {
+            "cards": recurring_setup_cards(),
+            "live_validation_pending": True,
+        },
+    )
+
+
+@login_required
+@require_action("payments", "view")
+def payments_registration_fees(request):
+    from members.models import MembershipRegistrationFee
+
+    qs = MembershipRegistrationFee.objects.select_related("member").order_by("-created_at")
+    status = request.GET.get("status") or ""
+    if status:
+        qs = qs.filter(status=status)
+    page = Paginator(qs, 25).get_page(request.GET.get("page"))
+    collected = operational_metrics()
+    return render(
+        request,
+        "dashboard/payments/registration_fees.html",
+        {
+            "page_obj": page,
+            "fees": page,
+            "status": status,
+            "status_choices": DonationStatus.choices,
+            "collected_total": collected["registration_collected_total"],
+            "collected_count": collected["registration_collected_count"],
+        },
+    )
+
+
+@login_required
 @require_action("payments", "view")
 def payments_capabilities(request):
     return render(
@@ -381,6 +437,7 @@ def payments_capabilities(request):
         "dashboard/payments/capabilities.html",
         {
             "matrix": provider_capability_matrix(),
+            "purpose_rows": purpose_capability_rows(),
             "live_validation_pending": True,
         },
     )

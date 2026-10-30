@@ -98,7 +98,15 @@ With `DEBUG=False`, defaults expect:
 
 ## 7b. Payment Management Center
 
-Dashboard → **Payment Management**: Overview, Payment Methods, Recurring, Donations, Membership Fees, Transactions, Refunds, Webhooks/IPN, Payment Logs, Settings, Capabilities.
+Dashboard → **Payment Management**: Overview, Payment Methods, **Recurring Payment Setup**, Recurring Payments (subscription list), Donations, Membership Fees, Registration Fees, Transactions, Refunds, Webhooks/IPN, Payment Logs, Settings, Capabilities.
+
+Recurring Payment Setup (`/dashboard/payments/recurring/setup/`) is the administrator checklist for SSLCommerz recurring, bKash subscription, and Nagad. It shows capability states and whether a secret is stored. It never renders store passwords, SALT keys, app secrets, or API passwords. The SSLCommerz connection test lives on Payment Methods → Configure and does not create a payment.
+
+Capability states used on that page:
+
+`NOT_IMPLEMENTED` · `NOT_CONFIGURED` · `CONFIGURED` · `PENDING_MERCHANT_APPROVAL` · `VERIFIED_IN_SANDBOX` · `VERIFIED_IN_PRODUCTION` · `ENABLED` · `DISABLED` · `FAILED`
+
+bKash and Nagad recurring stay `NOT_IMPLEMENTED` until the Foundation receives the official merchant API contract and approval. Direct one-time bKash/Nagad checkout is also not wired; public online checkout remains SSLCommerz.
 
 ### Provider matrix (honest states)
 
@@ -136,6 +144,8 @@ After deploy: `python manage.py seed_rbac` then `python manage.py migrate`.
 ```bash
 0 * * * * ... manage.py charge_due_subscriptions   # reconcile only
 # membership MOCK autopay: do not enable on production
+# There is no separate process_recurring_donations command.
+# charge_due_subscriptions is the reconcile-only job. It must not invent card charges.
 ```
 
 Public HTTPS is mandatory for real SSLCommerz / bKash / Nagad callbacks.

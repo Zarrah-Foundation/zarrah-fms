@@ -1,0 +1,52 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Registration Fees" %}{% endblock %}
+{% block topbar_title %}{% trans "Registration Fees" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "Registration Fees" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "One-time membership registration liabilities. These are separate from monthly fees." %}</p>
+  </div>
+</div>
+<div class="mb-4 grid gap-4 sm:grid-cols-2">
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Collected" %}</p>
+    <p class="text-2xl font-semibold">৳{{ collected_total|floatformat:0 }}</p>
+    <p class="text-xs text-ink-light">{{ collected_count }} {% trans "completed" %}</p>
+  </div>
+</div>
+<form method="get" class="mb-4 flex flex-wrap gap-2">
+  <select name="status" class="form-input max-w-xs">
+    <option value="">{% trans "All statuses" %}</option>
+    {% for v,l in status_choices %}
+    <option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn-secondary btn-sm">{% trans "Filter" %}</button>
+</form>
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>{% trans "Member" %}</th>
+        <th>{% trans "Amount" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Paid" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fee in fees %}
+      <tr>
+        <td>{{ fee.member.member_id }}</td>
+        <td>৳{{ fee.amount|floatformat:0 }}</td>
+        <td>{{ fee.get_status_display }}</td>
+        <td>{% if fee.paid_at %}{{ fee.paid_at|date:"j M Y" }}{% else %}—{% endif %}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">{% trans "No registration fees." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

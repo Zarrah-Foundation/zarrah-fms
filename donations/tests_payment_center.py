@@ -193,3 +193,126 @@ class PaymentSettingsGateTests(TestCase):
         s.recurring_donation_enabled = False
         s.save()
         self.assertFalse(PaymentSystemSettings.load().recurring_donation_enabled)
+
+
+@override_settings(
+    SSLCOMMERZ_STORE_ID="store-public",
+    SSLCOMMERZ_STORE_PASSWORD="STORE-PASSWORD-DO-NOT-LEAK",
+    SSLCOMMERZ_IS_SANDBOX=True,
+    SSLCOMMERZ_SALT_KEY="SALT-SECRET-VALUE-DO-NOT-LEAK",
+    SSLCOMMERZ_RECURRING_PLAN_REFER="plan-public-ref",
+    SITE_URL="https://staging.example.org",
+)
+class RecurringSetupCenterTests(TestCase):
+    def setUp(self):
+        self.super = _user("setup-sa@example.com", role=Role.SUPER_ADMIN, superuser=True)
+        self.member = _user("setup-member@example.com", role=Role.MEMBER)
+        PaymentMethodConfig.objects.update_or_create(
+            method=PaymentMethod.BKASH,
+            defaults={
+                "is_enabled": True,
+                "api_app_key": "bkash-app-key-public",
+                "encrypted_api_secret": "BKASH-APP-SECRET-DO-NOT-LEAK",
+                "api_username": "bkash-user",
+                "encrypted_api_password": "BKASH-API-PASSWORD-DO-NOT-LEAK",
+            },
+        )
+
+    def test_member_cannot_open_setup(self):
+        self.client.force_login(self.member)
+        response = self.client.get(reverse("dashboard-payments-recurring-setup"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_setup_page_hides_secrets_and_marks_unimplemented_wallets(self):
+        self.client.force_login(self.super)
+        response = self.client.get(reverse("dashboard-payments-recurring-setup"))
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode()
+        self.assertIn("Recurring Payment Setup", body)
+        self.assertIn("NOT_IMPLEMENTED", body)
+        self.assertIn("plan-public-ref", body)
+        self.assertIn("https://staging.example.org/donation/recurring/ipn/", body)
+        self.assertNotIn("STORE-PASSWORD-DO-NOT-LEAK", body)
+        self.assertNotIn("SALT-SECRET-VALUE-DO-NOT-LEAK", body)
+        self.assertNotIn("BKASH-APP-SECRET-DO-NOT-LEAK", body)
+        self.assertNotIn("BKASH-API-PASSWORD-DO-NOT-LEAK", body)
+        for card in response.context["cards"]:
+            blob = str(card)
+            self.assertNotIn("DO-NOT-LEAK", blob)
+            if card["method"] == PaymentMethod.BKASH:
+                self.assertEqual(card["recurring_state"], "NOT_IMPLEMENTED")
+                self.assertEqual(card["one_time_state"], "NOT_IMPLEMENTED")
+                self.assertFalse(card["accepting_new_subscriptions"])
+                self.assertTrue(card["has_api_secret"])
+            if card["method"] == PaymentMethod.NAGAD:
+                self.assertEqual(card["recurring_state"], "NOT_IMPLEMENTED")
+            if card["method"] == PaymentMethod.SSLCOMMERZ:
+                self.assertEqual(card["recurring_state"], "CONFIGURED")
+                self.assertTrue(card["has_salt"])
+                self.assertTrue(card["accepting_new_subscriptions"])
+
+    def test_capabilities_page_is_purpose_specific(self):
+        self.client.force_login(self.super)
+        response = self.client.get(reverse("dashboard-payments-capabilities"))
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode()
+        self.assertIn("Donation one-time", body)
+        self.assertIn("Membership Autopay", body)
+        bkash = next(row for row in response.context["purpose_rows"] if row["method"] == "BKASH")
+        self.assertEqual(bkash["donation_recurring"], "NOT_IMPLEMENTED")
+        self.assertEqual(bkash["membership_autopay"], "NOT_IMPLEMENTED")
+        self.assertFalse(bkash["donation_one_time_live"])
+
+    def test_overview_uses_database_totals(self):
+        txn = _txn(amount=80, status=DonationStatus.COMPLETED)
+        pending = _txn(amount=15, status=DonationStatus.PENDING)
+        from donations.models import DonationCategory
+
+        category = DonationCategory.objects.create(
+            name_bn="সাধারণ",
+            name_en="General",
+            slug="general-setup",
+        )
+        from donations.models import Donation
+
+        Donation.objects.create(
+            donor_name="A",
+            amount=80,
+            category=category,
+            status=DonationStatus.COMPLETED,
+            transaction=txn,
+        )
+        self.client.force_login(self.super)
+        response = self.client.get(reverse("dashboard-payments"))
+        self.assertEqual(response.status_code, 200)
+        metrics = response.context["metrics"]
+        self.assertEqual(metrics["donations_today_total"], 80)
+        self.assertEqual(metrics["donations_today_count"], 1)
+        self.assertGreaterEqual(metrics["txn_stats"]["pending"], 1)
+        self.assertEqual(pending.status, DonationStatus.PENDING)
+        self.assertNotIn("STORE-PASSWORD-DO-NOT-LEAK", response.content.decode())
+
+    def test_transaction_filters_by_date_gateway_and_reference(self):
+        keep = _txn(gateway=PaymentMethod.SSLCOMMERZ, bank_tran_id="GW-KEEP-99")
+        drop = _txn(gateway=PaymentMethod.CASH, bank_tran_id="GW-DROP-11")
+        Transaction.objects.filter(pk=drop.pk).update(created_at="2020-01-02T00:00:00Z")
+        self.client.force_login(self.super)
+        response = self.client.get(
+            reverse("dashboard-payments-transactions"),
+            {"q": "GW-KEEP-99", "gateway": PaymentMethod.SSLCOMMERZ},
+        )
+        self.assertEqual(response.status_code, 200)
+        rows = list(response.context["transactions"])
+        self.assertEqual([row.pk for row in rows], [keep.pk])
+        dated = self.client.get(
+            reverse("dashboard-payments-transactions"),
+            {"date_from": "2020-01-01", "date_to": "2020-01-03", "gateway": PaymentMethod.CASH},
+        )
+        self.assertEqual([row.pk for row in dated.context["transactions"]], [drop.pk])
+
+    def test_registration_fee_page_requires_login(self):
+        response = self.client.get(reverse("dashboard-payments-registration-fees"))
+        self.assertEqual(response.status_code, 302)
+        self.client.force_login(self.super)
+        opened = self.client.get(reverse("dashboard-payments-registration-fees"))
+        self.assertEqual(opened.status_code, 200)

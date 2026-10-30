@@ -51,6 +51,37 @@
     </tbody>
   </table>
 </div>
+<h2 class="mb-3 mt-8 text-lg font-semibold">{% trans "By purpose" %}</h2>
+<p class="mb-3 text-sm text-muted">{% trans "Direct bKash and Nagad stay unimplemented until their own merchant contracts are wired. A wallet inside SSLCommerz hosted checkout is not counted here." %}</p>
+<div class="overflow-x-auto">
+  <table class="w-full min-w-[960px] border-collapse text-sm">
+    <thead>
+      <tr class="border-b border-border/60 text-left">
+        <th class="px-3 py-2">{% trans "Provider" %}</th>
+        <th class="px-3 py-2">{% trans "Donation one-time" %}</th>
+        <th class="px-3 py-2">{% trans "Donation recurring" %}</th>
+        <th class="px-3 py-2">{% trans "Membership one-time" %}</th>
+        <th class="px-3 py-2">{% trans "Membership Autopay" %}</th>
+        <th class="px-3 py-2">{% trans "Refund" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in purpose_rows %}
+      <tr class="border-b border-border/40 align-top">
+        <td class="px-3 py-3 font-semibold">{{ row.label }}</td>
+        <td class="px-3 py-3">{{ row.donation_one_time }}{% if row.donation_one_time_live %} · {% trans "checkout open" %}{% endif %}</td>
+        <td class="px-3 py-3">{{ row.donation_recurring }}{% if row.donation_recurring_live %} · {% trans "accepting new" %}{% endif %}</td>
+        <td class="px-3 py-3">{{ row.membership_one_time }}{% if row.membership_one_time_live %} · {% trans "checkout open" %}{% endif %}</td>
+        <td class="px-3 py-3">{{ row.membership_autopay }}{% if row.autopay_mode == "MOCK" %} · MOCK{% endif %}</td>
+        <td class="px-3 py-3">{{ row.refund }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="mt-3 text-xs text-muted">
+  {% trans "Separate marks: code implemented, credentials configured, merchant approval, sandbox tested, and production verified. They are not the same state." %}
+</p>
 {% for row in matrix %}
 {% if row.notes %}
 <article class="mt-4 rounded-lg border border-border/60 bg-surface px-4 py-3 text-sm">

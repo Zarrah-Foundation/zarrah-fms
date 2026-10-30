@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 from PIL import Image
 
 from accounts.models import Role
@@ -14,6 +15,8 @@ from members.models import (
     ApplicationDocumentRequest,
     ApplicationEvent,
     ApplicationStatus,
+    Member,
+    MemberStatus,
 )
 from members.services import (
     create_application_as_admin,
@@ -136,6 +139,40 @@ class TransitionTests(TestCase):
         transition_application(app, ApplicationStatus.APPROVED, self.admin)
         with self.assertRaises(TransitionError):
             transition_application(app, ApplicationStatus.UNDER_REVIEW, self.admin)
+
+    def test_approve_links_existing_account_without_resetting_password(self):
+        existing = User.objects.create_user(
+            email="linked@example.com",
+            password="keep-this-password",
+            role=Role.DONOR,
+        )
+        existing.email_verified = timezone.now()
+        existing.save(update_fields=["email_verified"])
+        app = make_application(email="linked@example.com", phone="01766666666")
+        member = transition_application(app, ApplicationStatus.APPROVED, self.admin)
+        existing.refresh_from_db()
+        self.assertEqual(member.user_id, existing.pk)
+        self.assertTrue(existing.check_password("keep-this-password"))
+        self.assertEqual(existing.role, Role.MEMBER)
+        self.assertEqual(member.status, MemberStatus.APPROVED)
+
+    def test_approve_refuses_email_that_already_has_a_member(self):
+        existing = User.objects.create_user(
+            email="taken@example.com", password="Str0ngPass!23", role=Role.MEMBER
+        )
+        Member.objects.create(
+            member_id="ZF-2026-08888",
+            user=existing,
+            first_name="Taken",
+            last_name="Member",
+            phone="01888888888",
+            present_address="Road",
+            district="Dhaka",
+            status=MemberStatus.APPROVED,
+        )
+        app = make_application(email="taken@example.com", phone="01777777777")
+        with self.assertRaises(TransitionError):
+            transition_application(app, ApplicationStatus.APPROVED, self.admin)
 
 
 class AdminCreateFormTests(TestCase):

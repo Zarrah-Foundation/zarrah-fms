@@ -36,6 +36,23 @@ class FAQFrontendTests(TestCase):
 
 
 class ContactPageTests(TestCase):
+    def test_contact_form_is_stored(self):
+        from community.models import ContactMessage
+
+        response = self.client.post(
+            reverse("contact"),
+            {
+                "name": "Rina",
+                "email": "rina@example.com",
+                "subject": "Hello",
+                "message": "I would like to help.",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            ContactMessage.objects.filter(email="rina@example.com", subject="Hello").exists()
+        )
+
     def test_contact_shows_registration_and_safe_map(self):
         settings = SiteSettings.load()
         settings.registration_number = "S-15000/2026"

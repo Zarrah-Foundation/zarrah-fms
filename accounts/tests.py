@@ -5,7 +5,8 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from accounts.models import User
+from accounts.models import Role, User
+from members.models import Member, MemberStatus
 from accounts.verification import (
     can_resend_verification,
     issue_email_verify_token,
@@ -32,6 +33,29 @@ class EmailVerificationTests(TestCase):
         user = User.objects.get(email="new@example.com")
         self.assertIsNone(user.email_verified)
         self.assertTrue(user.email_verify_token)
+
+    def test_suspended_member_cannot_login(self):
+        user = User.objects.create_user(
+            email="suspended@example.com", password="Str0ngPass!23", role=Role.MEMBER
+        )
+        user.email_verified = timezone.now()
+        user.save(update_fields=["email_verified"])
+        Member.objects.create(
+            member_id="ZF-2026-00077",
+            user=user,
+            first_name="Sus",
+            last_name="Pended",
+            phone="01722222222",
+            present_address="Road",
+            district="Dhaka",
+            status=MemberStatus.SUSPENDED,
+        )
+        response = self.client.post(
+            reverse("login"),
+            {"username": "suspended@example.com", "password": "Str0ngPass!23"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
 
     def test_unverified_cannot_login(self):
         user = User.objects.create_user(email="u@example.com", password="Str0ngPass!23")

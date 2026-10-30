@@ -82,6 +82,14 @@ class LoginForm(AuthenticationForm):
                         "Check your inbox or request a new verification link."
                     )
                 )
+            from members.models import Member, MemberStatus
+
+            try:
+                profile = self.user_cache.member_profile
+            except Member.DoesNotExist:
+                profile = None
+            if profile is not None and profile.status == MemberStatus.SUSPENDED:
+                raise forms.ValidationError(_("This membership is suspended."))
         return self.cleaned_data
 
 

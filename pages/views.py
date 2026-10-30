@@ -1,5 +1,9 @@
+import logging
+
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
 from django.views.generic import FormView, TemplateView
 
 from core.maps import resolve_maps_embed_url
@@ -98,7 +102,6 @@ class ContactView(FormView):
         return context
 
     def form_valid(self, form):
-        form.send_email()
         data = form.cleaned_data
         try:
             from community.models import ContactMessage
@@ -107,6 +110,11 @@ class ContactView(FormView):
                 name=data["name"], email=data["email"],
                 subject=data["subject"], message=data["message"],
             )
+        except Exception:
+            logger.exception("Could not store contact message")
+            messages.error(self.request, _("Your message could not be saved. Please try again."))
+            return self.form_invalid(form)
+        try:
             from audit.notifications import ADMIN_ROLES, NotificationType, notify_roles
 
             notify_roles(
@@ -117,7 +125,11 @@ class ContactView(FormView):
                 related_object=msg,
             )
         except Exception:
-            pass
+            logger.exception("Contact notification failed")
+        try:
+            form.send_email()
+        except Exception:
+            logger.exception("Contact email failed")
         from core.templatetags.i18n_extras import zf_text
 
         messages.success(
@@ -133,7 +145,6 @@ class VolunteerView(FormView):
     success_url = "/volunteer/"
 
     def form_valid(self, form):
-        form.send_email()
         data = form.cleaned_data
         try:
             from community.models import Volunteer
@@ -142,6 +153,11 @@ class VolunteerView(FormView):
                 name=data["name"], email=data["email"],
                 phone=data["phone"], message=data.get("message", ""),
             )
+        except Exception:
+            logger.exception("Could not store volunteer registration")
+            messages.error(self.request, _("Your registration could not be saved. Please try again."))
+            return self.form_invalid(form)
+        try:
             from audit.notifications import ADMIN_ROLES, NotificationType, notify_roles
 
             notify_roles(
@@ -152,6 +168,10 @@ class VolunteerView(FormView):
                 related_object=vol,
             )
         except Exception:
-            pass
+            logger.exception("Volunteer notification failed")
+        try:
+            form.send_email()
+        except Exception:
+            logger.exception("Volunteer email failed")
         messages.success(self.request, _("Thank you for your interest in volunteering!"))
         return super().form_valid(form)

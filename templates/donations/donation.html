@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras static %}
+
+{% block title %}{% zf_label "Donation" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="legal-hero" aria-labelledby="donation-hero-heading">
+  <div class="container-app legal-hero__inner">
+    <nav aria-label="{% zf_label 'Breadcrumb' %}" class="legal-breadcrumb">
+      <a href="{% url 'home' %}">{% zf_label "Home" %}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{% zf_label "Donation" %}</span>
+    </nav>
+    <p class="legal-hero__eyebrow">{% zf_label "Support Our Work" %}</p>
+    <h1 id="donation-hero-heading" class="legal-hero__title">{% zf_label "Make a Donation" %}</h1>
+    <p class="legal-hero__lead">
+      {% zf_label "Your contribution helps Zarrah Foundation serve communities with compassion, transparency and care." %}
+    </p>
+    {% if show_recurring_option %}
+    <div class="zf-gift-modes" role="group" aria-label="{% zf_label 'Donation' %}">
+      <span class="zf-gift-mode is-active">{% zf_label "One-time Donation" %}</span>
+      <a href="{% url 'donation-recurring' %}" class="zf-gift-mode">
+        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+        {% zf_label "Recurring Donation" %}
+      </a>
+    </div>
+    {% else %}
+    <div class="zf-gift-modes">
+      <span class="zf-gift-mode is-active">{% zf_label "One-time Donation" %}</span>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="zf-public-stack bg-canvas">
+  <div class="container-app">
+  {% if categories %}
+  <div class="mb-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {% for category in categories %}
+    <article class="card flex flex-col{% if category.is_featured %} ring-2 ring-primary/20{% endif %}">
+      {% if category.image %}
+      <img src="{{ category.image.url }}" alt="" class="mb-4 h-40 w-full rounded-xl object-cover">
+      {% else %}
+      <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 text-2xl text-primary">
+        <i class="bi {{ category.icon|default:'bi-heart-fill' }}" aria-hidden="true"></i>
+      </div>
+      {% endif %}
+      <h2 class="text-lg font-semibold text-ink">
+        {% if LANGUAGE_CODE == 'bn' %}{{ category.name_bn }}{% else %}{{ category.name_en }}{% endif %}
+      </h2>
+      {% if category.description_bn or category.description_en %}
+      <p class="mt-2 flex-1 text-sm text-ink-light">
+        {% if LANGUAGE_CODE == 'bn' %}{{ category.description_bn }}{% else %}{{ category.description_en }}{% endif %}
+      </p>
+      {% endif %}
+      {% with amounts=category.quick_amounts.all %}
+      {% if amounts %}
+      <div class="mt-4 flex flex-wrap gap-2">
+        {% for qa in amounts %}
+        <span class="rounded-lg border border-border bg-canvas px-2.5 py-1 text-xs font-semibold text-ink-light">
+          ৳{{ qa.amount|floatformat:0 }}
+        </span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+      <a href="{% url 'donation-create' %}?category={{ category.pk }}"
+         class="btn-primary mt-5 inline-flex"
+         data-select-category="{{ category.pk }}">
+        <i class="bi bi-heart-fill" aria-hidden="true"></i>{% zf_label "Donate Now" %}
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="mb-10 text-ink-light">{% zf_label "No donation categories available at this time." %}</p>
+  {% endif %}
+
+  <div class="card mx-auto max-w-3xl">
+    <div class="mb-6 border-b border-border/60 pb-4">
+      <h2 class="text-h4">{% zf_label "Donation Form" %}</h2>
+      <p class="mt-1 text-sm text-ink-light">{% zf_label "Choose a category, pick a suggested amount or enter your own, then proceed to secure payment." %}</p>
+    </div>
+
+    <form id="donation-form" method="post" action="{% url 'donation-create' %}" class="space-y-5" novalidate>
+      {% csrf_token %}
+
+      {% if donation_form.non_field_errors %}
+      <div class="alert-danger" role="alert">
+        {{ donation_form.non_field_errors }}
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="{{ donation_form.category.id_for_label }}">
+          <span class="form-label-text">{{ donation_form.category.label }}</span>
+          <span class="form-required" aria-hidden="true">*</span>
+        </label>
+        {{ donation_form.category }}
+        {% for error in donation_form.category.errors %}
+        <p class="form-error" role="alert">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ donation_form.amount.id_for_label }}">
+          <span class="form-label-text">{% zf_label "Donation Amount" %}</span>
+          <span class="form-required" aria-hidden="true">*</span>
+        </label>
+        <div id="quick-amount-chips" class="mb-3 flex flex-wrap gap-2" hidden aria-live="polite"></div>
+        {{ donation_form.amount }}
+        <p class="form-hint">{% zf_label "Custom Amount" %} — {% zf_label "Select a suggested amount or type any amount in BDT." %}</p>
+        {% for error in donation_form.amount.errors %}
+        <p class="form-error" role="alert">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="form-group form-group-checkbox">
+        <label class="form-checkbox-label" for="{{ donation_form.is_anonymous.id_for_label }}">
+          {{ donation_form.is_anonymous }}
+          <span>{{ donation_form.is_anonymous.label }}</span>
+        </label>
+      </div>
+
+      <fieldset class="space-y-5">
+        <legend class="text-sm font-semibold text-ink">{% zf_label "Donor information" %}</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div class="form-group">
+          <label class="form-label" for="{{ donation_form.donor_name.id_for_label }}">
+            <span class="form-label-text">{{ donation_form.donor_name.label }}</span>
+            <span class="form-required" aria-hidden="true">*</span>
+          </label>
+          {{ donation_form.donor_name }}
+          {% for error in donation_form.donor_name.errors %}<p class="form-error" role="alert">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ donation_form.contact.id_for_label }}">
+            <span class="form-label-text">{{ donation_form.contact.label }}</span>
+            <span class="form-required" aria-hidden="true">*</span>
+          </label>
+          {{ donation_form.contact }}
+          {% if donation_form.contact.help_text %}
+          <p class="form-hint">{{ donation_form.contact.help_text }}</p>
+          {% endif %}
+          {% for error in donation_form.contact.errors %}<p class="form-error" role="alert">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+      </fieldset>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ donation_form.on_behalf_of.id_for_label }}">
+          <span class="form-label-text">{{ donation_form.on_behalf_of.label }}</span>
+          <span class="text-xs font-normal text-ink-light">({% zf_label "optional" %})</span>
+        </label>
+        {{ donation_form.on_behalf_of }}
+        {% for error in donation_form.on_behalf_of.errors %}<p class="form-error" role="alert">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" class="btn-primary">
+          <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>{% zf_label "Pay Now" %}
+        </button>
+        <p class="mt-3 text-xs text-ink-light">
+          {% zf_label "Secure Payment" %} — {% zf_label "You will be redirected to a secure payment page. Payment gateway options will expand as additional providers are enabled." %}
+        </p>
+      </div>
+    </form>
+  </div>
+  </div>
+</section>
+
+<script type="application/json" id="donation-quick-amounts">{{ quick_amounts_json|safe }}</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/donation-form.js' %}"></script>
+{% endblock %}

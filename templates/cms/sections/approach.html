@@ -1,0 +1,31 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section zf-approach" aria-labelledby="home-approach-{{ section.order }}-title">
+  <div class="container-app">
+    <div class="zf-approach__panel">
+      <div class="zf-approach__copy">
+        <p class="zf-home-eyebrow">{% trans "Zarrah Foundation" %}</p>
+        <h2 id="home-approach-{{ section.order }}-title" class="zf-home-title text-left">
+          {{ section|bl:"title" }}
+        </h2>
+        {% if section.content_en or section.content_bn %}
+        <p class="zf-home-lead mt-4 text-left">
+          {{ section|bl:"content" }}
+        </p>
+        {% endif %}
+        {% if section.button_link %}
+        <a href="{{ section.button_link }}" class="btn-primary mt-6 inline-flex">
+          {% if section.button_text_en or section.button_text_bn %}
+            {{ section|bl:"button_text" }}
+          {% else %}
+            {% trans "Learn more" %}
+          {% endif %}
+        </a>
+        {% endif %}
+      </div>
+      <div class="zf-approach__aside" aria-hidden="true">
+        <span class="zf-approach__mark">→</span>
+        <p class="zf-approach__aside-text">{% trans "Non-profit · Non-political · Humanitarian" %}</p>
+      </div>
+    </div>
+  </div>
+</section>

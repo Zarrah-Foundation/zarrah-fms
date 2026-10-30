@@ -1,0 +1,82 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Edit Member" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Edit Member" %}{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'dashboard-member-detail' member.pk %}" class="mb-4 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Back to profile" %}</a>
+
+<div class="mb-6">
+  <h1 class="dash-page-title">{% trans "Edit" %} {{ member.first_name }} {{ member.last_name }}</h1>
+  <p class="mt-1 text-sm text-ink-light"><span lang="en">{{ member.member_id }}</span>
+    {% if not can_edit_sensitive %} · {% trans "Sensitive official fields require elevated permission." %}{% endif %}
+  </p>
+</div>
+
+<form method="post" class="space-y-6" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="rounded-field border border-danger/40 bg-danger/5 p-3 text-sm text-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Identity" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.first_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.last_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.nid_number %}
+      {% include "dashboard/includes/_form_field.html" with field=form.date_of_birth %}
+      {% include "dashboard/includes/_form_field.html" with field=form.gender %}
+      {% include "dashboard/includes/_form_field.html" with field=form.blood_group %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Membership status" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.membership_type %}
+      {% include "dashboard/includes/_form_field.html" with field=form.status %}
+      {% include "dashboard/includes/_form_field.html" with field=form.is_founder %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Contact & address" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.phone %}
+      {% include "dashboard/includes/_form_field.html" with field=form.district %}
+      {% include "dashboard/includes/_form_field.html" with field=form.upazila %}
+      {% include "dashboard/includes/_form_field.html" with field=form.present_address %}
+      {% include "dashboard/includes/_form_field.html" with field=form.permanent_address %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Professional" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.occupation %}
+      {% include "dashboard/includes/_form_field.html" with field=form.organization %}
+      {% include "dashboard/includes/_form_field.html" with field=form.education %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Emergency contact" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.emergency_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.emergency_phone %}
+      {% include "dashboard/includes/_form_field.html" with field=form.emergency_relation %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Change reason" %}</h2>
+    {% include "dashboard/includes/_form_field.html" with field=form.reason %}
+    <p class="mt-2 text-xs text-ink-light">{% trans "Required when changing name, NID, status, membership type, or other official fields." %}</p>
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save changes" %}</button>
+    <a href="{% url 'dashboard-member-detail' member.pk %}" class="btn-secondary">{% trans "Cancel" %}</a>
+  </div>
+</form>
+{% endblock %}

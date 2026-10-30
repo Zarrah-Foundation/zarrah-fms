@@ -1,0 +1,52 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{{ volunteer.name }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Volunteer" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <a href="{% url 'dashboard-volunteers' %}" class="mb-1 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Volunteers" %}</a>
+    <h1 class="dash-page-title">{{ volunteer.name }}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% status_badge volunteer.status volunteer.get_status_display %}</p>
+  </div>
+  {% if can_edit %}
+  <form method="post" action="{% url 'dashboard-volunteer-delete' volunteer.pk %}" onsubmit="return confirm('{% trans "Delete this volunteer?" %}');">
+    {% csrf_token %}
+    <button type="submit" class="btn-danger btn-sm"><i class="bi bi-trash"></i>{% trans "Delete" %}</button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="card-flat lg:col-span-2">
+    <h2 class="mb-3 text-h4">{% trans "Details" %}</h2>
+    <dl class="dash-dl">
+      <div><dt>{% trans "Email" %}</dt><dd><a href="mailto:{{ volunteer.email }}" class="text-primary">{{ volunteer.email }}</a></dd></div>
+      <div><dt>{% trans "Phone" %}</dt><dd>{{ volunteer.phone }}</dd></div>
+      <div><dt>{% trans "Area of interest" %}</dt><dd>{{ volunteer.area_of_interest|default:"—" }}</dd></div>
+      <div><dt>{% trans "Registered" %}</dt><dd>{{ volunteer.created_at|date:"M d, Y H:i" }}</dd></div>
+    </dl>
+    {% if volunteer.message %}
+    <div class="mt-4">
+      <p class="mb-1 text-sm font-semibold text-ink">{% trans "Message" %}</p>
+      <p class="whitespace-pre-line text-sm text-ink-light">{{ volunteer.message }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if can_edit %}
+  <div class="card-flat">
+    <h2 class="mb-3 text-h4">{% trans "Update status" %}</h2>
+    <form method="post" action="{% url 'dashboard-volunteer-status' volunteer.pk %}" class="space-y-3">
+      {% csrf_token %}
+      <select name="status" class="form-select w-full">
+        {% for code, label in statuses %}<option value="{{ code }}" {% if volunteer.status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <button type="submit" class="btn-primary btn-sm w-full"><i class="bi bi-check-lg"></i>{% trans "Save status" %}</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

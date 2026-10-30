@@ -1,0 +1,1004 @@
+{% extends "base.html" %}
+{% load i18n static i18n_extras %}
+
+{% block title %}{% zf_label "Privacy" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{% if LANGUAGE_CODE == 'bn' %}{{ privacy_hero.subtitle_bn }}{% else %}{{ privacy_hero.subtitle_en }}{% endif %}">
+{% endblock %}
+
+{% block og_title %}{% zf_label "Privacy" %} | {{ site_settings.localized_name }}{% endblock %}
+{% block og_description %}{% if LANGUAGE_CODE == 'bn' %}{{ privacy_hero.subtitle_bn }}{% else %}{{ privacy_hero.subtitle_en }}{% endif %}{% endblock %}
+
+{% block extra_head %}
+<style>
+  html { scroll-behavior: smooth; }
+
+  .privacy-doc {
+    --p-primary: #0B6B3A;
+    --p-ink: #1F2937;
+    --p-muted: #6B7280;
+    --p-border: rgba(229, 231, 235, 0.9);
+    --p-canvas: #F7F9F8;
+    --p-radius: 1.25rem;
+  }
+
+  .privacy-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  @media (min-width: 640px) {
+    .privacy-container { padding-left: 1.5rem; padding-right: 1.5rem; }
+  }
+  @media (min-width: 1024px) {
+    .privacy-container {
+      max-width: 1700px;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+    .privacy-container--hero { padding-top: 5.5rem; padding-bottom: 5.5rem; }
+    .privacy-container--body { padding-top: 4.5rem; padding-bottom: 5rem; }
+  }
+  @media (min-width: 1280px) {
+    .privacy-container {
+      max-width: 1760px;
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+  @media (min-width: 1536px) {
+    .privacy-container {
+      max-width: 1800px;
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  .privacy-layout { display: block; }
+  .privacy-toc-aside { display: none; margin-bottom: 2.5rem; }
+  .privacy-toc-mobile { display: block; margin-bottom: 2rem; }
+
+  @media (min-width: 1024px) {
+    .privacy-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .privacy-toc-aside {
+      display: block;
+      grid-column: 1;
+      margin-bottom: 0;
+      min-width: 0;
+      position: sticky;
+      top: 96px;
+      align-self: start;
+      z-index: 5;
+    }
+    .privacy-toc-mobile { display: none; }
+    .privacy-doc .privacy-main { grid-column: 2; }
+  }
+  @media (min-width: 1280px) {
+    .privacy-layout { grid-template-columns: 300px minmax(0, 1fr); gap: 3rem; }
+  }
+  @media (min-width: 1536px) {
+    .privacy-layout { grid-template-columns: 320px minmax(0, 1fr); gap: 3.5rem; }
+  }
+
+  .privacy-doc .privacy-main {
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+  @media (min-width: 1024px) {
+    .privacy-doc .privacy-main { gap: 2rem; }
+  }
+
+  /* Scrollable TOC panel (GitHub Docs pattern: sticky aside + overflow nav) */
+  .privacy-toc {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.15rem 1rem 1.25rem;
+    border-radius: 1.15rem;
+    border: 1px solid var(--p-border);
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(0,0,0,.04);
+  }
+  .privacy-toc-progress {
+    height: 3px;
+    margin: 0 0 0.85rem;
+    border-radius: 999px;
+    background: rgba(11, 107, 58, 0.1);
+    overflow: hidden;
+  }
+  .privacy-toc-progress > span {
+    display: block;
+    height: 100%;
+    width: 8%;
+    border-radius: inherit;
+    background: var(--p-primary);
+    transition: width 0.25s ease;
+  }
+  .privacy-toc-label {
+    margin: 0 0 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--p-muted);
+  }
+  .privacy-toc a[data-privacy-toc] {
+    display: block;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.65rem;
+    text-decoration: none;
+    color: var(--p-ink);
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .privacy-toc a[data-privacy-toc]:hover {
+    background: rgba(11, 107, 58, 0.06);
+    color: var(--p-primary);
+  }
+  .privacy-toc a[aria-current="true"] {
+    background: rgba(11, 107, 58, 0.1);
+    color: var(--p-primary);
+  }
+  .privacy-toc a[data-privacy-toc] .toc-bn {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .privacy-toc a[data-privacy-toc] .toc-en {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.68rem;
+    opacity: 0.8;
+    line-height: 1.3;
+  }
+
+  /* Mobile TOC accordion */
+  .privacy-accordion {
+    border-radius: 1rem;
+    border: 1px solid var(--p-border);
+    background: #fff;
+    overflow: hidden;
+  }
+  .privacy-accordion > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.15rem;
+    cursor: pointer;
+    list-style: none;
+  }
+  .privacy-accordion > summary::-webkit-details-marker { display: none; }
+  .privacy-accordion .privacy-chevron { transition: transform 0.2s ease; }
+  .privacy-accordion[open] .privacy-chevron { transform: rotate(180deg); }
+  .privacy-accordion-panel { padding: 0 0.75rem 1rem; }
+
+  /* Bilingual */
+  .privacy-bilingual {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+  }
+  @media (min-width: 768px) {
+    .privacy-bilingual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 2.5rem;
+      align-items: start;
+    }
+    .privacy-bilingual .privacy-lang-divider { display: none; }
+    .privacy-bilingual .privacy-lang--en {
+      border-left: 1px solid rgba(229, 231, 235, 0.95);
+      padding-left: 2rem;
+    }
+  }
+  .privacy-lang { padding: 0.65rem 0 0.1rem; }
+  .privacy-lang-label {
+    display: inline-block;
+    margin-bottom: 0.4rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--p-primary);
+  }
+  .privacy-lang--en .privacy-lang-label { color: #64748b; }
+  .privacy-lang-text {
+    margin: 0;
+    font-size: 1.02rem;
+    line-height: 1.8;
+    color: var(--p-ink);
+  }
+  .privacy-lang--en .privacy-lang-text {
+    font-size: 0.96rem;
+    line-height: 1.75;
+    color: #4b5563;
+  }
+  .privacy-lang-text--lead { font-size: 1.1rem; line-height: 1.85; }
+  .privacy-lang--en .privacy-lang-text--lead { font-size: 1.02rem; }
+  .privacy-lang-text--sm { font-size: 0.92rem; line-height: 1.7; }
+  .privacy-lang-divider {
+    height: 1px;
+    margin: 0.85rem 0;
+    background: linear-gradient(90deg, rgba(11,107,58,0.25), transparent);
+  }
+
+  /* Compact bilingual (category / use cards) stays stacked */
+  .privacy-item-card .privacy-bilingual,
+  .privacy-principle .privacy-bilingual {
+    display: flex;
+    flex-direction: column;
+  }
+  .privacy-item-card .privacy-lang-divider,
+  .privacy-principle .privacy-lang-divider { display: block; }
+  .privacy-item-card .privacy-lang--en,
+  .privacy-principle .privacy-lang--en {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  /* Cards */
+  .privacy-card {
+    border-radius: var(--p-radius);
+    border: 1px solid var(--p-border);
+    background: #fff;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, 0.04);
+    padding: 1.5rem 1.4rem;
+  }
+  @media (min-width: 1024px) {
+    .privacy-card { padding: 1.85rem 2rem; }
+  }
+  .privacy-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-bottom: 1.15rem;
+  }
+  .privacy-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    flex-shrink: 0;
+    border-radius: 0.85rem;
+    background: rgba(11, 107, 58, 0.1);
+    color: var(--p-primary);
+    font-size: 1.15rem;
+  }
+  .privacy-card-title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--p-ink);
+    letter-spacing: -0.02em;
+  }
+  .privacy-card-title-en {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--p-muted);
+  }
+
+  /* Principles */
+  .privacy-principles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+  @media (min-width: 640px) {
+    .privacy-principles { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  }
+  @media (min-width: 1280px) {
+    .privacy-principles { grid-template-columns: repeat(4, 1fr); gap: 1.15rem; }
+  }
+  .privacy-principle {
+    height: 100%;
+    padding: 1.25rem 1.2rem;
+    border-radius: 1.1rem;
+    border: 1px solid var(--p-border);
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .privacy-principle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+  }
+  .privacy-principle-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    margin-bottom: 0.85rem;
+    border-radius: 999px;
+    background: rgba(11, 107, 58, 0.1);
+    color: var(--p-primary);
+    font-size: 1.05rem;
+  }
+  .privacy-principle h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--p-ink);
+  }
+  .privacy-principle h3 span[lang="en"] {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--p-muted);
+  }
+  .privacy-principle .privacy-lang-text { font-size: 0.9rem; line-height: 1.65; }
+  .privacy-principle .privacy-lang--en .privacy-lang-text { font-size: 0.85rem; }
+
+  /* Item grids */
+  .privacy-item-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    margin-top: 1.15rem;
+  }
+  @media (min-width: 640px) {
+    .privacy-item-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  }
+  @media (min-width: 1280px) {
+    .privacy-item-grid--3 { grid-template-columns: repeat(3, 1fr); }
+  }
+  .privacy-item-card {
+    height: 100%;
+    padding: 1.15rem 1.15rem 1.2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--p-border);
+    background: var(--p-canvas);
+  }
+  .privacy-item-card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.55rem;
+  }
+  .privacy-item-card-head i {
+    color: var(--p-primary);
+    font-size: 1.05rem;
+  }
+  .privacy-item-card h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--p-ink);
+  }
+  .privacy-item-card h3 span[lang="en"] {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--p-muted);
+  }
+
+  /* Callouts */
+  .privacy-callout {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    margin-top: 1.15rem;
+    padding: 1rem 1.1rem;
+    border-radius: 0.95rem;
+    border: 1px solid transparent;
+  }
+  .privacy-callout-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    font-size: 0.95rem;
+  }
+  .privacy-callout-title {
+    margin: 0 0 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .privacy-callout--info {
+    border-color: rgba(37, 99, 235, 0.18);
+    background: rgba(37, 99, 235, 0.05);
+  }
+  .privacy-callout--info .privacy-callout-icon,
+  .privacy-callout--info .privacy-callout-title { color: #2563EB; }
+  .privacy-callout--info .privacy-callout-icon { background: rgba(37, 99, 235, 0.1); }
+  .privacy-callout--legal {
+    border-color: rgba(11, 107, 58, 0.2);
+    background: rgba(11, 107, 58, 0.05);
+  }
+  .privacy-callout--legal .privacy-callout-icon,
+  .privacy-callout--legal .privacy-callout-title { color: var(--p-primary); }
+  .privacy-callout--legal .privacy-callout-icon { background: rgba(11, 107, 58, 0.1); }
+  .privacy-callout--rights {
+    border-color: rgba(212, 160, 23, 0.28);
+    background: rgba(212, 160, 23, 0.08);
+  }
+  .privacy-callout--rights .privacy-callout-icon,
+  .privacy-callout--rights .privacy-callout-title { color: #A16207; }
+  .privacy-callout--rights .privacy-callout-icon { background: rgba(212, 160, 23, 0.15); }
+  .privacy-callout--security {
+    border-color: rgba(15, 118, 110, 0.22);
+    background: rgba(15, 118, 110, 0.06);
+  }
+  .privacy-callout--security .privacy-callout-icon,
+  .privacy-callout--security .privacy-callout-title { color: #0F766E; }
+  .privacy-callout--security .privacy-callout-icon { background: rgba(15, 118, 110, 0.12); }
+  .privacy-callout .privacy-bilingual { margin-top: 0.15rem; }
+  .privacy-callout .privacy-lang-text { font-size: 0.92rem; }
+  .privacy-callout .privacy-lang--en .privacy-lang-text { font-size: 0.88rem; }
+
+  /* Hero */
+  .privacy-hero-title {
+    font-size: clamp(2.35rem, 5vw, 3.4rem);
+    line-height: 1.12;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .privacy-hero-subtitle-en {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+    font-weight: 600;
+    opacity: 0.88;
+  }
+  .privacy-hero-copy .privacy-bilingual {
+    display: flex;
+    flex-direction: column;
+  }
+  @media (min-width: 768px) {
+    .privacy-hero-copy .privacy-bilingual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+    .privacy-hero-copy .privacy-lang-divider { display: none; }
+    .privacy-hero-copy .privacy-lang--en {
+      border-left: none;
+      padding-left: 0;
+    }
+  }
+  @media (min-width: 1024px) {
+    .privacy-hero-copy .privacy-bilingual { gap: 4rem; }
+  }
+  .privacy-hero-copy .privacy-lang-label { color: rgba(255,255,255,0.65); }
+  .privacy-hero-copy .privacy-lang-text { color: rgba(255,255,255,0.95); }
+  .privacy-hero-copy .privacy-lang--en .privacy-lang-text { color: rgba(255,255,255,0.78); }
+  .privacy-hero-copy .privacy-lang-divider {
+    background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08) 50%, transparent);
+  }
+  .privacy-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Contact card */
+  .privacy-contact-card {
+    border-radius: 1.35rem;
+    border: 1px solid rgba(11, 107, 58, 0.18);
+    background: linear-gradient(145deg, #0B6B3A 0%, #084F2C 55%, #0F766E 100%);
+    color: #fff;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 16px 40px rgba(8, 79, 44, 0.22);
+  }
+  @media (min-width: 1024px) {
+    .privacy-contact-card { padding: 2.25rem 2.35rem; }
+  }
+  .privacy-contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .privacy-contact-grid {
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+  }
+  .privacy-contact-list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+  }
+  .privacy-contact-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.95rem;
+  }
+  .privacy-contact-list a {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .privacy-contact-list a:hover { color: #FDE68A; }
+  .privacy-contact-card .privacy-lang-label { color: rgba(255,255,255,0.65); }
+  .privacy-contact-card .privacy-lang--en .privacy-lang-label { color: rgba(255,255,255,0.55); }
+  .privacy-contact-card .privacy-lang-text { color: rgba(255,255,255,0.95); }
+  .privacy-contact-card .privacy-lang--en .privacy-lang-text { color: rgba(255,255,255,0.8); }
+  .privacy-contact-card .privacy-lang-divider {
+    background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08) 50%, transparent);
+  }
+  .privacy-contact-card .privacy-bilingual {
+    display: flex;
+    flex-direction: column;
+  }
+  .privacy-contact-card .privacy-lang--en {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .privacy-principle { transition: none; }
+    .privacy-principle:hover { transform: none; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Privacy Policy — Zarrah Foundation",
+  "description": "Privacy Policy of Zarrah Foundation explaining data collection, use, cookies, rights and contact.",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'privacy' %}",
+  "isPartOf": {
+    "@type": "NGO",
+    "name": "{{ site_settings.localized_name|default:'Zarrah Foundation'|escapejs }}"
+  },
+  "dateModified": "2026-07-23"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="privacy-doc">
+
+{# ---- Hero ---- #}
+<section class="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-secondary text-white" aria-labelledby="privacy-hero-heading">
+  <div class="bg-pattern-dots absolute inset-0 opacity-25" aria-hidden="true"></div>
+  <div class="privacy-container privacy-container--hero relative py-14">
+    <nav aria-label="{% zf_label 'Breadcrumb' %}" class="mb-8 text-sm text-white/70">
+      <ol class="flex flex-wrap items-center gap-2">
+        <li><a href="{% url 'home' %}" class="transition-colors hover:text-white">{% zf_label "Home" %}</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="font-semibold text-white" aria-current="page">{% zf_label "Privacy" %}</li>
+      </ol>
+    </nav>
+
+    <h1 id="privacy-hero-heading" class="mt-2">
+      <span lang="bn" class="privacy-hero-title text-white">{{ privacy_hero.title_bn }}</span>
+      <span lang="en" class="privacy-hero-subtitle-en text-white">{{ privacy_hero.title_en }}</span>
+    </h1>
+
+    <div class="mt-5 flex flex-wrap gap-2">
+      <span class="privacy-meta-chip">
+        <i class="bi bi-calendar3" aria-hidden="true"></i>
+        <span lang="bn">সর্বশেষ হালনাগাদ: {{ privacy_last_updated.bn }}</span>
+        <span class="opacity-50" aria-hidden="true">·</span>
+        <span lang="en">Last updated: {{ privacy_last_updated.en }}</span>
+      </span>
+    </div>
+
+    <div class="privacy-hero-copy mt-8">
+      {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_hero.subtitle_bn en=privacy_hero.subtitle_en size="lead" %}
+    </div>
+  </div>
+  {% include "includes/ui/sections/_wave_divider.html" with color="text-canvas" %}
+</section>
+
+{# ---- Body ---- #}
+<div class="bg-canvas">
+  <div class="privacy-container privacy-container--body py-12">
+    <div class="privacy-layout">
+
+      <aside class="privacy-toc-aside" aria-label="{% trans 'Table of contents' %}">
+        <nav class="privacy-toc" aria-label="{% trans 'On this page' %}">
+          <div class="privacy-toc-progress" aria-hidden="true"><span id="privacy-toc-bar"></span></div>
+          <p class="privacy-toc-label">
+            <span lang="bn">সূচিপত্র</span>
+            <span aria-hidden="true"> · </span>
+            <span lang="en">Contents</span>
+          </p>
+          {% for item in privacy_toc %}
+          <a href="#{{ item.id }}" data-privacy-toc="{{ item.id }}">
+            <span lang="bn" class="toc-bn">{{ item.bn }}</span>
+            <span lang="en" class="toc-en">{{ item.en }}</span>
+          </a>
+          {% endfor %}
+        </nav>
+      </aside>
+
+      <details class="privacy-accordion privacy-toc-mobile">
+        <summary>
+          <span>
+            <span lang="bn" class="block font-bold text-ink">সূচিপত্র</span>
+            <span lang="en" class="block text-sm text-ink-light">Table of contents</span>
+          </span>
+          <i class="bi bi-list privacy-chevron text-xl" aria-hidden="true"></i>
+        </summary>
+        <nav class="privacy-accordion-panel space-y-1" aria-label="{% trans 'Mobile table of contents' %}">
+          {% for item in privacy_toc %}
+          <a href="#{{ item.id }}" class="block rounded-lg px-3 py-2 text-sm text-ink-light hover:bg-primary/5 hover:text-primary">
+            <span lang="bn">{{ item.bn }}</span>
+            <span class="text-ink/30"> · </span>
+            <span lang="en">{{ item.en }}</span>
+          </a>
+          {% endfor %}
+        </nav>
+      </details>
+
+      <div class="privacy-main">
+
+        {# Principles #}
+        <section aria-label="{% trans 'Privacy principles' %}">
+          <div class="privacy-principles">
+            {% for p in privacy_principles %}
+            <article class="privacy-principle">
+              <span class="privacy-principle-icon" aria-hidden="true"><i class="bi {{ p.icon }}"></i></span>
+              <h3>
+                <span lang="bn">{{ p.title_bn }}</span>
+                <span lang="en">{{ p.title_en }}</span>
+              </h3>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=p.text_bn en=p.text_en size="sm" %}
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# 1. Introduction #}
+        <section id="introduction" class="privacy-card anchor-offset" aria-labelledby="introduction-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-info-circle-fill"></i></span>
+            <h2 id="introduction-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_introduction.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_introduction.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_introduction.bn en=privacy_introduction.en %}
+          <aside class="privacy-callout privacy-callout--legal" aria-label="{% trans 'Important notice' %}">
+            <span class="privacy-callout-icon" aria-hidden="true"><i class="bi bi-shield-fill-check"></i></span>
+            <div>
+              <p class="privacy-callout-title">
+                <span lang="bn">গুরুত্বপূর্ণ নোটিশ</span> · <span lang="en">Important Notice</span>
+              </p>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_introduction.notice_bn en=privacy_introduction.notice_en size="sm" %}
+            </div>
+          </aside>
+        </section>
+
+        {# 2. Collect #}
+        <section id="collect" class="privacy-card anchor-offset" aria-labelledby="collect-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-database-fill"></i></span>
+            <h2 id="collect-heading" class="privacy-card-title">
+              <span lang="bn">আমরা যে তথ্য সংগ্রহ করি</span>
+              <span lang="en" class="privacy-card-title-en">Information We Collect</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_collect_intro.bn en=privacy_collect_intro.en %}
+          <div class="privacy-item-grid">
+            {% for item in privacy_collect_categories %}
+            <article class="privacy-item-card">
+              <div class="privacy-item-card-head">
+                <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+                <h3>
+                  <span lang="bn">{{ item.title_bn }}</span>
+                  <span lang="en">{{ item.title_en }}</span>
+                </h3>
+              </div>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=item.bn en=item.en size="sm" %}
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# 3. Use #}
+        <section id="use" class="privacy-card anchor-offset" aria-labelledby="use-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-gear-wide-connected"></i></span>
+            <h2 id="use-heading" class="privacy-card-title">
+              <span lang="bn">তথ্য কীভাবে ব্যবহার করি</span>
+              <span lang="en" class="privacy-card-title-en">How We Use Information</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_use_intro.bn en=privacy_use_intro.en %}
+          <div class="privacy-item-grid privacy-item-grid--3">
+            {% for item in privacy_use_items %}
+            <article class="privacy-item-card">
+              <div class="privacy-item-card-head">
+                <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+                <h3>
+                  <span lang="bn">{{ item.title_bn }}</span>
+                  <span lang="en">{{ item.title_en }}</span>
+                </h3>
+              </div>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=item.bn en=item.en size="sm" %}
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# 4. Cookies #}
+        <section id="cookies" class="privacy-card anchor-offset" aria-labelledby="cookies-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-fingerprint"></i></span>
+            <h2 id="cookies-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_cookies.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_cookies.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_cookies.intro_bn en=privacy_cookies.intro_en %}
+          <div class="privacy-item-grid privacy-item-grid--3">
+            {% for item in privacy_cookies.items %}
+            <article class="privacy-item-card">
+              <div class="privacy-item-card-head">
+                <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+                <h3>
+                  <span lang="bn">{{ item.title_bn }}</span>
+                  <span lang="en">{{ item.title_en }}</span>
+                </h3>
+              </div>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=item.bn en=item.en size="sm" %}
+            </article>
+            {% endfor %}
+          </div>
+          <aside class="privacy-callout privacy-callout--info" aria-label="{% trans 'Cookie notice' %}">
+            <span class="privacy-callout-icon" aria-hidden="true"><i class="bi bi-info-circle-fill"></i></span>
+            <div>
+              <p class="privacy-callout-title">
+                <span lang="bn">কুকি নোটিশ</span> · <span lang="en">Cookie Notice</span>
+              </p>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_cookies.note_bn en=privacy_cookies.note_en size="sm" %}
+            </div>
+          </aside>
+        </section>
+
+        {# 5. Third party #}
+        <section id="third-party" class="privacy-card anchor-offset" aria-labelledby="third-party-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-boxes"></i></span>
+            <h2 id="third-party-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_third_party.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_third_party.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_third_party.intro_bn en=privacy_third_party.intro_en %}
+          <div class="privacy-item-grid privacy-item-grid--3">
+            {% for item in privacy_third_party.items %}
+            <article class="privacy-item-card">
+              <div class="privacy-item-card-head">
+                <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+                <h3>
+                  <span lang="bn">{{ item.title_bn }}</span>
+                  <span lang="en">{{ item.title_en }}</span>
+                </h3>
+              </div>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=item.bn en=item.en size="sm" %}
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# 6. Sharing #}
+        <section id="sharing" class="privacy-card anchor-offset" aria-labelledby="sharing-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-share-fill"></i></span>
+            <h2 id="sharing-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_sharing.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_sharing.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_sharing.bn en=privacy_sharing.en %}
+          <aside class="privacy-callout privacy-callout--legal" aria-label="{% trans 'Legal notice' %}">
+            <span class="privacy-callout-icon" aria-hidden="true"><i class="bi bi-bank2"></i></span>
+            <div>
+              <p class="privacy-callout-title">
+                <span lang="bn">আইনগত নোটিশ</span> · <span lang="en">Legal Notice</span>
+              </p>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_sharing.callout_bn en=privacy_sharing.callout_en size="sm" %}
+            </div>
+          </aside>
+        </section>
+
+        {# 7. Security #}
+        <section id="security" class="privacy-card anchor-offset" aria-labelledby="security-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-lock-fill"></i></span>
+            <h2 id="security-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_security.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_security.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_security.bn en=privacy_security.en %}
+          <aside class="privacy-callout privacy-callout--security" aria-label="{% trans 'Security' %}">
+            <span class="privacy-callout-icon" aria-hidden="true"><i class="bi bi-shield-lock-fill"></i></span>
+            <div>
+              <p class="privacy-callout-title">
+                <span lang="bn">নিরাপত্তা</span> · <span lang="en">Security</span>
+              </p>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_security.callout_bn en=privacy_security.callout_en size="sm" %}
+            </div>
+          </aside>
+        </section>
+
+        {# 8. Retention #}
+        <section id="retention" class="privacy-card anchor-offset" aria-labelledby="retention-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-hourglass-split"></i></span>
+            <h2 id="retention-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_retention.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_retention.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_retention.bn en=privacy_retention.en %}
+        </section>
+
+        {# 9. Rights #}
+        <section id="rights" class="privacy-card anchor-offset" aria-labelledby="rights-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-person-check-fill"></i></span>
+            <h2 id="rights-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_rights.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_rights.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_rights.intro_bn en=privacy_rights.intro_en %}
+          <div class="privacy-item-grid">
+            {% for item in privacy_rights.items %}
+            <article class="privacy-item-card">
+              <div class="privacy-item-card-head">
+                <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+                <h3>
+                  <span lang="bn">{{ item.title_bn }}</span>
+                  <span lang="en">{{ item.title_en }}</span>
+                </h3>
+              </div>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=item.bn en=item.en size="sm" %}
+            </article>
+            {% endfor %}
+          </div>
+          <aside class="privacy-callout privacy-callout--rights" aria-label="{% trans 'Your rights' %}">
+            <span class="privacy-callout-icon" aria-hidden="true"><i class="bi bi-person-vcard"></i></span>
+            <div>
+              <p class="privacy-callout-title">
+                <span lang="bn">ব্যক্তিগত অধিকার</span> · <span lang="en">Individual Rights</span>
+              </p>
+              {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_rights.note_bn en=privacy_rights.note_en size="sm" %}
+            </div>
+          </aside>
+        </section>
+
+        {# 10. Children #}
+        <section id="children" class="privacy-card anchor-offset" aria-labelledby="children-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-emoji-smile-fill"></i></span>
+            <h2 id="children-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_children.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_children.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_children.bn en=privacy_children.en %}
+        </section>
+
+        {# 11. International #}
+        <section id="international" class="privacy-card anchor-offset" aria-labelledby="international-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-globe2"></i></span>
+            <h2 id="international-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_international.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_international.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_international.bn en=privacy_international.en %}
+        </section>
+
+        {# 12. Updates #}
+        <section id="updates" class="privacy-card anchor-offset" aria-labelledby="updates-heading">
+          <header class="privacy-card-header">
+            <span class="privacy-card-icon" aria-hidden="true"><i class="bi bi-arrow-repeat"></i></span>
+            <h2 id="updates-heading" class="privacy-card-title">
+              <span lang="bn">{{ privacy_updates.title_bn }}</span>
+              <span lang="en" class="privacy-card-title-en">{{ privacy_updates.title_en }}</span>
+            </h2>
+          </header>
+          {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_updates.bn en=privacy_updates.en %}
+        </section>
+
+        {# 13. Contact #}
+        <section id="contact" class="anchor-offset" aria-labelledby="contact-heading">
+          <div class="privacy-contact-card">
+            <div class="privacy-contact-grid">
+              <div>
+                <p class="mb-2 text-xs font-extrabold uppercase tracking-widest text-white/65">
+                  <span lang="bn">যোগাযোগ</span> · <span lang="en">Contact</span>
+                </p>
+                <h2 id="contact-heading" class="text-2xl font-extrabold tracking-tight text-white lg:text-3xl">
+                  <span lang="bn" class="block">{{ privacy_contact.title_bn }}</span>
+                  <span lang="en" class="mt-1 block text-lg font-semibold text-white/85">{{ privacy_contact.title_en }}</span>
+                </h2>
+                <div class="mt-4 text-white/90">
+                  {% include "pages/includes/privacy/_bilingual.html" with bn=privacy_contact.bn en=privacy_contact.en size="sm" %}
+                </div>
+                <ul class="privacy-contact-list">
+                  <li>
+                    <i class="bi bi-building" aria-hidden="true"></i>
+                    <span>{{ site_settings.localized_name }}</span>
+                  </li>
+                  {% if site_settings.primary_email %}
+                  <li>
+                    <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+                    <a href="mailto:{{ site_settings.primary_email }}">{{ site_settings.primary_email }}</a>
+                  </li>
+                  {% endif %}
+                  <li>
+                    <i class="bi bi-globe" aria-hidden="true"></i>
+                    {% if site_settings.website_url %}
+                    <a href="{{ site_settings.website_url }}" target="_blank" rel="noopener noreferrer">{{ site_settings.website_url }}</a>
+                    {% else %}
+                    <a href="{% url 'home' %}">zarrah.org</a>
+                    {% endif %}
+                  </li>
+                </ul>
+              </div>
+              <div class="flex flex-col items-start gap-3 md:items-end">
+                <a href="{% url 'contact' %}" class="btn-accent btn-lg">
+                  <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
+                  <span lang="bn">যোগাযোগ পাতা</span>
+                  <span class="opacity-50" aria-hidden="true">·</span>
+                  <span lang="en">Contact page</span>
+                </a>
+                {% if site_settings.primary_email %}
+                <a href="mailto:{{ site_settings.primary_email }}" class="btn-outline-white btn-lg">
+                  <i class="bi bi-envelope" aria-hidden="true"></i>
+                  <span lang="en">Email us</span>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/privacy-toc.js' %}" defer></script>
+{% endblock %}

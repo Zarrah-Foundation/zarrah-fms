@@ -1,0 +1,36 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Finance" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Finance" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <h1 class="dash-page-title"><i class="bi bi-wallet2 mr-2 text-primary"></i>{% trans "Finance Overview" %}</h1>
+  <div class="flex gap-2">
+    <a href="{% url 'dashboard-finance-cashbook' %}" class="btn-secondary btn-sm"><i class="bi bi-journal-text"></i>{% trans "Cash Book" %}</a>
+    <a href="{% url 'dashboard-finance-ledger' %}" class="btn-secondary btn-sm"><i class="bi bi-list-columns"></i>{% trans "Ledger" %}</a>
+  </div>
+</div>
+
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  {% trans "Total Income" as l1 %}{% trans "Total Expense" as l2 %}{% trans "Net Balance" as l3 %}
+  {% include "dashboard/includes/_stat_card.html" with label=l1 value=income_total|floatformat:0 icon="bi-arrow-down-circle" tone="success" sub="BDT" url="/dashboard/finance/income/" %}
+  {% include "dashboard/includes/_stat_card.html" with label=l2 value=expense_total|floatformat:0 icon="bi-arrow-up-circle" tone="danger" sub="BDT" url="/dashboard/finance/expense/" %}
+  {% include "dashboard/includes/_stat_card.html" with label=l3 value=net_balance|floatformat:0 icon="bi-cash-stack" tone="primary" sub="BDT" %}
+</div>
+
+<div class="card-flat">
+  <h2 class="mb-4 text-h4">{% trans "Monthly Summary" %}</h2>
+  {% if monthly %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>{% trans "Month" %}</th><th>{% trans "Income" %}</th><th>{% trans "Expense" %}</th><th>{% trans "Net" %}</th></tr></thead>
+    <tbody>
+      {% for m in monthly %}
+      <tr><td>{{ m.year }}-{{ m.month|stringformat:"02d" }}</td><td class="text-success">{{ m.total_income|floatformat:0 }}</td><td class="text-danger">{{ m.total_expense|floatformat:0 }}</td><td class="font-semibold">{{ m.net_balance|floatformat:0 }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="text-sm text-ink-light">{% trans "No summary data yet." %}</p>{% endif %}
+</div>
+{% endblock %}

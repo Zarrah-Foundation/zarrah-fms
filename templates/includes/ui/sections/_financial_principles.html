@@ -1,0 +1,25 @@
+{% load i18n_extras %}
+<section id="{{ heading_id|default:'financial-principles' }}" class="{{ wrapper_class|default:'section bg-canvas scroll-mt-24' }}" aria-labelledby="{{ heading_id|default:'financial-principles' }}-heading">
+  <div class="{{ inner_class|default:'container-app' }}">
+    <div class="mb-8 max-w-3xl">
+      <h2 id="{{ heading_id|default:'financial-principles' }}-heading" class="text-h2 text-ink">{{ principles|bl:"title" }}</h2>
+      <p class="mt-4 text-body leading-8 text-ink-light">{{ principles|bl:"intro" }}</p>
+    </div>
+    <ul class="zf-principle-grid">
+      {% for item in principles.points %}
+      <li class="zf-principle-card">
+        <h3 class="zf-principle-card__title">{{ item|bl:"title" }}</h3>
+        <p class="zf-principle-card__text">{{ item|bl:"text" }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if extra_note %}
+    <p class="mt-6 max-w-3xl text-sm leading-7 text-ink-light">{{ extra_note }}</p>
+    {% endif %}
+    {% if cta_href and cta_label %}
+    <p class="mt-8">
+      <a href="{{ cta_href }}" class="{{ cta_class|default:'btn-secondary' }}">{{ cta_label }}</a>
+    </p>
+    {% endif %}
+  </div>
+</section>

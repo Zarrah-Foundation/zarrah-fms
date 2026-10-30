@@ -1,0 +1,15 @@
+{% load i18n %}
+{% comment %}
+Reusable inline newsletter/email-capture form (currently routes to Contact).
+Usage:
+  {% include "includes/ui/forms/_newsletter_form.html" %}
+  {% include "includes/ui/forms/_newsletter_form.html" with input_id="hero-newsletter-email" dark=False %}
+{% endcomment %}
+<form action="{% url 'contact' %}" method="get" class="flex items-center gap-2">
+  <label class="sr-only" for="{{ input_id|default:'footer-newsletter-email' }}">{% trans "Email address" %}</label>
+  <input id="{{ input_id|default:'footer-newsletter-email' }}" type="email" required placeholder="{% trans 'Your email' %}"
+    class="w-full rounded-field border {% if dark == False %}border-border bg-surface text-ink placeholder:text-ink-light focus:border-primary focus:ring-primary/30{% else %}border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-accent-light focus:ring-accent-light/40{% endif %} px-4 py-2.5 text-sm focus:outline-none focus:ring-2">
+  <button type="submit" class="btn-accent btn-sm shrink-0" aria-label="{% trans 'Subscribe' %}">
+    <i class="bi bi-send-fill" aria-hidden="true"></i>
+  </button>
+</form>

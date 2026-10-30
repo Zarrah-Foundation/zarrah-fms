@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras html_extras %}
+
+{% block title %}{{ article|bl:"title" }} - {% trans "Zarrah Foundation" %}{% endblock %}
+
+{% block content %}
+<article class="mx-auto max-w-3xl px-4 py-12">
+  {% if article.featured_image %}
+  <img src="{{ article.featured_image.url }}" alt="" class="mb-8 h-64 w-full rounded-xl object-cover">
+  {% endif %}
+  <h1 class="text-3xl font-bold text-emerald-800">{{ article|bl:"title" }}</h1>
+  <p class="mt-2 text-sm text-gray-500">{{ article.published_at|date:"F d, Y" }} · {{ article.view_count }} {% trans "views" %}</p>
+  <div class="prose news-content mt-8 max-w-none text-gray-700">{{ article|bl:"content"|richtext }}</div>
+  <a href="{% url 'news' %}" class="btn-secondary mt-8 inline-block">{% trans "Back to News" %}</a>
+</article>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Payment Cancelled" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-lg px-4 py-16 text-center">
+  <div class="card">
+    <h1 class="mb-4 text-2xl font-bold text-yellow-700">{% zf_label "Payment Cancelled" %}</h1>
+    <p class="text-gray-600">{% zf_label "You cancelled the payment. No charges were made." %}</p>
+    <a href="{% url 'donation' %}" class="btn-primary mt-6 inline-block">{% zf_label "Return to Donation" %}</a>
+  </div>
+</div>
+{% endblock %}

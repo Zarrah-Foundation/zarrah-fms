@@ -1,0 +1,9 @@
+{% comment %}
+Reusable dismissible-style alert row for a single Django message.
+Usage:
+  {% include "includes/ui/alerts/_alert.html" with message=message %}
+{% endcomment %}
+<div role="alert" class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %} shadow-soft-sm">
+  <i class="bi {% if message.tags == 'error' %}bi-x-circle-fill{% elif message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'warning' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}" aria-hidden="true"></i>
+  <span>{{ message }}</span>
+</div>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% trans "News" %} - {% trans "Zarrah Foundation" %}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl px-4 py-12">
+  <h1 class="mb-8 text-3xl font-bold text-emerald-800">{% trans "News" %}</h1>
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for article in news_list %}
+    <a href="{% url 'news-detail' article.slug %}" class="card block hover:shadow-md transition">
+      {% if article.featured_image %}<img src="{{ article.featured_image.url }}" alt="" class="mb-4 h-48 w-full rounded-lg object-cover">{% endif %}
+      <h2 class="font-semibold text-emerald-800">{{ article|bl:"title" }}</h2>
+      {% with excerpt=article|bl:"excerpt" %}
+      {% if excerpt %}<p class="mt-2 text-sm text-gray-600">{{ excerpt|truncatewords:20 }}</p>{% endif %}
+      {% endwith %}
+      <p class="mt-2 text-xs text-gray-400">{{ article.published_at|date:"M d, Y" }}</p>
+    </a>
+    {% empty %}
+    <p class="text-gray-600">{% trans "No news articles yet." %}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

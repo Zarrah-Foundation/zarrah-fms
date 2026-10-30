@@ -1,0 +1,51 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My meetings" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "My meetings" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <h1 class="dash-page-title"><i class="bi bi-calendar-check"></i> {% trans "My meetings" %}</h1>
+</div>
+
+<div class="space-y-6">
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Upcoming" %}</h2>
+    <table class="dash-table">
+      <thead><tr><th>{% trans "Meeting" %}</th><th>{% trans "Starts" %}</th><th>{% trans "Your status" %}</th><th></th></tr></thead>
+      <tbody>
+        {% for p in upcoming %}
+        <tr>
+          <td>{{ p.meeting.title_en|default:p.meeting.title_bn }} <span class="text-xs text-ink-light">({{ p.meeting.reference_id }})</span></td>
+          <td>{{ p.meeting.starts_at|date:"Y-m-d H:i" }}</td>
+          <td><span class="badge">{{ p.get_status_display }}</span></td>
+          <td class="text-right"><a href="{% url 'my-meeting-detail' p.meeting.pk %}" class="btn-ghost btn-sm">{% trans "Open" %}</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-ink-light">{% trans "No upcoming meetings." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Past" %}</h2>
+    <table class="dash-table">
+      <thead><tr><th>{% trans "Meeting" %}</th><th>{% trans "Date" %}</th><th>{% trans "Status" %}</th><th></th></tr></thead>
+      <tbody>
+        {% for p in past %}
+        <tr>
+          <td>{{ p.meeting.title_en|default:p.meeting.title_bn }}</td>
+          <td>{{ p.meeting.starts_at|date:"Y-m-d" }}</td>
+          <td>{{ p.get_status_display }}</td>
+          <td class="text-right"><a href="{% url 'my-meeting-detail' p.meeting.pk %}" class="btn-ghost btn-sm">{% trans "View" %}</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-ink-light">{% trans "No past meetings." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

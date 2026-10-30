@@ -1,0 +1,17 @@
+{% load i18n %}
+{% comment %}Stat card. Params: label, value, icon (optional bi-*), tone
+(primary|success|warning|danger|info|accent, default primary), url (optional),
+sub (optional small text).{% endcomment %}
+{% with tone=tone|default:"primary" %}
+<div class="stat-card">
+  <div class="min-w-0">
+    <p class="stat-card-label">{{ label }}</p>
+    <p class="stat-card-value text-{{ tone }}{% if tone == 'primary' %}-dark{% endif %}">{{ value }}</p>
+    {% if sub %}<p class="mt-1 text-xs text-ink-light">{{ sub }}</p>{% endif %}
+    {% if url %}<a href="{{ url }}" class="mt-1 inline-block text-sm font-medium text-primary hover:underline">{% trans "View" %} &rarr;</a>{% endif %}
+  </div>
+  {% if icon %}
+  <span class="stat-card-icon bg-{{ tone }}/10 text-{{ tone }}{% if tone == 'primary' %}-dark{% endif %}"><i class="bi {{ icon }}"></i></span>
+  {% endif %}
+</div>
+{% endwith %}

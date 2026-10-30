@@ -1,0 +1,295 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{{ meeting.reference_id }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Meeting" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{{ meeting.title_en|default:meeting.title_bn }}</h1>
+    <p class="mt-1 text-sm text-ink-light">
+      {{ meeting.reference_id }} · {{ meeting.meeting_type.name_en }} ·
+      <span class="badge">{{ meeting.get_status_display }}</span>
+    </p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    {% if can_edit %}
+    <a href="{% url 'dashboard-meeting-edit' meeting.pk %}" class="btn-secondary"><i class="bi bi-pencil"></i>{% trans "Edit" %}</a>
+    {% endif %}
+    {% if can_create_resolution %}
+    <a href="{% url 'dashboard-resolution-create' meeting.pk %}" class="btn-primary"><i class="bi bi-file-earmark-plus"></i>{% trans "New resolution" %}</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="mb-4 rounded-card border border-border/60 bg-surface px-4 py-3 text-sm">
+  <p>
+    <span class="font-medium">{% trans "Quorum rule" %}:</span>
+    {{ meeting.meeting_type.name_en }} — {{ quorum_rule }}
+    ·
+    {% if quorum.achieved %}
+    <span class="badge-primary font-semibold tracking-wide">{% trans "QUORUM ACHIEVED" %}</span>
+    {% else %}
+    <span class="badge font-semibold tracking-wide">{% trans "NOT ACHIEVED" %}</span>
+    {% endif %}
+  </p>
+</div>
+
+<div class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Eligible" %}</p>
+    <p class="text-xl font-bold">{{ quorum.eligible_count }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Required quorum" %}</p>
+    <p class="text-xl font-bold">{{ quorum.required }}</p>
+    <p class="text-xs text-ink-light">{{ quorum_rule }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Present" %}</p>
+    <p class="text-xl font-bold">{{ quorum.present_count }}</p>
+    <p class="text-xs">{% if quorum.achieved %}{% trans "QUORUM ACHIEVED" %}{% else %}{% trans "NOT ACHIEVED" %}{% endif %}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Participants" %}</p>
+    <p class="text-xl font-bold">{{ participants|length }}</p>
+    {% if meeting.participants_frozen_at %}<p class="text-xs text-ink-light">{% trans "Frozen" %}</p>{% endif %}
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+
+    {% if show_online and meeting.mode != "OFFLINE" %}
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Online access" %}</h2>
+      <dl class="grid gap-2 text-sm sm:grid-cols-2">
+        {% if meeting.online_platform %}<div><dt class="text-ink-light">{% trans "Platform" %}</dt><dd>{{ meeting.online_platform }}</dd></div>{% endif %}
+        {% if meeting.meeting_url %}<div><dt class="text-ink-light">{% trans "URL" %}</dt><dd><a href="{{ meeting.meeting_url }}" target="_blank" rel="noopener">{{ meeting.meeting_url }}</a></dd></div>{% endif %}
+        {% if meeting.meeting_id_code %}<div><dt class="text-ink-light">{% trans "Meeting ID" %}</dt><dd>{{ meeting.meeting_id_code }}</dd></div>{% endif %}
+        {% if meeting.meeting_password %}<div><dt class="text-ink-light">{% trans "Password" %}</dt><dd>{{ meeting.meeting_password }}</dd></div>{% endif %}
+      </dl>
+      {% if meeting.joining_instructions %}<p class="mt-3 text-sm">{{ meeting.joining_instructions|linebreaksbr }}</p>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Participants" %}</h2>
+      <div class="table-wrap overflow-x-auto">
+      <table class="dash-table">
+        <thead><tr><th>{% trans "Member" %}</th><th>{% trans "Position" %}</th><th>{% trans "Status" %}</th><th></th></tr></thead>
+        <tbody>
+          {% for p in participants %}
+          <tr>
+            <td>
+              <span class="font-medium">{{ p.member.first_name }} {{ p.member.last_name }}</span>
+              <span class="block font-mono text-xs text-ink-light">{{ p.member.member_id }}</span>
+            </td>
+            <td class="text-sm text-ink-light">{{ p.position_label }}</td>
+            <td><span class="badge">{{ p.get_status_display }}</span></td>
+            <td class="text-right">
+            {% if can_manage_attendance %}
+              {% if p.status == "ACCEPTED" or p.status == "INVITED" %}
+              <form method="post" action="{% url 'dashboard-meeting-attendance-mark' meeting.pk p.pk %}" class="inline-flex flex-wrap justify-end gap-1">
+                {% csrf_token %}
+                <button name="status" value="ATTENDED" class="btn-ghost btn-sm">{% trans "Present" %}</button>
+                <button name="status" value="ABSENT" class="btn-ghost btn-sm">{% trans "Absent" %}</button>
+              </form>
+              {% elif p.status == "ATTENDED" %}
+              <form method="post" action="{% url 'dashboard-meeting-attendance-mark' meeting.pk p.pk %}" class="inline" onsubmit="return confirm('{% trans "Mark this member Absent?" %}');">
+                {% csrf_token %}
+                <button name="status" value="ABSENT" class="btn-secondary btn-sm">{% trans "→ Absent" %}</button>
+              </form>
+              {% elif p.status == "ABSENT" %}
+              <form method="post" action="{% url 'dashboard-meeting-attendance-mark' meeting.pk p.pk %}" class="inline" onsubmit="return confirm('{% trans "Mark this member Present?" %}');">
+                {% csrf_token %}
+                <button name="status" value="ATTENDED" class="btn-secondary btn-sm">{% trans "→ Present" %}</button>
+              </form>
+              {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-ink-light">{% trans "No participants yet." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      {% if can_manage_participants and not meeting.participants_frozen_at %}
+      <div class="mt-4 grid gap-4 md:grid-cols-2">
+        <form method="post" action="{% url 'dashboard-meeting-participant-add-member' meeting.pk %}" class="space-y-2">
+          {% csrf_token %}
+          {% include "dashboard/includes/_form_field.html" with field=add_member_form.member %}
+          <button type="submit" class="btn-secondary btn-sm">{% trans "Add member" %}</button>
+        </form>
+        <form method="post" action="{% url 'dashboard-meeting-participant-add-group' meeting.pk %}" class="space-y-2">
+          {% csrf_token %}
+          {% include "dashboard/includes/_form_field.html" with field=add_group_form.group %}
+          <button type="submit" class="btn-secondary btn-sm">{% trans "Add from group" %}</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Guests" %}</h2>
+      <table class="dash-table">
+        <thead><tr><th>{% trans "Name" %}</th><th>{% trans "Organization" %}</th><th>{% trans "Status" %}</th><th></th></tr></thead>
+        <tbody>
+          {% for g in guests %}
+          <tr>
+            <td>{{ g.full_name }}</td>
+            <td>{{ g.organization|default:"—" }}</td>
+            <td>{{ g.get_status_display }}</td>
+            <td class="text-right">
+              {% if can_manage_participants %}
+              <a href="{% url 'dashboard-meeting-guest-edit' meeting.pk g.pk %}" class="btn-ghost btn-sm">{% trans "Edit" %}</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-ink-light">{% trans "No guests." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if can_manage_participants %}
+      <form method="post" action="{% url 'dashboard-meeting-guest-add' meeting.pk %}" class="mt-4 space-y-3 border-t border-border/60 pt-4">
+        {% csrf_token %}
+        <h3 class="text-h5">{% trans "Add guest" %}</h3>
+        <div class="dash-form-grid">
+          {% for field in guest_form %}
+          {% include "dashboard/includes/_form_field.html" with field=field %}
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn-secondary btn-sm">{% trans "Add guest" %}</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Agenda" %}</h2>
+      <ol class="list-decimal space-y-2 pl-5">
+        {% for item in agenda_items %}
+        <li><strong>{{ item.title_en|default:item.title_bn }}</strong> <span class="badge">{{ item.get_status_display }}</span></li>
+        {% empty %}
+        <li class="list-none text-ink-light">{% trans "No agenda items." %}</li>
+        {% endfor %}
+      </ol>
+      {% if can_manage_agenda %}
+      <form method="post" action="{% url 'dashboard-meeting-agenda-add' meeting.pk %}" enctype="multipart/form-data" class="mt-4 space-y-3 border-t border-border/60 pt-4">
+        {% csrf_token %}
+        <h3 class="text-h5">{% trans "Add agenda item" %}</h3>
+        <div class="dash-form-grid">
+          {% for field in agenda_form %}
+          {% include "dashboard/includes/_form_field.html" with field=field %}
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn-secondary btn-sm">{% trans "Add item" %}</button>
+      </form>
+      {% if agenda_items %}
+      <form method="post" action="{% url 'dashboard-meeting-agenda-reorder' meeting.pk %}" class="mt-3">
+        {% csrf_token %}
+        <input type="hidden" name="order" value="{% for item in agenda_items %}{{ item.pk }}{% if not forloop.last %},{% endif %}{% endfor %}">
+        <button type="submit" class="btn-ghost btn-sm">{% trans "Reset order (listed sequence)" %}</button>
+      </form>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Proceedings" %}</h2>
+      {% if can_manage_agenda %}
+      <form method="post" action="{% url 'dashboard-meeting-proceedings-save' meeting.pk %}" novalidate>
+        {% csrf_token %}
+        <div class="dash-form-grid">
+          {% for field in proceeding_form %}
+          {% include "dashboard/includes/_form_field.html" with field=field %}
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn-secondary mt-3">{% trans "Save proceedings" %}</button>
+      </form>
+      {% elif proceeding %}
+      <div class="prose max-w-none">{{ proceeding.content_en|default:proceeding.content_bn|safe }}</div>
+      {% else %}
+      <p class="text-ink-light">{% trans "No proceedings recorded." %}</p>
+      {% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Resolutions" %}</h2>
+      <table class="dash-table">
+        <thead><tr><th>{% trans "ID" %}</th><th>{% trans "Title" %}</th><th>{% trans "Status" %}</th><th></th></tr></thead>
+        <tbody>
+          {% for r in resolutions %}
+          <tr>
+            <td class="font-mono text-sm">{{ r.resolution_id }}</td>
+            <td>{{ r.title_en|default:r.title_bn }}</td>
+            <td><span class="badge">{{ r.get_status_display }}</span></td>
+            <td class="text-right"><a href="{% url 'dashboard-resolution-detail' r.pk %}" class="btn-ghost btn-sm">{% trans "Open" %}</a></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-ink-light">{% trans "No resolutions." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    {% if can_edit %}
+    <div class="card-flat space-y-3">
+      <h2 class="text-h4">{% trans "Workflow" %}</h2>
+      {% for next in allowed_next %}
+      <form method="post" action="{% url 'dashboard-meeting-transition' meeting.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="new_status" value="{{ next }}">
+        <button type="submit" class="btn-secondary w-full">
+          {% if next == "INVITATIONS_SENT" %}{% trans "Send invitations" %}{% else %}{% trans "Move to" %} {{ next }}{% endif %}
+        </button>
+      </form>
+      {% endfor %}
+      {% if meeting.status == "SCHEDULED" or meeting.status == "DRAFT" %}
+      <form method="post" action="{% url 'dashboard-meeting-transition' meeting.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="send_invitations">
+        <button type="submit" class="btn-primary w-full">{% trans "Send invitations (freeze roster)" %}</button>
+      </form>
+      {% endif %}
+      {% if can_manage_participants %}
+      <form method="post" action="{% url 'dashboard-meeting-participants-freeze' meeting.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-ghost w-full">{% trans "Freeze roster only" %}</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card-flat text-sm">
+      <h2 class="mb-3 text-h4">{% trans "Schedule" %}</h2>
+      <p><strong>{% trans "Starts" %}:</strong> {{ meeting.starts_at }}</p>
+      {% if meeting.ends_at %}<p><strong>{% trans "Ends" %}:</strong> {{ meeting.ends_at }}</p>{% endif %}
+      <p><strong>{% trans "Mode" %}:</strong> {{ meeting.get_mode_display }}</p>
+      {% if meeting.venue_name %}<p><strong>{% trans "Venue" %}:</strong> {{ meeting.venue_name }}</p>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/tinymce@7.6.0/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+(function () {
+  if (!window.tinymce) return;
+  tinymce.init({
+    selector: "textarea.js-richtext",
+    menubar: false,
+    plugins: "lists link table autolink",
+    toolbar: "blocks | bold italic | bullist numlist | link removeformat",
+    height: 320,
+    branding: false,
+    setup: function (editor) { editor.on("change keyup", function () { editor.save(); }); }
+  });
+})();
+</script>
+{% endblock %}

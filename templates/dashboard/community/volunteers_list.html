@@ -1,0 +1,57 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{% trans "Volunteers" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Volunteers" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-hand-thumbs-up mr-2 text-primary"></i>{% trans "Volunteers" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{{ page_obj.paginator.count }} {% trans "registrations" %}</p>
+  </div>
+</div>
+
+<form method="get" class="dash-toolbar">
+  <input type="search" name="q" value="{{ search_query }}" placeholder="{% trans 'Name, email, phone…' %}" class="dash-search">
+  <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "All statuses" %}</option>
+    {% for code, label in statuses %}<option value="{{ code }}" {% if status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-search"></i>{% trans "Filter" %}</button>
+  {% if search_query or status %}<a href="?" class="btn-ghost btn-sm">{% trans "Clear" %}</a>{% endif %}
+</form>
+
+{% if volunteers %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Email" %}</th>
+        <th>{% trans "Phone" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Registered" %}</th>
+        <th class="text-right">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in volunteers %}
+      <tr>
+        <td class="font-medium">{{ v.name }}</td>
+        <td>{{ v.email }}</td>
+        <td>{{ v.phone }}</td>
+        <td>{% status_badge v.status v.get_status_display %}</td>
+        <td>{{ v.created_at|date:"M d, Y" }}</td>
+        <td class="text-right"><a href="{% url 'dashboard-volunteer-detail' v.pk %}" class="dash-icon-btn" title="{% trans 'View' %}"><i class="bi bi-eye"></i></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No volunteers found" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-hand-thumbs-up" title=empty_title %}
+{% endif %}
+{% endblock %}

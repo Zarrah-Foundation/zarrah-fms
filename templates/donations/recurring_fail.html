@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Payment Failed" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="section container-app">
+  <div class="mx-auto max-w-xl text-center">
+    <h1 class="text-h3">{% zf_label "Payment Failed" %}</h1>
+    <p class="mt-3 text-ink-light">{% zf_label "Your monthly donation was not activated. No recurring schedule was started." %}</p>
+    <a href="{% url 'donation' %}" class="btn-primary mt-6 inline-flex">{% zf_label "Try again" %}</a>
+  </div>
+</section>
+{% endblock %}

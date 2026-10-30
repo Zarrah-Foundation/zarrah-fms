@@ -1,0 +1,29 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Recurring Payments" %}{% endblock %}
+{% block topbar_title %}{% trans "Recurring Payments" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><div><h1 class="dash-page-title">{% trans "Recurring Payments" %}</h1>
+<p class="text-sm text-ink-light">{% trans "Donation subscriptions and membership Autopay (separate systems)." %}</p></div>
+<a href="{% url 'dashboard-recurring' %}" class="btn-secondary btn-sm">{% trans "Donation admin detail" %}</a></div>
+<form method="get" class="mb-4 flex flex-wrap gap-2">
+  <input class="form-input max-w-xs" name="q" value="{{ q }}" placeholder="{% trans 'Search donor…' %}">
+  <select name="status" class="form-input max-w-xs"><option value="">{% trans "All statuses" %}</option>{% for v,l in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <label class="flex items-center gap-1 text-sm"><input type="checkbox" name="due" value="1" {% if due %}checked{% endif %}> {% trans "Due" %}</label>
+  <button class="btn-secondary btn-sm">{% trans "Filter" %}</button>
+</form>
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+<table class="dash-table"><thead><tr>
+<th>{% trans "Type" %}</th><th>{% trans "Donor" %}</th><th>{% trans "Provider" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th><th>{% trans "Next" %}</th><th></th>
+</tr></thead><tbody>
+{% for s in subscriptions %}<tr>
+<td>{% trans "Donation" %}</td><td>{{ s.donor_name }}</td><td>{{ s.get_payment_gateway_display }}</td><td>৳{{ s.amount|floatformat:0 }}</td><td>{{ s.get_status_display }}</td>
+<td>{% if s.next_billing %}{{ s.next_billing|date:"j M Y" }}{% else %}—{% endif %}</td>
+<td><a href="{% url 'dashboard-recurring-detail' s.pk %}" class="text-primary">{% trans "Open" %}</a></td>
+</tr>{% empty %}<tr><td colspan="7">{% trans "No donation subscriptions." %}</td></tr>{% endfor %}
+</tbody></table></div>
+{% if autopays %}
+<h2 class="mt-10 text-lg font-semibold">{% trans "Membership Autopay (active)" %}</h2>
+<ul class="mt-3 space-y-2 text-sm">{% for a in autopays %}<li>{{ a.member }} · {{ a.gateway }} · {{ a.mode }} · next {{ a.next_charge_on|default:"—" }}</li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

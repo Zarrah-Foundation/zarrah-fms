@@ -1,0 +1,44 @@
+{% load i18n i18n_extras %}
+{# Reusable public document card — Transparency & Reports #}
+<article class="zf-doc-card">
+  <p class="zf-doc-card__eyebrow">{% zf_report_type report.type %}</p>
+
+  <h3 class="zf-doc-card__title break-words">{{ report.localized_title }}</h3>
+
+  {% if report.localized_description %}
+  <p class="zf-doc-card__summary break-words">{{ report.localized_description }}</p>
+  {% endif %}
+
+  <dl class="zf-doc-card__meta">
+    <div>
+      <dt>{% zf_label "Language" %}</dt>
+      <dd>{% if LANGUAGE_CODE == 'bn' %}বাংলা / English{% else %}EN / BN{% endif %}</dd>
+    </div>
+    <div>
+      <dt>{% zf_label "Category" %}</dt>
+      <dd>{% zf_report_type report.type %}</dd>
+    </div>
+    {% if report.year or report.published_at %}
+    <div>
+      <dt>{% zf_label "Date" %}</dt>
+      <dd>
+        {% if report.year %}{{ report.year }}{% endif %}
+        {% if report.year and report.published_at %}<span aria-hidden="true"> · </span>{% endif %}
+        {% if report.published_at %}{{ report.published_at|date:"j M Y" }}{% endif %}
+      </dd>
+    </div>
+    {% endif %}
+  </dl>
+
+  <div class="zf-doc-card__cta">
+    {% if report.file %}
+    <a href="{% url 'report-download' report.pk %}" class="btn-primary btn-sm inline-flex min-h-11 items-center justify-center gap-2" aria-label="{% zf_label 'Download document' %}">
+      <i class="bi bi-download" aria-hidden="true"></i>{% zf_label "Download" %}
+    </a>
+    {% else %}
+    <button type="button" class="btn-primary btn-sm inline-flex min-h-11 cursor-not-allowed items-center justify-center gap-2 opacity-50" disabled>
+      <i class="bi bi-download" aria-hidden="true"></i>{% zf_label "Download unavailable" %}
+    </button>
+    {% endif %}
+  </div>
+</article>

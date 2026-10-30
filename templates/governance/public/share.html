@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ resolution.resolution_id }} · {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-3xl px-4 py-10">
+  <header class="mb-8 border-b border-border pb-6">
+    <p class="text-sm text-ink-light">{{ meeting_ref }} · {{ meeting_title }}</p>
+    <h1 class="text-h2">{{ resolution.title_en|default:resolution.title_bn }}</h1>
+    <p class="mt-2 text-sm"><span class="badge">{{ resolution.get_status_display }}</span> · {{ resolution.resolution_id }}</p>
+  </header>
+
+  {% if version %}
+  <article class="prose max-w-none mb-8">
+    {{ version.content_en|default:version.content_bn|safe }}
+    {% if version.decision_bn or version.decision_en %}
+    <h2>{% trans "Decision" %}</h2>
+    {{ version.decision_en|default:version.decision_bn|safe }}
+    {% endif %}
+  </article>
+  {% endif %}
+
+  {% if signers %}
+  <section class="mb-8">
+    <h2 class="text-h4 mb-3">{% trans "Signatories" %}</h2>
+    <ul class="space-y-2 text-sm">
+      {% for s in signers %}
+      <li>{{ s.name }}{% if s.designation %} — {{ s.designation }}{% endif %}{% if s.signed_at %} ({{ s.signed_at|date:"Y-m-d" }}){% endif %}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <div class="flex flex-wrap gap-3 text-sm">
+    <a href="{% url 'public-resolution-pdf' share.token %}" class="btn-secondary">{% trans "Download PDF" %}</a>
+    <a href="{% url 'public-resolution-docx' share.token %}" class="btn-secondary">{% trans "Download DOCX" %}</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{{ page_title }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi {{ page_icon }} mr-2 text-primary"></i>{{ page_title }}</h1>
+    <p class="mt-1 text-sm text-ink-light">{{ page_obj.paginator.count }} {% trans "total" %}</p>
+  </div>
+  {% if can_create and create_url_name %}
+  <a href="{% url create_url_name %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Add new" %}</a>
+  {% endif %}
+</div>
+
+{% if has_search %}
+<form method="get" class="dash-toolbar">
+  <input type="search" name="q" value="{{ search_query }}" placeholder="{% trans 'Search…' %}" class="dash-search">
+  <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-search"></i>{% trans "Search" %}</button>
+  {% if search_query %}<a href="?" class="btn-ghost btn-sm">{% trans "Clear" %}</a>{% endif %}
+</form>
+{% endif %}
+
+{% if object_list %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        {% for col in columns %}<th>{{ col.label }}</th>{% endfor %}
+        {% if can_edit or can_delete %}<th class="text-right">{% trans "Actions" %}</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in object_list %}
+      <tr>
+        {% for col in columns %}<td>{{ obj|get_attr:col.field }}</td>{% endfor %}
+        {% if can_edit or can_delete %}
+        <td class="text-right">
+          <div class="inline-flex items-center gap-1">
+            {% if can_edit and edit_url_name %}
+            <a href="{% url edit_url_name obj.pk %}" class="dash-icon-btn" title="{% trans 'Edit' %}"><i class="bi bi-pencil"></i></a>
+            {% endif %}
+            {% if can_delete and delete_url_name %}
+            <a href="{% url delete_url_name obj.pk %}" class="dash-icon-btn hover:text-danger" title="{% trans 'Delete' %}"><i class="bi bi-trash"></i></a>
+            {% endif %}
+          </div>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "Nothing here yet" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon=page_icon title=empty_title %}
+{% endif %}
+{% endblock %}

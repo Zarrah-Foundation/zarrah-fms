@@ -1,0 +1,66 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "SMTP Settings" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "SMTP Settings" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "SMTP Settings" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "When active, outgoing mail uses these settings; otherwise the .env SMTP values are used." %}</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <form method="post" class="space-y-6 lg:col-span-2">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="card-flat">
+      <h2 class="mb-5 text-h4">{% trans "Server" %}</h2>
+      <div class="dash-form-grid">
+        {% include "dashboard/includes/_form_field.html" with field=form.host %}
+        {% include "dashboard/includes/_form_field.html" with field=form.port %}
+        {% include "dashboard/includes/_form_field.html" with field=form.username %}
+        {% include "dashboard/includes/_form_field.html" with field=form.password %}
+        {% include "dashboard/includes/_form_field.html" with field=form.encryption %}
+      </div>
+      <div class="mt-4">
+        {% include "dashboard/includes/_form_field.html" with field=form.is_active %}
+      </div>
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-5 text-h4">{% trans "Sender" %}</h2>
+      <div class="dash-form-grid">
+        {% include "dashboard/includes/_form_field.html" with field=form.from_name %}
+        {% include "dashboard/includes/_form_field.html" with field=form.from_email %}
+        {% include "dashboard/includes/_form_field.html" with field=form.reply_to %}
+      </div>
+    </div>
+
+    {% if can_edit %}
+    <div class="flex justify-end">
+      <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save changes" %}</button>
+    </div>
+    {% endif %}
+  </form>
+
+  <div>
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Send Test Email" %}</h2>
+      {% if can_edit %}
+      <form method="post" action="{% url 'dashboard-smtp-test' %}" class="space-y-3">
+        {% csrf_token %}
+        <label class="form-label" for="to_email">{% trans "Recipient" %}</label>
+        <input type="email" id="to_email" name="to_email" class="form-input" value="{{ default_to }}" required>
+        <button type="submit" class="btn-secondary w-full"><i class="bi bi-send"></i>{% trans "Send test" %}</button>
+      </form>
+      {% else %}
+      <p class="text-sm text-ink-light">{% trans "You have read-only access." %}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

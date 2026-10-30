@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ site_settings.meta_title|default:site_settings.localized_name }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ site_settings.meta_description|default:site_settings.localized_tagline }}">
+{% endblock %}
+
+{% block content %}
+<div class="home-stack">
+  {% for section in sections %}
+    {% include section.template_name with section=section %}
+  {% empty %}
+  <section class="zf-hero" aria-labelledby="home-fallback-title">
+    <div class="zf-hero__glow" aria-hidden="true"></div>
+    <div class="container-app relative z-[1] flex flex-col items-center gap-6 py-16 text-center md:py-24">
+      <p class="zf-hero__eyebrow">{% trans "Zarrah Foundation" %}</p>
+      <h1 id="home-fallback-title" class="zf-hero__title">
+        {% blocktrans with name=site_settings.localized_name %}Welcome to {{ name }}{% endblocktrans %}
+      </h1>
+      <p class="zf-hero__lead">
+        {% if site_settings.localized_tagline %}{{ site_settings.localized_tagline }}{% else %}{% trans "Small Acts, Lasting Impact" %}{% endif %}
+      </p>
+      <div class="zf-hero__actions">
+        <a href="{% url 'donation' %}" class="btn-accent">
+          <i class="bi bi-heart-fill" aria-hidden="true"></i>{% trans "Donate Now" %}
+        </a>
+        <a href="{% url 'membership' %}" class="btn zf-hero__btn-secondary">
+          <i class="bi bi-people-fill" aria-hidden="true"></i>{% trans "Become a Member" %}
+        </a>
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/gallery-slider.js' %}?v=20260809-gallery" defer></script>
+{% endblock %}

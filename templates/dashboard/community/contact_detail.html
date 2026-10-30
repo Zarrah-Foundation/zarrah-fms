@@ -1,0 +1,35 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{{ message.subject }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Contact Message" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <a href="{% url 'dashboard-contact-messages' %}" class="mb-1 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Contact Messages" %}</a>
+    <h1 class="dash-page-title">{{ message.subject }}</h1>
+  </div>
+  {% if can_delete %}
+  <form method="post" action="{% url 'dashboard-contact-message-delete' message.pk %}" onsubmit="return confirm('{% trans "Delete this message?" %}');">
+    {% csrf_token %}
+    <button type="submit" class="btn-danger btn-sm"><i class="bi bi-trash"></i>{% trans "Delete" %}</button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="card-flat max-w-3xl">
+  <dl class="dash-dl">
+    <div><dt>{% trans "From" %}</dt><dd>{{ message.name }}</dd></div>
+    <div><dt>{% trans "Email" %}</dt><dd><a href="mailto:{{ message.email }}" class="text-primary">{{ message.email }}</a></dd></div>
+    <div><dt>{% trans "Received" %}</dt><dd>{{ message.created_at|date:"M d, Y H:i" }}</dd></div>
+  </dl>
+  <div class="mt-4 border-t border-border/60 pt-4">
+    <p class="mb-1 text-sm font-semibold text-ink">{% trans "Message" %}</p>
+    <p class="whitespace-pre-line text-sm text-ink-light">{{ message.message }}</p>
+  </div>
+  <div class="mt-5">
+    <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject }}" class="btn-primary btn-sm"><i class="bi bi-reply"></i>{% trans "Reply by email" %}</a>
+  </div>
+</div>
+{% endblock %}

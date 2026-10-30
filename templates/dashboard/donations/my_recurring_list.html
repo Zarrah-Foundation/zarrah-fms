@@ -1,0 +1,50 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My Recurring Donations" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "My Recurring Donations" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "My Recurring Donations" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Monthly general donations linked to your account." %}</p>
+  </div>
+  <a href="{% url 'donation-recurring' %}" class="btn-primary btn-sm">
+    <i class="bi bi-arrow-repeat"></i>{% trans "Set up monthly gift" %}
+  </a>
+</div>
+
+{% if subscriptions %}
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>{% trans "Amount" %}</th>
+        <th>{% trans "Frequency" %}</th>
+        <th>{% trans "Provider" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Next charge" %}</th>
+        <th>{% trans "Started" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in subscriptions %}
+      <tr>
+        <td class="font-semibold">৳{{ s.amount|floatformat:0 }}</td>
+        <td>{{ s.get_frequency_display }}</td>
+        <td>{{ s.get_payment_gateway_display }}</td>
+        <td>{{ s.get_status_display }}</td>
+        <td>{% if s.next_billing %}{{ s.next_billing|date:"j M Y" }}{% else %}—{% endif %}</td>
+        <td>{{ s.created_at|date:"j M Y" }}</td>
+        <td><a href="{% url 'dashboard-my-recurring-detail' s.pk %}" class="text-primary hover:underline">{% trans "View" %}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-ink-light">{% trans "You have no recurring donations yet." %}</p>
+{% endif %}
+{% endblock %}

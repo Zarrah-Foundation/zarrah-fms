@@ -1,0 +1,62 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Results" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Results" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mx-auto max-w-3xl">
+  <div class="dash-page-header">
+    <h1 class="dash-page-title">{{ election.title_bn|default:election.title_en }}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Published aggregate results only. Individual ballots remain secret." %}</p>
+  </div>
+
+  <div class="mb-6 grid gap-3 sm:grid-cols-3">
+    <div class="rounded-card border border-border/60 bg-surface p-4">
+      <p class="text-xs uppercase text-ink-light">{% trans "Votes" %}</p>
+      <p class="text-xl font-bold">{{ results.turnout.votes }}</p>
+    </div>
+    <div class="rounded-card border border-border/60 bg-surface p-4">
+      <p class="text-xs uppercase text-ink-light">{% trans "Eligible" %}</p>
+      <p class="text-xl font-bold">{{ results.turnout.eligible }}</p>
+    </div>
+    <div class="rounded-card border border-border/60 bg-surface p-4">
+      <p class="text-xs uppercase text-ink-light">{% trans "Quorum" %}</p>
+      <p class="text-xl font-bold">{{ results.turnout.required }}</p>
+    </div>
+  </div>
+
+  <div class="card-flat">
+    {% if results.mode == "choice" %}
+    <table class="dash-table">
+      <thead><tr><th>{% trans "Option" %}</th><th>{% trans "Votes" %}</th></tr></thead>
+      <tbody>
+        {% for row in results.scores %}
+        <tr><td>{{ row.label }}</td><td>{{ row.votes }}</td></tr>
+        {% empty %}
+        <tr><td colspan="2">{% trans "No results." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <h2 class="mb-3 text-h4">{% trans "Winners" %}</h2>
+    <ul class="mb-6 list-disc space-y-1 pl-5">
+      {% for w in results.winners %}
+      <li>{{ w.name }} — {{ w.points }} {% trans "pts" %} ({{ w.seat_type }})</li>
+      {% empty %}
+      <li class="text-ink-light">{% trans "No winners listed." %}</li>
+      {% endfor %}
+    </ul>
+    <h2 class="mb-3 text-h4">{% trans "All scores" %}</h2>
+    <table class="dash-table">
+      <thead><tr><th>{% trans "Candidate" %}</th><th>{% trans "Points" %}</th></tr></thead>
+      <tbody>
+        {% for row in results.scores %}
+        <tr><td>{{ row.name }}</td><td>{{ row.points }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

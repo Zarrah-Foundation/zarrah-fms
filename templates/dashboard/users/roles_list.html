@@ -1,0 +1,56 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Roles & Permissions" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Roles & Permissions" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-shield-lock mr-2 text-primary"></i>{% trans "Roles & Permissions" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Action-based roles assigned to users." %}</p>
+  </div>
+  {% if can_create %}<a href="{% url 'dashboard-role-create' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Add role" %}</a>{% endif %}
+</div>
+
+{% if roles %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Users" %}</th>
+        <th>{% trans "Permissions" %}</th>
+        <th>{% trans "Type" %}</th>
+        <th>{% trans "Active" %}</th>
+        <th class="text-right">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in roles %}
+      <tr>
+        <td class="font-medium">{{ r.name }}</td>
+        <td>{{ r.n_users }}</td>
+        <td>{{ r.permission_count }}</td>
+        <td>{% if r.is_system %}<span class="badge-info">{% trans "System" %}</span>{% else %}<span class="badge-muted">{% trans "Custom" %}</span>{% endif %}</td>
+        <td>{% if r.is_active %}<span class="badge-success">{% trans "Yes" %}</span>{% else %}<span class="badge-muted">{% trans "No" %}</span>{% endif %}</td>
+        <td class="text-right">
+          {% if can_edit %}<a href="{% url 'dashboard-role-edit' r.pk %}" class="dash-icon-btn" title="{% trans 'Edit' %}"><i class="bi bi-pencil"></i></a>{% endif %}
+          {% if can_delete and not r.is_system %}
+          <form method="post" action="{% url 'dashboard-role-delete' r.pk %}" class="inline" onsubmit="return confirm('{% trans "Delete this role?" %}');">
+            {% csrf_token %}
+            <button type="submit" class="dash-icon-btn text-danger" title="{% trans 'Delete' %}"><i class="bi bi-trash"></i></button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+{% trans "No roles yet" as empty_title %}
+{% trans "Run seed_rbac to create default roles, or add one." as empty_msg %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-shield-lock" title=empty_title message=empty_msg %}
+{% endif %}
+{% endblock %}

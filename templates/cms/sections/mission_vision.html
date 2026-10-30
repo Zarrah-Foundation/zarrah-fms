@@ -1,0 +1,64 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section" aria-labelledby="home-mv-title">
+  <div class="container-app">
+    <div class="zf-home-heading mx-auto mb-10 max-w-2xl text-center">
+      <p class="zf-home-eyebrow">{% trans "Our Purpose" %}</p>
+      <h2 id="home-mv-title" class="zf-home-title">
+        {{ section|bl:"title" }}
+      </h2>
+    </div>
+
+    {% with cfg=section.get_config %}
+    <div class="zf-mv-grid">
+      <article class="zf-mv-card">
+        <div class="zf-mv-card__icon" aria-hidden="true"><i class="bi bi-bullseye"></i></div>
+        <h3 class="zf-mv-card__title">
+          {% if LANGUAGE_CODE == 'bn' %}
+            {{ cfg.mission_title_bn|default:"আমাদের লক্ষ্য" }}
+          {% else %}
+            {{ cfg.mission_title_en|default:"Our Mission" }}
+          {% endif %}
+        </h3>
+        <p class="zf-mv-card__text">
+          {% if LANGUAGE_CODE == 'bn' %}
+            {{ mission_vision.mission_bn|default:mission_vision.mission_en }}
+          {% else %}
+            {{ mission_vision.mission_en|default:mission_vision.mission_bn }}
+          {% endif %}
+        </p>
+      </article>
+      {% if mission_vision.vision_en or mission_vision.vision_bn %}
+      <article class="zf-mv-card">
+        <div class="zf-mv-card__icon" aria-hidden="true"><i class="bi bi-building"></i></div>
+        <h3 class="zf-mv-card__title">
+          {% if LANGUAGE_CODE == 'bn' %}
+            {{ cfg.vision_title_bn|default:"সাংগঠনিক পরিচিতি" }}
+          {% else %}
+            {{ cfg.vision_title_en|default:"Organizational Nature" }}
+          {% endif %}
+        </h3>
+        <p class="zf-mv-card__text">
+          {% if LANGUAGE_CODE == 'bn' %}
+            {{ mission_vision.vision_bn|default:mission_vision.vision_en }}
+          {% else %}
+            {{ mission_vision.vision_en|default:mission_vision.vision_bn }}
+          {% endif %}
+        </p>
+      </article>
+      {% endif %}
+    </div>
+    {% endwith %}
+
+    {% if section.button_link %}
+    <div class="mt-8 text-center">
+      <a href="{{ section.button_link }}" class="btn-secondary">
+        {% if section.button_text_en or section.button_text_bn %}
+          {{ section|bl:"button_text" }}
+        {% else %}
+          {% trans "Learn more" %}
+        {% endif %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>

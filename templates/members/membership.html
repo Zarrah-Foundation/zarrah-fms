@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Membership" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{% zf_label 'Membership of Zarrah Foundation — eligibility, application and fees as set by the organisation.' %}">
+{% endblock %}
+
+{% block content %}
+<section class="legal-hero" aria-labelledby="membership-hero-heading">
+  <div class="container-app legal-hero__inner">
+    <nav aria-label="{% zf_label 'Breadcrumb' %}" class="legal-breadcrumb">
+      <a href="{% url 'home' %}">{% zf_label "Home" %}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{% zf_label "Membership" %}</span>
+    </nav>
+    <p class="legal-hero__eyebrow">{% zf_label "Membership" %}</p>
+    <h1 id="membership-hero-heading" class="legal-hero__title">{% zf_label "Become a Member" %}</h1>
+    <p class="legal-hero__lead">{% zf_label "Zarrah Foundation is a voluntary, non-profit, non-political humanitarian society. Membership is by application and review — it is not automatic." %}</p>
+  </div>
+</section>
+
+<section class="zf-public-stack bg-canvas">
+  <div class="container-app">
+    <div class="card mx-auto max-w-3xl">
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div class="text-center">
+          <p class="text-sm font-semibold text-ink">{% zf_label "1. Apply" %}</p>
+          <p class="text-xs text-ink-light">{% zf_label "Submit the membership application form" %}</p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm font-semibold text-ink">{% zf_label "2. Review" %}</p>
+          <p class="text-xs text-ink-light">{% zf_label "The Executive Council reviews applications" %}</p>
+        </div>
+        <div class="text-center">
+          <p class="text-sm font-semibold text-ink">{% zf_label "3. Approval" %}</p>
+          <p class="text-xs text-ink-light">{% zf_label "Approved members receive a Member ID and dashboard access" %}</p>
+        </div>
+      </div>
+      <div class="mt-8 flex flex-wrap justify-center gap-4">
+        <a href="{% url 'membership-apply' %}" class="btn-primary">{% zf_label "Apply for Membership" %}</a>
+        <a href="{% url 'membership-status' %}" class="btn-secondary">{% zf_label "Check Application Status" %}</a>
+        <a href="{% url 'public-membership-fee-payment' %}" class="btn-secondary">{% zf_label "Pay Membership Fee" %}</a>
+        <a href="{% url 'contact' %}" class="btn-secondary">{% zf_label "Contact Admin" %}</a>
+      </div>
+    </div>
+
+    {% if membership_eligibility %}
+    <div class="mx-auto mt-12 max-w-3xl">
+      <h2 class="text-h3 text-ink">{% zf_label "Membership Requirements" %}</h2>
+      <p class="mt-3 text-ink-light">{{ membership_eligibility|bl:"intro" }}</p>
+      <ul class="mt-4 list-disc space-y-2 pl-5 text-ink-light">
+        {% for item in membership_eligibility.items %}
+        <li>{{ item|bl }}</li>
+        {% endfor %}
+      </ul>
+      <p class="mt-4 text-ink-light">{{ membership_eligibility|bl:"outro" }}</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

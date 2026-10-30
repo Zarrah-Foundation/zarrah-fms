@@ -1,0 +1,33 @@
+{% load i18n i18n_extras %}
+{% if home_impact_stats %}
+<section class="zf-home-section" aria-labelledby="home-impact-title">
+  <div class="container-app">
+    <div class="zf-home-heading mx-auto mb-8 max-w-2xl text-center">
+      <p class="zf-home-eyebrow">{% trans "Verified records" %}</p>
+      <h2 id="home-impact-title" class="zf-home-title">
+        {{ section|bl:"title"|default:_("Impact Statistics") }}
+      </h2>
+      {% if section.content_en or section.content_bn %}
+      <p class="zf-home-lead mt-3">{{ section|bl:"content" }}</p>
+      {% endif %}
+    </div>
+    <ul class="zf-stat-grid">
+      {% for item in home_impact_stats %}
+      <li class="zf-stat-card">
+        {% if item.icon %}
+        <i class="{{ item.icon }} zf-stat-card__icon" aria-hidden="true"></i>
+        {% endif %}
+        <p class="zf-stat-card__value">{{ item.value }}</p>
+        <p class="zf-stat-card__label">{{ item.localized_label }}</p>
+        {% if item.localized_description %}
+        <p class="zf-stat-card__desc">{{ item.localized_description }}</p>
+        {% endif %}
+        {% if item.period_year %}
+        <p class="zf-stat-card__period">{{ item.period_year }}</p>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}

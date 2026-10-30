@@ -1,0 +1,33 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}
+  {{ block.super }}
+  {% if donation_summary %}
+  <div style="margin: 12px 0 20px; padding: 14px 16px; background: #f3f7f4; border: 1px solid #d0d7d2; border-radius: 6px;">
+    <h2 style="margin: 0 0 10px; font-size: 15px;">{% trans "Donation summary" %}</h2>
+    <p style="margin: 0; font-size: 13px; line-height: 1.6;">
+      <strong>{% trans "Total" %}:</strong> {{ donation_summary.total_count }}
+      &nbsp;|&nbsp;
+      <strong>{% trans "Success" %}:</strong> {{ donation_summary.success_count }}
+      ({{ donation_summary.success_amount|floatformat:0 }} BDT)
+      &nbsp;|&nbsp;
+      <strong>{% trans "Pending" %}:</strong> {{ donation_summary.pending_count }}
+      &nbsp;|&nbsp;
+      <strong>{% trans "Failed" %}:</strong> {{ donation_summary.failed_count }}
+      &nbsp;|&nbsp;
+      <strong>{% trans "Cancelled" %}:</strong> {{ donation_summary.cancelled_count }}
+      &nbsp;|&nbsp;
+      <strong>{% trans "Refunded" %}:</strong> {{ donation_summary.refunded_count }}
+    </p>
+    {% if donation_summary.by_category %}
+    <p style="margin: 8px 0 0; font-size: 12px; color: #444;">
+      <strong>{% trans "Top categories (successful)" %}:</strong>
+      {% for row in donation_summary.by_category %}
+        {{ row.category__name_en|default:"—" }} ({{ row.count }} / {{ row.total|floatformat:0 }} BDT){% if not forloop.last %}; {% endif %}
+      {% endfor %}
+    </p>
+    {% endif %}
+  </div>
+  {% endif %}
+{% endblock %}

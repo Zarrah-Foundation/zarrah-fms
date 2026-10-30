@@ -1,0 +1,66 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Notifications" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Notifications" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "Notifications" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% blocktrans count counter=unread_count %}{{ counter }} unread{% plural %}{{ counter }} unread{% endblocktrans %}</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="inline-flex rounded-badge border border-border bg-canvas p-1">
+      <a href="?" class="rounded-badge px-3 py-1.5 text-sm font-semibold {% if not unread_only %}bg-primary text-white{% else %}text-ink-light hover:text-primary{% endif %}">{% trans "All" %}</a>
+      <a href="?filter=unread" class="rounded-badge px-3 py-1.5 text-sm font-semibold {% if unread_only %}bg-primary text-white{% else %}text-ink-light hover:text-primary{% endif %}">{% trans "Unread" %}</a>
+    </div>
+    {% if unread_count %}
+    <form method="post" action="{% url 'dashboard-notifications-read-all' %}" class="js-notif-mark-all">
+      {% csrf_token %}
+      <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-check2-all"></i>{% trans "Mark all read" %}</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if notifications %}
+<div class="overflow-hidden rounded-card border border-border/60 bg-surface shadow-soft-sm">
+  {% for n in notifications %}
+  <div class="flex items-start gap-3 border-b border-border/40 px-4 py-4 last:border-b-0 {% if n.viewer_is_unread %}notif-unread{% endif %}" data-notif-row>
+    <span class="notif-dot {% if n.priority == 'CRITICAL' %}bg-danger{% elif n.priority == 'HIGH' %}bg-warning{% elif n.priority == 'LOW' %}bg-ink-light{% else %}bg-info{% endif %}" title="{{ n.get_priority_display }}"></span>
+    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><i class="bi {{ n.icon|default:'bi-bell' }}"></i></span>
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <p class="font-semibold text-ink">{{ n.title }}</p>
+        {% if n.viewer_is_unread %}<span class="badge-primary">{% trans "New" %}</span>{% endif %}
+      </div>
+      <p class="mt-0.5 text-sm text-ink-light">{{ n.message }}</p>
+      <p class="mt-1 text-xs text-ink-light/70">{{ n.created_at|date:"M d, Y H:i" }}</p>
+      {% if n.link %}<a href="{{ n.link }}" class="mt-1 inline-block text-sm font-medium text-primary hover:underline">{% trans "Open" %} &rarr;</a>{% endif %}
+    </div>
+    <div class="flex shrink-0 items-center gap-1">
+      {% if n.viewer_is_unread %}
+      <form method="post" action="{% url 'dashboard-notification-read' n.pk %}" class="js-notif-mark-read">
+        {% csrf_token %}
+        <button type="submit" class="dash-icon-btn" title="{% trans 'Mark as read' %}"><i class="bi bi-check-lg"></i></button>
+      </form>
+      {% endif %}
+      {% if n.user_id %}
+      <form method="post" action="{% url 'dashboard-notification-delete' n.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="dash-icon-btn hover:text-danger" title="{% trans 'Delete' %}"><i class="bi bi-trash"></i></button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No notifications" as empty_title %}
+{% trans "You're all caught up." as empty_msg %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-bell" title=empty_title message=empty_msg %}
+{% endif %}
+{% endblock %}

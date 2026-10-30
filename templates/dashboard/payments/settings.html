@@ -1,0 +1,46 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n i18n_extras %}
+{% block title %}{% zf_label "Payment Settings" %}{% endblock %}
+{% block topbar_title %}{% zf_label "Payment Settings" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><h1 class="dash-page-title">{% zf_label "Payment Settings" %}</h1></div>
+<form method="post" class="max-w-xl space-y-6 rounded-card border border-border/60 bg-surface p-6">
+  {% csrf_token %}
+  <label class="flex items-center gap-2"><input type="checkbox" name="one_time_donation_enabled" class="form-checkbox" {% if payment_settings.one_time_donation_enabled %}checked{% endif %}> {% zf_label "One-time donations enabled" %}</label>
+
+  <fieldset class="space-y-3 rounded-xl border border-border/70 p-4">
+    <legend class="px-1 text-sm font-semibold text-ink">
+      {% zf_label "Recurring Donations" %}
+      <span class="font-normal text-ink-light">· {% zf_label "Monthly Donation" %}</span>
+    </legend>
+    <div class="flex flex-wrap gap-4">
+      <label class="inline-flex items-center gap-2">
+        <input type="radio" name="recurring_donation_enabled" value="on" class="form-radio" {% if payment_settings.recurring_donation_enabled %}checked{% endif %}>
+        {% zf_label "Enabled" %}
+      </label>
+      <label class="inline-flex items-center gap-2">
+        <input type="radio" name="recurring_donation_enabled" value="off" class="form-radio" {% if not payment_settings.recurring_donation_enabled %}checked{% endif %}>
+        {% zf_label "Disabled" %}
+      </label>
+    </div>
+    <p class="text-sm text-ink-light">
+      {% zf_label "When disabled, the recurring/monthly donation option is hidden from the public donation page and new recurring subscriptions cannot be started." %}
+    </p>
+    <p class="text-xs text-ink-light">
+      {% zf_label "Existing active subscriptions are not cancelled automatically." %}
+    </p>
+    {% if not payment_settings.recurring_donation_enabled %}
+    <p class="rounded-lg bg-canvas px-3 py-2 text-sm font-semibold text-ink">
+      {% zf_label "New recurring donations disabled" %}
+    </p>
+    {% endif %}
+  </fieldset>
+
+  <label class="flex items-center gap-2"><input type="checkbox" name="public_membership_fee_enabled" class="form-checkbox" {% if payment_settings.public_membership_fee_enabled %}checked{% endif %}> {% zf_label "Public current-month membership fee" %}</label>
+  <label class="flex items-center gap-2"><input type="checkbox" name="membership_autopay_enabled" class="form-checkbox" {% if payment_settings.membership_autopay_enabled %}checked{% endif %}> {% zf_label "Membership Autopay enabled" %}</label>
+  <div class="form-group"><label class="form-label">{% zf_label "Minimum donation" %}</label><input class="form-input" type="number" step="1" name="min_donation_amount" value="{{ payment_settings.min_donation_amount }}"></div>
+  <div class="form-group"><label class="form-label">{% zf_label "Maximum donation" %}</label><input class="form-input" type="number" step="1" name="max_donation_amount" value="{{ payment_settings.max_donation_amount }}"></div>
+  <p class="text-xs text-ink-light">{% zf_label "Allowed recurring frequencies: MONTHLY only." %}</p>
+  <button type="submit" class="btn-primary">{% zf_label "Save" %}</button>
+</form>
+{% endblock %}

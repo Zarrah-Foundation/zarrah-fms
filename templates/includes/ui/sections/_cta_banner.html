@@ -1,0 +1,29 @@
+{% load i18n i18n_extras %}
+{% comment %}
+Reusable gradient call-to-action banner with a row of buttons.
+Usage:
+  {% include "includes/ui/sections/_cta_banner.html" with title=about_cta|bl:"title" subtitle=about_cta|bl:"subtitle" buttons=about_cta.buttons %}
+Params:
+  title, subtitle - copy (required/optional)
+  buttons - list of {icon, text_en/text_bn (read via |bl:"text"), url_name, variant}
+{% endcomment %}
+<section class="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-primary-dark py-20 lg:py-28" aria-labelledby="cta-heading">
+  <div class="bg-pattern-dots absolute inset-0 opacity-40" aria-hidden="true"></div>
+  <svg class="pointer-events-none absolute -right-20 -top-20 h-72 w-72 text-white/[0.06]" viewBox="0 0 200 200" fill="currentColor" aria-hidden="true">
+    <circle cx="100" cy="100" r="100" />
+  </svg>
+
+  <div class="container-app relative flex flex-col items-center gap-6 text-center">
+    <h2 id="cta-heading" class="max-w-2xl text-h2 text-white">{{ title }}</h2>
+    {% if subtitle %}
+    <p class="max-w-xl text-body text-white/85">{{ subtitle }}</p>
+    {% endif %}
+
+    <div class="mt-2 flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
+      {% for button in buttons %}
+      {% url button.url_name as button_href %}
+      {% include "includes/ui/buttons/_btn.html" with href=button_href text=button|bl:"text" icon=button.icon variant=button.variant size="lg" extra_class="min-h-12 w-full justify-center sm:w-auto" %}
+      {% endfor %}
+    </div>
+  </div>
+</section>

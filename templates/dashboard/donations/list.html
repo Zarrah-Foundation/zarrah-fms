@@ -1,0 +1,82 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{% trans "Donations" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Donations" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-heart mr-2 text-primary"></i>{% trans "Donations" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{{ page_obj.paginator.count }} {% trans "records" %}</p>
+  </div>
+  <div class="flex items-center gap-2">
+    {% if can_create %}<a href="{% url 'dashboard-donation-manual' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Record manual" %}</a>{% endif %}
+    <a href="{% url 'dashboard-donation-reports' %}" class="btn-secondary btn-sm"><i class="bi bi-graph-up"></i>{% trans "Reports" %}</a>
+  </div>
+</div>
+
+<div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  {% trans "Total (successful)" as l_total %}
+  {% trans "Successful count" as l_count %}
+  {% with total_val=totals.total|default:0 %}
+  {% include "dashboard/includes/_stat_card.html" with label=l_total value=total_val icon="bi-cash-coin" tone="success" sub="BDT" %}
+  {% endwith %}
+  {% include "dashboard/includes/_stat_card.html" with label=l_count value=totals.count|default:0 icon="bi-receipt" tone="primary" %}
+</div>
+
+<form method="get" class="dash-toolbar">
+  <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Name, phone, email, receipt…' %}" class="dash-search">
+  <select name="type" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "All types" %}</option>
+    <option value="online" {% if dtype == 'online' %}selected{% endif %}>{% trans "Online" %}</option>
+    <option value="manual" {% if dtype == 'manual' %}selected{% endif %}>{% trans "Manual" %}</option>
+    <option value="anonymous" {% if dtype == 'anonymous' %}selected{% endif %}>{% trans "Anonymous" %}</option>
+  </select>
+  <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "All statuses" %}</option>
+    {% for code, label in status_choices %}<option value="{{ code }}" {% if status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select name="category" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "All categories" %}</option>
+    {% for c in categories %}<option value="{{ c.id }}" {% if category == c.id|stringformat:'s' %}selected{% endif %}>{{ c.name_en }}</option>{% endfor %}
+  </select>
+  <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-search"></i>{% trans "Filter" %}</button>
+  {% if q or status or category or dtype %}<a href="?" class="btn-ghost btn-sm">{% trans "Clear" %}</a>{% endif %}
+</form>
+
+{% if donations %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Date" %}</th>
+        <th>{% trans "Donor" %}</th>
+        <th>{% trans "Category" %}</th>
+        <th>{% trans "Amount" %}</th>
+        <th>{% trans "Method" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th class="text-right">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in donations %}
+      <tr>
+        <td>{{ d.created_at|date:"M d, Y" }}</td>
+        <td>{{ d.display_name }}{% if d.is_anonymous %} <span class="badge-accent">{% trans "Anon" %}</span>{% endif %}</td>
+        <td>{{ d.category.name_en }}</td>
+        <td class="font-semibold">{{ d.amount|floatformat:0 }} {{ d.currency }}</td>
+        <td>{{ d.get_payment_method_display }}</td>
+        <td>{% status_badge d.status d.get_status_display %}</td>
+        <td class="text-right"><a href="{% url 'dashboard-donation-detail' d.pk %}" class="dash-icon-btn" title="{% trans 'View' %}"><i class="bi bi-eye"></i></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No donations found" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-heart" title=empty_title %}
+{% endif %}
+{% endblock %}

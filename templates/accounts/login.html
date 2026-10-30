@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %} - {% trans "Zarrah Foundation" %}{% endblock %}
+
+{% block content %}
+<div class="section container-app flex justify-center">
+  <div class="w-full max-w-md">
+    <div class="mb-8 text-center">
+      <span class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <i class="bi bi-shield-lock-fill text-2xl" aria-hidden="true"></i>
+      </span>
+      <h1 class="text-h3">{% trans "Welcome Back" %}</h1>
+      <p class="mt-2 text-ink-light">{% trans "Login to access your Zarrah Foundation account" %}</p>
+    </div>
+
+    <div class="card">
+      <form method="post" class="space-y-5">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div role="alert" class="rounded-field bg-danger/10 px-4 py-3 text-sm font-medium text-danger">
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        {% for field in form %}
+        <div>
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn-primary w-full">
+          <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>{% trans "Login" %}
+        </button>
+      </form>
+
+      <div class="mt-6 space-y-2 text-center text-sm">
+        <p><a href="{% url 'forgot-password' %}" class="font-medium text-primary hover:underline">{% trans "Forgot password?" %}</a></p>
+        <p class="text-ink-light">
+          {% trans "Don't have an account?" %}
+          <a href="{% url 'register' %}" class="font-medium text-primary hover:underline">{% trans "Register" %}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

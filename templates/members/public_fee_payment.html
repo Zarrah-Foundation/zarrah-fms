@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Membership Fee Payment" %} - {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="section container-app">
+  <div class="mx-auto max-w-xl">
+    <div class="mb-8">
+      <span class="badge-primary mb-4">
+        <i class="bi bi-wallet2" aria-hidden="true"></i>{% zf_label "Membership" %}
+      </span>
+      <h1 class="text-h2 text-primary-dark">{% zf_label "Membership Fee Payment" %}</h1>
+      <p class="mt-3 text-ink-light">
+        {% zf_label "You can pay the current month's membership fee without logging in." %}
+      </p>
+      <p class="mt-2 text-sm text-ink-light">
+        {% zf_label "Payments for previous or future months require you to log in to your account." %}
+      </p>
+    </div>
+
+    {% if stage == "already_paid" %}
+    <div class="card" role="status">
+      <div class="flex items-start gap-3">
+        <i class="bi bi-check-circle text-2xl text-success" aria-hidden="true"></i>
+        <div>
+          <h2 class="text-h4">{% zf_label "Already paid" %}</h2>
+          <p class="mt-2 text-ink">{{ already_paid_message }}</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="{{ login_url }}" class="btn-primary">
+              <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>{% zf_label "Login to your account" %}
+            </a>
+            <a href="{% url 'public-membership-fee-payment' %}" class="btn-secondary">
+              {% zf_label "Pay for another member" %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% elif stage == "confirm" and confirmed %}
+    <div class="card">
+      <h2 class="text-h4 border-b border-border/60 pb-3">{% zf_label "Confirm payment" %}</h2>
+      <dl class="mt-5 space-y-3 text-sm">
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-light">{% zf_label "Member Name" %}</dt>
+          <dd class="font-semibold text-ink text-right">{{ confirmed.display_name }}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-light">{% zf_label "Membership ID" %}</dt>
+          <dd class="font-semibold text-ink text-right" lang="en">{{ confirmed.member_id }}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-ink-light">{% zf_label "Fee Period" %}</dt>
+          <dd class="font-semibold text-ink text-right">{{ confirmed.period_label }}</dd>
+        </div>
+        <div class="flex justify-between gap-4 border-t border-border/60 pt-3">
+          <dt class="text-ink-light">{% zf_label "Membership Fee" %}</dt>
+          <dd class="text-lg font-bold text-primary" lang="en">৳{{ confirmed.amount|floatformat:0 }}</dd>
+        </div>
+      </dl>
+
+      <div class="mt-6 rounded-xl border border-border/70 bg-canvas p-4">
+        <p class="text-sm font-semibold text-ink">{% zf_label "Payment method" %}</p>
+        <p class="mt-1 text-sm text-ink-light">
+          {% zf_label "Secure online payment via SSLCommerz (cards and wallets enabled on the merchant store)." %}
+        </p>
+      </div>
+
+      <form id="public-fee-pay-form" method="post" action="{% url 'public-membership-fee-pay' %}" class="mt-6 space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="checkout_token" value="{{ confirmed.token }}">
+        <button type="submit" id="public-fee-pay-btn" class="btn-primary w-full justify-center">
+          <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+          <span data-default-label>{% zf_label "Pay Now" %}</span>
+          <span data-loading-label class="hidden">{% zf_label "Redirecting…" %}</span>
+        </button>
+      </form>
+      <p class="mt-3 text-center text-xs text-ink-light">
+        {% zf_label "You will be redirected to a secure payment page. Do not refresh while payment is processing." %}
+      </p>
+      <p class="mt-4 text-center">
+        <a href="{% url 'public-membership-fee-payment' %}" class="text-sm text-primary hover:underline">
+          {% zf_label "Use a different Membership ID" %}
+        </a>
+      </p>
+    </div>
+
+    {% else %}
+    <div class="card">
+      <h2 class="text-h4 border-b border-border/60 pb-3">{% zf_label "Verify Membership" %}</h2>
+      <form method="post" action="{% url 'public-membership-fee-verify' %}" class="mt-5 space-y-5" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="id_member_id">
+            <span class="form-label-text">{% zf_label "Membership ID" %}</span>
+            <span class="form-required" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            name="member_id"
+            id="id_member_id"
+            value="{{ member_id_value }}"
+            class="form-input"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            required
+            maxlength="50"
+            placeholder="{% zf_label 'e.g. ZF-2026-00025' %}"
+            aria-describedby="member-id-help"
+          >
+          <p id="member-id-help" class="mt-1.5 text-xs text-ink-light">
+            {% zf_label "Enter the Membership ID exactly as issued by Zarrah Foundation." %}
+          </p>
+        </div>
+        <button type="submit" class="btn-primary w-full justify-center">
+          <i class="bi bi-search" aria-hidden="true"></i>{% zf_label "Verify Membership" %}
+        </button>
+      </form>
+      <p class="mt-5 text-center text-sm text-ink-light">
+        {% zf_label "Already have an account?" %}
+        <a href="{% url 'login' %}?next={% url 'dashboard-my-fees' %}" class="text-primary hover:underline">
+          {% zf_label "Log in to pay other months" %}
+        </a>
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  var form = document.getElementById("public-fee-pay-form");
+  if (!form) return;
+  var btn = document.getElementById("public-fee-pay-btn");
+  form.addEventListener("submit", function () {
+    if (!btn) return;
+    btn.disabled = true;
+    btn.setAttribute("aria-busy", "true");
+    var def = btn.querySelector("[data-default-label]");
+    var loading = btn.querySelector("[data-loading-label]");
+    if (def) def.classList.add("hidden");
+    if (loading) loading.classList.remove("hidden");
+  });
+})();
+</script>
+{% endblock %}

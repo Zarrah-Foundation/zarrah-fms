@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras static %}
+
+{% block title %}{% zf_label "Recurring Donation" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="legal-hero" aria-labelledby="recurring-hero-heading">
+  <div class="container-app legal-hero__inner">
+    <nav aria-label="{% zf_label 'Breadcrumb' %}" class="legal-breadcrumb">
+      <a href="{% url 'home' %}">{% zf_label "Home" %}</a>
+      <span aria-hidden="true">/</span>
+      <a href="{% url 'donation' %}">{% zf_label "Donation" %}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{% zf_label "Recurring Donation" %}</span>
+    </nav>
+    <p class="legal-hero__eyebrow">{% zf_label "Recurring Support" %}</p>
+    <h1 id="recurring-hero-heading" class="legal-hero__title">{% zf_label "Recurring Donation" %}</h1>
+    <p class="legal-hero__lead">
+      {% zf_label "Set up a monthly donation. You can cancel anytime via your secure management link or dashboard." %}
+    </p>
+    <div class="zf-gift-modes" role="group" aria-label="{% zf_label 'Donation' %}">
+      <a href="{% url 'donation' %}" class="zf-gift-mode">{% zf_label "One-time Donation" %}</a>
+      <span class="zf-gift-mode is-active">
+        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+        {% zf_label "Recurring Donation" %}
+      </span>
+    </div>
+  </div>
+</section>
+
+<section class="zf-public-stack bg-canvas">
+  <div class="container-app">
+  {% if not recurring_signup_allowed %}
+  <div class="alert-warning mb-8 max-w-3xl" role="status">
+    <p class="font-semibold">{% zf_label "Recurring donations are not available right now." %}</p>
+    {% if recurring_config_reason %}
+    <p class="mt-1 text-sm">{{ recurring_config_reason }}</p>
+    {% endif %}
+    <p class="mt-4">
+      <a href="{% url 'donation' %}" class="btn-primary inline-flex">{% zf_label "One-time Donation" %}</a>
+    </p>
+  </div>
+  {% else %}
+  <div class="mx-auto max-w-3xl card">
+    <div class="mb-6 border-b border-border/60 pb-4">
+      <h2 class="text-h4">{% zf_label "Monthly Donation" %}</h2>
+      <p class="mt-1 text-sm text-ink-light">
+        {% zf_label "Frequency" %}: <strong>{% zf_label "Monthly" %}</strong>
+        · {% zf_label "Provider" %}: <strong lang="en">{{ recurring_provider_label }}</strong>
+      </p>
+      <p class="mt-2 text-xs text-ink-light">
+        {% zf_label "bKash and Nagad recurring are not available in this release." %}
+      </p>
+    </div>
+
+    <form method="post" action="{% url 'donation-recurring' %}" class="space-y-5" novalidate>
+      {% csrf_token %}
+      {{ form.frequency }}
+      {{ form.payment_provider }}
+
+      {% if form.non_field_errors %}
+      <div class="alert-danger" role="alert">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.category.id_for_label }}">
+          <span class="form-label-text">{{ form.category.label }}</span>
+          <span class="form-required" aria-hidden="true">*</span>
+        </label>
+        {{ form.category }}
+        {{ form.category.errors }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.amount.id_for_label }}">
+          <span class="form-label-text">{{ form.amount.label }}</span>
+          <span class="form-required" aria-hidden="true">*</span>
+        </label>
+        {{ form.amount }}
+        {{ form.amount.errors }}
+      </div>
+
+      <fieldset class="space-y-5">
+        <legend class="text-sm font-semibold text-ink">{% zf_label "Donor information" %}</legend>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.donor_name.id_for_label }}">
+          <span class="form-label-text">{{ form.donor_name.label }}</span>
+        </label>
+        {{ form.donor_name }}
+        {{ form.donor_name.errors }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.contact.id_for_label }}">
+          <span class="form-label-text">{{ form.contact.label }}</span>
+          <span class="form-required" aria-hidden="true">*</span>
+        </label>
+        {{ form.contact }}
+        {% if form.contact.help_text %}<p class="form-help">{{ form.contact.help_text }}</p>{% endif %}
+        {{ form.contact.errors }}
+      </div>
+      </fieldset>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.message.id_for_label }}">
+          <span class="form-label-text">{{ form.message.label }}</span>
+        </label>
+        {{ form.message }}
+      </div>
+
+      <div class="flex items-center gap-2">
+        {{ form.is_anonymous }}
+        <label for="{{ form.is_anonymous.id_for_label }}">{{ form.is_anonymous.label }}</label>
+      </div>
+
+      <button type="submit" class="btn-primary w-full sm:w-auto">
+        <i class="bi bi-shield-lock" aria-hidden="true"></i>
+        {% zf_label "Continue" %} — {% zf_label "Secure Payment" %}
+      </button>
+    </form>
+  </div>
+  {% endif %}
+  </div>
+</section>
+{% endblock %}

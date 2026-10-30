@@ -1,0 +1,162 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{{ election.title_en }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Election" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{{ election.title_en }}</h1>
+    <p class="mt-1 text-sm text-ink-light">
+      {{ election.get_election_type_display }} · {{ election.get_status_display }}
+      {% if election.results_published %}· {% trans "Results published" %}{% endif %}
+      {% if election.electorate_frozen_at %}· {% trans "Electorate frozen" %}{% endif %}
+    </p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    {% if can_edit and not election.configuration_locked %}
+    <a href="{% url 'dashboard-election-edit' election.pk %}" class="btn-secondary"><i class="bi bi-pencil"></i>{% trans "Edit" %}</a>
+    {% elif can_edit %}
+    <a href="{% url 'dashboard-election-edit' election.pk %}" class="btn-secondary"><i class="bi bi-pencil"></i>{% trans "Edit titles" %}</a>
+    {% endif %}
+    {% if can_delete %}
+    <form method="post" action="{% url 'dashboard-election-delete' election.pk %}" onsubmit="return confirm('{% trans "Delete this election?" %}');">
+      {% csrf_token %}
+      <button type="submit" class="btn-ghost text-danger">{% trans "Delete" %}</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Eligible" %}</p>
+    <p class="text-xl font-bold">{{ eligible_count }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Votes" %}</p>
+    <p class="text-xl font-bold">{{ results.turnout.votes }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Quorum" %}</p>
+    <p class="text-xl font-bold">{{ results.turnout.required }}</p>
+    <p class="text-xs">{% if turnout_ok %}{% trans "Met" %}{% else %}{% trans "Not met" %}{% endif %}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Candidates" %}</p>
+    <p class="text-xl font-bold">{{ candidate_count }}</p>
+    {% if election.end_at %}<p class="text-xs text-ink-light">{% trans "Ends" %} {{ election.end_at }}</p>{% endif %}
+  </div>
+</div>
+
+{% if preview and election.election_type == "ADVISORY_COUNCIL" %}
+<p class="mb-6 text-sm text-ink-light">
+  {% blocktrans with reserved=preview.reserved_founder_seats elected=preview.elected_seats founders=preview.founder_count %}
+  Founder-reserved seats: {{ reserved }}. Open elected seats: {{ elected }}. Founder candidates in pool: {{ founders }}.
+  {% endblocktrans %}
+</p>
+{% endif %}
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Aggregate results" %}</h2>
+      <p class="mb-3 text-xs text-ink-light">{% trans "Individual ballots are secret. Only aggregate scores are shown. No ballot export." %}</p>
+      {% if results.mode == "choice" %}
+      <table class="dash-table">
+        <thead><tr><th>{% trans "Option" %}</th><th>{% trans "Votes" %}</th></tr></thead>
+        <tbody>
+          {% for row in results.scores %}
+          <tr><td>{{ row.label }}</td><td>{{ row.votes }}</td></tr>
+          {% empty %}
+          <tr><td colspan="2" class="text-ink-light">{% trans "No ballots yet." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <table class="dash-table">
+        <thead>
+          <tr>
+            <th>{% trans "Candidate" %}</th>
+            <th>{% trans "Points" %}</th>
+            <th>{% trans "Founder" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results.scores %}
+          <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.points }}</td>
+            <td>{% if row.is_founder %}{% trans "Yes" %}{% else %}—{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-ink-light">{% trans "No ballots yet." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if results.winners %}
+      <h3 class="mb-2 mt-6 text-h5">{% trans "Projected winners" %}</h3>
+      <ul class="list-disc space-y-1 pl-5 text-sm">
+        {% for w in results.winners %}
+        <li>{{ w.name }} ({{ w.points }} pts · {{ w.seat_type }})</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div>
+    {% if can_manage %}
+    <div class="card-flat space-y-3">
+      <h2 class="mb-2 text-h4">{% trans "Actions" %}</h2>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}">{% csrf_token %}
+        <input type="hidden" name="action" value="schedule">
+        <button type="submit" class="btn-secondary w-full">{% trans "Schedule" %}</button>
+      </form>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}">{% csrf_token %}
+        <input type="hidden" name="action" value="open">
+        <button type="submit" class="btn-primary w-full">{% trans "Open (freeze electorate)" %}</button>
+      </form>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}">{% csrf_token %}
+        <input type="hidden" name="action" value="close">
+        <button type="submit" class="btn-secondary w-full">{% trans "Close" %}</button>
+      </form>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}" class="space-y-2">{% csrf_token %}
+        <input type="hidden" name="action" value="extend">
+        <label class="form-label" for="new_end_at">{% trans "Extend until" %}</label>
+        <input type="datetime-local" name="new_end_at" id="new_end_at" class="form-input" required>
+        <button type="submit" class="btn-secondary w-full">{% trans "Extend" %}</button>
+      </form>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}" class="space-y-2">{% csrf_token %}
+        <input type="hidden" name="action" value="finalize">
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="admin_override" value="1" class="form-checkbox">
+          {% trans "Override turnout quorum" %}
+        </label>
+        <input type="text" name="notes" class="form-input" placeholder="{% trans 'Override reason (required if overriding)' %}">
+        <button type="submit" class="btn-secondary w-full">{% trans "Finalize" %}</button>
+      </form>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}">{% csrf_token %}
+        <input type="hidden" name="action" value="publish">
+        <button type="submit" class="btn-primary w-full">{% trans "Publish results" %}</button>
+      </form>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}" class="space-y-2" onsubmit="return confirm('{% trans "Restart clears all ballots for THIS election. Continue?" %}');">{% csrf_token %}
+        <input type="hidden" name="action" value="restart">
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="confirm_restart" value="1" class="form-checkbox" required>
+          {% trans "I confirm restart" %}
+        </label>
+        <button type="submit" class="btn-ghost w-full text-danger">{% trans "Restart" %}</button>
+      </form>
+      <form method="post" action="{% url 'dashboard-election-action' election.pk %}" class="space-y-2">{% csrf_token %}
+        <input type="hidden" name="action" value="cancel">
+        <input type="text" name="notes" class="form-input" placeholder="{% trans 'Cancel reason' %}">
+        <button type="submit" class="btn-ghost w-full text-danger">{% trans "Cancel election" %}</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

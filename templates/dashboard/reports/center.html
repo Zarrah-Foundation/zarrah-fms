@@ -1,0 +1,61 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Reports" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Reports" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-file-earmark-bar-graph mr-2 text-primary"></i>{% trans "Reports" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Export data as Excel or PDF." %}</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+  <div class="card-flat">
+    <span class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-2xl text-primary"><i class="bi bi-heart"></i></span>
+    <h2 class="text-h4">{% trans "Donations" %}</h2>
+    <p class="mb-4 mt-1 text-sm text-ink-light">{% trans "All donation records." %}</p>
+    {% if can_export %}
+    <div class="flex gap-2">
+      <a href="{% url 'dashboard-report-export' 'donations' 'xlsx' %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-excel"></i>{% trans "Excel" %}</a>
+      <a href="{% url 'dashboard-report-export' 'donations' 'pdf' %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-pdf"></i>{% trans "PDF" %}</a>
+    </div>
+    {% else %}<p class="text-sm text-ink-light">{% trans "No export permission." %}</p>{% endif %}
+  </div>
+
+  <div class="card-flat">
+    <span class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-2xl text-primary"><i class="bi bi-people"></i></span>
+    <h2 class="text-h4">{% trans "Membership" %}</h2>
+    <p class="mb-4 mt-1 text-sm text-ink-light">{% trans "All member records." %}</p>
+    <div class="flex flex-wrap gap-2">
+      {% if can_export %}
+      <a href="{% url 'dashboard-report-export' 'members' 'xlsx' %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-excel"></i>{% trans "Excel" %}</a>
+      <a href="{% url 'dashboard-report-export' 'members' 'pdf' %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-pdf"></i>{% trans "PDF" %}</a>
+      {% endif %}
+      {% if can_members_bulk_report %}
+      <a href="{% url 'dashboard-members-bulk-report' %}" class="btn-secondary btn-sm"><i class="bi bi-collection"></i>{% trans "Profile PDF pack" %}</a>
+      {% endif %}
+      {% if can_applications_bulk_report %}
+      <a href="{% url 'dashboard-applications-bulk-report' %}" class="btn-secondary btn-sm"><i class="bi bi-files"></i>{% trans "Applications PDF pack" %}</a>
+      {% endif %}
+    </div>
+    {% if not can_export and not can_members_bulk_report and not can_applications_bulk_report %}
+    <p class="text-sm text-ink-light">{% trans "No export permission." %}</p>
+    {% endif %}
+  </div>
+
+  <div class="card-flat">
+    <span class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-2xl text-primary"><i class="bi bi-wallet2"></i></span>
+    <h2 class="text-h4">{% trans "Finance" %}</h2>
+    <p class="mb-4 mt-1 text-sm text-ink-light">{% trans "Income & expense entries." %}</p>
+    {% if can_export %}
+    <div class="flex gap-2">
+      <a href="{% url 'dashboard-report-export' 'finance' 'xlsx' %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-excel"></i>{% trans "Excel" %}</a>
+      <a href="{% url 'dashboard-report-export' 'finance' 'pdf' %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-pdf"></i>{% trans "PDF" %}</a>
+    </div>
+    {% else %}<p class="text-sm text-ink-light">{% trans "No export permission." %}</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+/*
+  Global utilities that must ship outside the Tailwind build,
+  so they are never purged and work without a CSS rebuild.
+*/
+
+/*
+  Anchor offset under the floating sticky site header.
+  Header: top-4 (1rem) + nav shell (~3.5–4rem) + breathing room.
+  Apply .anchor-offset to any element targeted by hash / TOC links.
+*/
+.anchor-offset {
+  scroll-margin-top: 7.5rem; /* 120px — mobile / compact header */
+}
+
+@media (min-width: 1024px) {
+  .anchor-offset {
+    scroll-margin-top: 8.75rem; /* 140px — desktop floating header */
+  }
+}

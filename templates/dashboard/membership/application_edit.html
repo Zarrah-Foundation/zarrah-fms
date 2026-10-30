@@ -1,0 +1,68 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Edit Application" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Edit Application" %}{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'dashboard-application-detail' application.pk %}" class="mb-4 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Back to application" %}</a>
+
+<div class="mb-6">
+  <h1 class="dash-page-title">{% trans "Edit application" %}</h1>
+  <p class="mt-1 text-sm text-ink-light">{{ application.full_name }}
+    {% if application.reference_code %} · <span lang="en">{{ application.reference_code }}</span>{% endif %}
+  </p>
+</div>
+
+<form method="post" class="space-y-6" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="rounded-field border border-danger/40 bg-danger/5 p-3 text-sm text-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Applicant identity" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.english_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.bangla_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.father_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.mother_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.date_of_birth %}
+      {% include "dashboard/includes/_form_field.html" with field=form.gender %}
+      {% include "dashboard/includes/_form_field.html" with field=form.identity_type %}
+      {% include "dashboard/includes/_form_field.html" with field=form.identity_number %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Contact & address" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.phone %}
+      {% include "dashboard/includes/_form_field.html" with field=form.email %}
+      {% include "dashboard/includes/_form_field.html" with field=form.present_district %}
+      {% include "dashboard/includes/_form_field.html" with field=form.present_upazila %}
+      {% include "dashboard/includes/_form_field.html" with field=form.present_address %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Professional & emergency" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.occupation %}
+      {% include "dashboard/includes/_form_field.html" with field=form.organization %}
+      {% include "dashboard/includes/_form_field.html" with field=form.emergency_name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.emergency_phone %}
+      {% include "dashboard/includes/_form_field.html" with field=form.emergency_relation %}
+      {% include "dashboard/includes/_form_field.html" with field=form.admin_message %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Change reason" %}</h2>
+    {% include "dashboard/includes/_form_field.html" with field=form.reason %}
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save changes" %}</button>
+    <a href="{% url 'dashboard-application-detail' application.pk %}" class="btn-secondary">{% trans "Cancel" %}</a>
+  </div>
+</form>
+{% endblock %}

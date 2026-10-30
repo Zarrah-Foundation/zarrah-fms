@@ -1,0 +1,14 @@
+{% load i18n i18n_extras %}
+{% get_current_language as CURRENT_LANG %}
+<form action="{% url 'set_language' %}" method="post" class="inline-flex" data-language-switch>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.path }}">
+  <div class="lang-segmented{% if size == 'sm' %} lang-segmented-sm{% endif %}" role="radiogroup" aria-label="{% zf_label 'Language' %}">
+    <button type="submit" name="language" value="bn"
+      class="lang-segmented-btn{% if CURRENT_LANG == 'bn' %} lang-segmented-btn-active{% endif %}"
+      role="radio" aria-checked="{% if CURRENT_LANG == 'bn' %}true{% else %}false{% endif %}">বাং</button>
+    <button type="submit" name="language" value="en"
+      class="lang-segmented-btn{% if CURRENT_LANG == 'en' %} lang-segmented-btn-active{% endif %}"
+      role="radio" aria-checked="{% if CURRENT_LANG == 'en' %}true{% else %}false{% endif %}">EN</button>
+  </div>
+</form>

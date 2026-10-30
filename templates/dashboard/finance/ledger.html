@@ -1,0 +1,35 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Ledger" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Ledger" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <h1 class="dash-page-title"><i class="bi bi-list-columns mr-2 text-primary"></i>{% trans "Ledger" %}</h1>
+  <a href="{% url 'dashboard-finance' %}" class="btn-ghost btn-sm">{% trans "Back" %}</a>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Income by Source" %}</h2>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>{% trans "Source" %}</th><th>{% trans "Count" %}</th><th>{% trans "Total" %}</th></tr></thead>
+      <tbody>
+        {% for r in income_by_source %}<tr><td>{{ r.source|default:"—" }}</td><td>{{ r.count }}</td><td class="text-success">{{ r.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-center text-ink-light">{% trans "No data" %}</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Expense by Category" %}</h2>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>{% trans "Category" %}</th><th>{% trans "Count" %}</th><th>{% trans "Total" %}</th></tr></thead>
+      <tbody>
+        {% for r in expense_by_category %}<tr><td>{{ r.category|default:"—" }}</td><td>{{ r.count }}</td><td class="text-danger">{{ r.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-center text-ink-light">{% trans "No data" %}</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+</div>
+{% endblock %}

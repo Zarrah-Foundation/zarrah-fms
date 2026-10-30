@@ -1,0 +1,12 @@
+{% load i18n %}
+<section class="my-12 card">
+  {% if section.title_en or section.title_bn %}
+  <h2 class="text-2xl font-bold text-emerald-800">{% if LANGUAGE_CODE == 'bn' and section.title_bn %}{{ section.title_bn }}{% else %}{{ section.title_en|default:section.title_bn }}{% endif %}</h2>
+  {% endif %}
+  {% if section.content_bn or section.content_en %}
+  <p class="mt-4 text-gray-600">{% if LANGUAGE_CODE == 'bn' and section.content_bn %}{{ section.content_bn }}{% else %}{{ section.content_en|default:section.content_bn }}{% endif %}</p>
+  {% endif %}
+  {% if section.button_link %}
+  <a href="{{ section.button_link }}" class="btn-primary mt-6">{% if LANGUAGE_CODE == 'bn' and section.button_text_bn %}{{ section.button_text_bn }}{% else %}{{ section.button_text_en|default:"Donate" }}{% endif %}</a>
+  {% endif %}
+</section>

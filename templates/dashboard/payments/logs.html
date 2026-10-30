@@ -1,0 +1,14 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Payment Logs" %}{% endblock %}
+{% block topbar_title %}{% trans "Payment Logs" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><h1 class="dash-page-title">{% trans "Payment Logs" %}</h1></div>
+<form method="get" class="mb-4"><input class="form-input max-w-xs" name="action" value="{{ action }}" placeholder="{% trans 'Filter action…' %}"></form>
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+<table class="dash-table"><thead><tr><th>{% trans "When" %}</th><th>{% trans "Action" %}</th><th>{% trans "Actor" %}</th><th>{% trans "Provider" %}</th><th>{% trans "Message" %}</th></tr></thead>
+<tbody>{% for e in events %}<tr>
+<td>{{ e.created_at|date:"j M Y H:i" }}</td><td>{{ e.action }}</td><td>{{ e.actor|default:"—" }}</td><td>{{ e.provider|default:"—" }}</td><td class="text-sm">{{ e.message }}</td>
+</tr>{% empty %}<tr><td colspan="5">{% trans "No log entries." %}</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B6B3A">
+  <title>{% block title %}{{ site_settings.meta_title|default:site_settings.localized_name }}{% endblock %}</title>
+
+  {% block meta_description %}
+  <meta name="description" content="{{ site_settings.meta_description|default:'Zarrah Foundation — Small Acts, Lasting Impact. A voluntary, non-profit, non-political humanitarian organisation in Bangladesh.' }}">
+  {% endblock %}
+  {% if site_settings.meta_keywords %}
+  <meta name="keywords" content="{{ site_settings.meta_keywords }}">
+  {% endif %}
+
+  <meta property="og:title" content="{% block og_title %}{{ site_settings.meta_title|default:site_settings.localized_name }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ site_settings.meta_description }}{% endblock %}">
+  <link rel="canonical" href="{% if site_settings.canonical_origin %}{{ site_settings.canonical_origin }}{{ request.path }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endif %}">
+  {% if site_settings.og_image %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.og_image.url }}">
+  {% elif site_settings.site_logo %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.site_logo.url }}">
+  {% endif %}
+
+  {% if site_settings.site_favicon %}
+  <link rel="icon" href="{{ site_settings.site_favicon.url }}">
+  <link rel="shortcut icon" href="{{ site_settings.site_favicon.url }}">
+  {% endif %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.maateen.me/kalpurush/font.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}?v=20260813-bilingual">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}?v=20260813-governance">
+  <link rel="stylesheet" href="{% static 'css/utilities.css' %}?v=20260723-anchor">
+  <link rel="stylesheet" href="{% static 'css/homepage.css' %}?v=20260813-bilingual">
+  <link rel="stylesheet" href="{% static 'css/pages-polish.css' %}?v=20260813-hero-gutter">
+  <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="flex min-h-screen flex-col bg-canvas">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-btn focus:bg-primary focus:px-4 focus:py-2 focus:text-white">
+    {% trans "Skip to main content" %}
+  </a>
+
+  {% include "includes/nav.html" %}
+
+  {% if messages %}
+  <div class="container-app mt-4 w-full space-y-2" aria-live="polite">
+    {% for message in messages %}
+    {% include "includes/ui/alerts/_alert.html" with message=message %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <main id="main-content" class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "includes/footer.html" %}
+
+  {% include "includes/back_to_top.html" %}
+
+  <script src="{% static 'js/drawer-scroll-lock.js' %}"></script>
+  <script src="{% static 'js/nav-drawer.js' %}"></script>
+  <script src="{% static 'js/form-state-persist.js' %}?v=20260810-langscroll"></script>
+  <script src="{% static 'js/back-to-top.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Transaction" %}{% endblock %}
+{% block topbar_title %}{% trans "Transaction" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><div><h1 class="dash-page-title">{{ txn.tran_id }}</h1><p class="text-sm text-ink-light">{{ txn.get_purpose_display }} · {{ txn.get_status_display }}</p></div>
+<a href="{% url 'dashboard-payments-transactions' %}" class="btn-secondary btn-sm">{% trans "Back" %}</a></div>
+<div class="rounded-card border border-border/60 bg-surface p-5 space-y-2 text-sm">
+<p><span class="text-ink-light">{% trans "Amount" %}:</span> ৳{{ txn.amount|floatformat:2 }} {{ txn.currency }}</p>
+<p><span class="text-ink-light">{% trans "Gateway" %}:</span> {{ txn.gateway }}</p>
+<p><span class="text-ink-light">{% trans "Customer" %}:</span> {{ txn.cus_name }} {% if txn.cus_email %}· {{ txn.cus_email }}{% endif %}</p>
+<p><span class="text-ink-light">{% trans "Bank ref" %}:</span> {{ txn.bank_tran_id|default:"—" }}</p>
+</div>
+{% if can_refund and txn.status == "COMPLETED" %}
+<form method="post" action="{% url 'dashboard-payments-refund-request' txn.pk %}" class="mt-6 max-w-md space-y-3">
+  {% csrf_token %}
+  <div class="form-group"><label class="form-label">{% trans "Refund amount" %}</label><input class="form-input" name="amount" type="number" step="0.01" value="{{ txn.amount }}"></div>
+  <div class="form-group"><label class="form-label">{% trans "Reason" %}</label><textarea class="form-input" name="reason" rows="3" required></textarea></div>
+  <button class="btn-secondary">{% trans "Request refund" %}</button>
+  <p class="text-xs text-ink-light">{% trans "Requires Super Admin approval. Not marked refunded until provider confirms." %}</p>
+</form>
+{% endif %}
+{% if refunds %}
+<h2 class="mt-8 text-lg font-semibold">{% trans "Refund requests" %}</h2>
+<ul class="mt-2 space-y-2 text-sm">{% for r in refunds %}<li><a class="text-primary" href="{% url 'dashboard-payments-refund-detail' r.pk %}">৳{{ r.amount|floatformat:0 }} — {{ r.get_status_display }}</a></li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

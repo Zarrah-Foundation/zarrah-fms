@@ -1,0 +1,20 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Webhooks / IPN" %}{% endblock %}
+{% block topbar_title %}{% trans "Webhooks / IPN" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><h1 class="dash-page-title">{% trans "Webhooks / IPN" %}</h1>
+<p class="text-sm text-ink-light">{% trans "Read-only sanitized events. Secrets are never shown." %}</p></div>
+<form method="get" class="mb-4 flex flex-wrap gap-2">
+  <select name="provider" class="form-input max-w-xs"><option value="">{% trans "All providers" %}</option><option value="SSLCOMMERZ" {% if provider == "SSLCOMMERZ" %}selected{% endif %}>SSLCommerz</option><option value="BKASH" {% if provider == "BKASH" %}selected{% endif %}>bKash</option><option value="NAGAD" {% if provider == "NAGAD" %}selected{% endif %}>Nagad</option></select>
+  <select name="status" class="form-input max-w-xs"><option value="">{% trans "All statuses" %}</option><option value="RECEIVED">Received</option><option value="PROCESSED">Processed</option><option value="FAILED">Failed</option><option value="IGNORED">Ignored</option></select>
+  <button class="btn-secondary btn-sm">{% trans "Filter" %}</button>
+</form>
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+<table class="dash-table"><thead><tr><th>{% trans "Received" %}</th><th>{% trans "Provider" %}</th><th>{% trans "Event" %}</th><th>{% trans "Status" %}</th><th>{% trans "Error" %}</th><th></th></tr></thead>
+<tbody>{% for e in events %}<tr>
+<td>{{ e.received_at|date:"j M Y H:i" }}</td><td>{{ e.provider }}</td><td class="text-xs">{{ e.external_event_id }}</td><td>{{ e.get_processing_status_display }}</td><td class="text-xs">{{ e.error_message|default:"—" }}</td>
+<td><a href="{% url 'dashboard-payments-webhook-detail' e.pk %}" class="text-primary">{% trans "Open" %}</a></td>
+</tr>{% empty %}<tr><td colspan="6">{% trans "No webhook events." %}</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% load i18n dashboard_extras %}
+{% comment %}Pagination. Requires `page_obj` (Django Paginator page). Preserves
+existing query-string filters (except `page`).{% endcomment %}
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="dash-pagination" aria-label="{% trans 'Pagination' %}">
+  {% if page_obj.has_previous %}
+  <a href="?{% query_replace page=page_obj.previous_page_number %}" class="dash-page-link" aria-label="{% trans 'Previous' %}"><i class="bi bi-chevron-left"></i></a>
+  {% else %}
+  <span class="dash-page-link dash-page-link-disabled"><i class="bi bi-chevron-left"></i></span>
+  {% endif %}
+
+  {% for num in page_obj.paginator.page_range %}
+    {% if num == page_obj.number %}
+    <span class="dash-page-link dash-page-link-active" aria-current="page">{{ num }}</span>
+    {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+    <a href="?{% query_replace page=num %}" class="dash-page-link">{{ num }}</a>
+    {% endif %}
+  {% endfor %}
+
+  {% if page_obj.has_next %}
+  <a href="?{% query_replace page=page_obj.next_page_number %}" class="dash-page-link" aria-label="{% trans 'Next' %}"><i class="bi bi-chevron-right"></i></a>
+  {% else %}
+  <span class="dash-page-link dash-page-link-disabled"><i class="bi bi-chevron-right"></i></span>
+  {% endif %}
+</nav>
+{% endif %}

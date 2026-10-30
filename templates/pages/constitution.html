@@ -1,0 +1,1719 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}গঠনতন্ত্র · Constitution | {{ site_settings.localized_name }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="জাররাহ ফাউন্ডেশনের সংঘস্মারক ও গঠনতন্ত্র — সোসাইটি নিবন্ধন আইন, ১৮৬০। Memorandum of Association and Articles of Association of Zarrah Foundation under the Societies Registration Act, 1860.">
+{% endblock %}
+
+{% block og_title %}গঠনতন্ত্র · Constitution | {{ site_settings.localized_name }}{% endblock %}
+{% block og_description %}জাররাহ ফাউন্ডেশনের অফিসিয়াল সংঘস্মারক ও গঠনতন্ত্র। Official MoA & AoA of Zarrah Foundation.{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ---- Constitution documentation polish (scoped) ---- */
+  html { scroll-behavior: smooth; }
+
+  .constitution-doc {
+    --c-max: 42rem;
+    --c-prose: 48rem;
+    --c-radius: 1.25rem;
+    --c-border: rgba(229, 231, 235, 0.85);
+    --c-ink: #1F2937;
+    --c-muted: #6B7280;
+    --c-primary: #0B6B3A;
+    --c-canvas: #F7F9F8;
+  }
+
+  /* Docs shell: wide on desktop, unchanged on small screens */
+  .constitution-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  @media (min-width: 640px) {
+    .constitution-container { padding-left: 1.5rem; padding-right: 1.5rem; }
+  }
+  @media (min-width: 1024px) {
+    .constitution-container {
+      max-width: 1700px;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .constitution-container {
+      max-width: 1760px;
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+  @media (min-width: 1536px) {
+    .constitution-container {
+      max-width: 1800px;
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  .constitution-layout {
+    display: block;
+  }
+  /* Desktop TOC: do not rely on Tailwind lg:block (may be purged from output.css) */
+  .constitution-toc-aside {
+    display: none;
+    margin-bottom: 2.5rem;
+  }
+  .constitution-toc-mobile {
+    display: block;
+    margin-bottom: 2rem;
+  }
+  @media (min-width: 1024px) {
+    .constitution-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .constitution-toc-aside {
+      display: block;
+      grid-column: 1;
+      margin-bottom: 0;
+      min-width: 0;
+      /* Same floating TOC pattern as Privacy: sticky on aside, scroll on nav */
+      position: sticky;
+      top: 96px;
+      align-self: start;
+      z-index: 5;
+    }
+    .constitution-toc-mobile {
+      display: none;
+    }
+    /* Explicit placement so main never falls into the 280px TOC track */
+    .constitution-doc .constitution-main {
+      grid-column: 2;
+    }
+  }
+  @media (min-width: 1280px) {
+    .constitution-layout {
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 3rem;
+    }
+  }
+  @media (min-width: 1536px) {
+    .constitution-layout {
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 3.5rem;
+    }
+  }
+
+  /* Main fills remaining width — do NOT clamp the whole column */
+  .constitution-doc .constitution-main {
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Desktop vertical rhythm (avoid purged lg:py-* utilities) */
+  @media (min-width: 1024px) {
+    .constitution-container--hero { padding-top: 6rem; padding-bottom: 6rem; }
+    .constitution-container--body { padding-top: 5rem; padding-bottom: 5rem; }
+  }
+
+  /* Section rhythm */
+  .constitution-doc .constitution-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4.5rem;
+  }
+  @media (min-width: 1024px) {
+    .constitution-doc .constitution-stack { gap: 5rem; }
+  }
+  @media (min-width: 1280px) {
+    .constitution-doc .constitution-stack { gap: 5.5rem; }
+  }
+
+  .constitution-section-header { margin-bottom: 1.75rem; }
+  @media (min-width: 1280px) {
+    .constitution-section-header { margin-bottom: 2rem; }
+  }
+  .constitution-part-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(11, 107, 58, 0.08);
+    color: var(--c-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .constitution-section-title {
+    font-size: clamp(1.75rem, 2.5vw, 2.35rem);
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--c-ink);
+    letter-spacing: -0.02em;
+  }
+  .constitution-section-title-en {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--c-muted);
+    letter-spacing: 0;
+  }
+  .constitution-section-note {
+    margin-top: 0.65rem;
+    font-size: 0.875rem;
+    color: var(--c-muted);
+  }
+  .constitution-dot { margin: 0 0.4rem; opacity: 0.4; }
+
+  /* Clause cards */
+  .constitution-clause {
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-radius);
+    background: #fff;
+    padding: 1.5rem 1.35rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,.03);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    width: 100%;
+  }
+  @media (min-width: 640px) {
+    .constitution-clause { padding: 1.75rem 1.75rem; }
+  }
+  @media (min-width: 1280px) {
+    .constitution-clause { padding: 1.85rem 2rem; }
+  }
+  .constitution-clause:hover {
+    border-color: rgba(11, 107, 58, 0.18);
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+  }
+  .constitution-clause-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(229, 231, 235, 0.7);
+  }
+  .constitution-clause-num {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.5rem;
+    background: rgba(11, 107, 58, 0.08);
+    color: var(--c-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .constitution-clause-title {
+    flex: 1 1 12rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--c-ink);
+    line-height: 1.35;
+  }
+  .constitution-clause-title-en {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--c-muted);
+  }
+  .constitution-clause-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+
+  /* Bilingual language cards */
+  .constitution-bilingual {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: none;
+    width: 100%;
+  }
+  @media (min-width: 1280px) {
+    .constitution-bilingual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 2rem;
+      align-items: start;
+    }
+    .constitution-bilingual .constitution-lang-divider {
+      display: none;
+    }
+    .constitution-bilingual .constitution-lang--en {
+      border-left: 1px solid rgba(229, 231, 235, 0.9);
+      padding-left: 2rem;
+    }
+  }
+  .constitution-lang {
+    padding: 0.85rem 0 0.15rem;
+  }
+  .constitution-lang-label {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-primary);
+  }
+  .constitution-lang--en .constitution-lang-label {
+    color: #64748b;
+  }
+  .constitution-lang-text {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--c-ink);
+  }
+  .constitution-lang--en .constitution-lang-text {
+    font-size: 0.975rem;
+    line-height: 1.75;
+    color: #4b5563;
+  }
+  .constitution-lang-text--lead {
+    font-size: 1.125rem;
+    line-height: 1.85;
+  }
+  .constitution-lang--en .constitution-lang-text--lead {
+    font-size: 1.02rem;
+  }
+  .constitution-lang-text--sm {
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+  .constitution-lang--en .constitution-lang-text--sm {
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+  .constitution-lang-divider {
+    height: 1px;
+    margin: 0.85rem 0 0.35rem;
+    background: linear-gradient(90deg, rgba(11,107,58,0.18), rgba(229,231,235,0.9) 40%, transparent);
+  }
+
+  .constitution-bilingual--note,
+  .constitution-bilingual--warning,
+  .constitution-bilingual--clause {
+    padding: 1rem 1.1rem;
+    border-radius: 1rem;
+    border: 1px solid var(--c-border);
+  }
+  @media (min-width: 1280px) {
+    .constitution-bilingual--note,
+    .constitution-bilingual--warning,
+    .constitution-bilingual--clause {
+      padding: 1.25rem 1.5rem;
+    }
+  }
+  .constitution-bilingual--note {
+    background: rgba(11, 107, 58, 0.04);
+    border-color: rgba(11, 107, 58, 0.15);
+  }
+  .constitution-bilingual--warning {
+    background: rgba(245, 158, 11, 0.06);
+    border-color: rgba(245, 158, 11, 0.28);
+  }
+  .constitution-bilingual--clause {
+    background: var(--c-canvas);
+  }
+
+  /* Objective cards */
+  .constitution-obj-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .constitution-obj-grid { grid-template-columns: repeat(2, 1fr); gap: 1.15rem; }
+  }
+  @media (min-width: 1280px) {
+    .constitution-obj-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  }
+  @media (min-width: 1536px) {
+    .constitution-obj-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  .constitution-obj-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.35rem;
+    border-radius: var(--c-radius);
+    border: 1px solid var(--c-border);
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(0,0,0,.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  @media (min-width: 1280px) {
+    .constitution-obj-card { padding: 1.5rem; }
+  }
+  .constitution-obj-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(11, 107, 58, 0.2);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
+  }
+  .constitution-obj-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.9rem;
+    background: rgba(11, 107, 58, 0.09);
+    color: var(--c-primary);
+    font-size: 1.15rem;
+  }
+  /* Objectives: keep stacked bilingual inside cards (narrow cells) */
+  .constitution-obj-card .constitution-bilingual {
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+  }
+  .constitution-obj-card .constitution-lang-divider { display: block; }
+  .constitution-obj-card .constitution-lang--en {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  /* Hierarchy / timeline */
+  .constitution-hierarchy {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+  }
+  @media (min-width: 768px) {
+    .constitution-hierarchy::before {
+      content: "";
+      position: absolute;
+      left: 1.35rem;
+      top: 1.5rem;
+      bottom: 1.5rem;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(11,107,58,0.35), rgba(11,107,58,0.08));
+      border-radius: 999px;
+    }
+  }
+  .constitution-hierarchy-card {
+    position: relative;
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-radius);
+    background: #fff;
+    padding: 1.4rem 1.35rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,.03);
+  }
+  @media (min-width: 768px) {
+    .constitution-hierarchy-card {
+      margin-left: 0.25rem;
+      padding-left: 3.5rem;
+    }
+    .constitution-hierarchy-card::before {
+      content: "";
+      position: absolute;
+      left: 1.1rem;
+      top: 1.65rem;
+      width: 0.7rem;
+      height: 0.7rem;
+      border-radius: 999px;
+      background: #fff;
+      border: 2.5px solid var(--c-primary);
+      box-shadow: 0 0 0 4px rgba(11,107,58,0.1);
+      z-index: 1;
+    }
+  }
+
+  /* Accordion */
+  .constitution-accordion {
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-radius);
+    background: #fff;
+    overflow: hidden;
+  }
+  .constitution-accordion > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    cursor: pointer;
+    list-style: none;
+    padding: 1.1rem 1.25rem;
+  }
+  .constitution-accordion > summary::-webkit-details-marker { display: none; }
+  .constitution-accordion > summary:focus-visible {
+    outline: 2px solid var(--c-primary);
+    outline-offset: 2px;
+  }
+  .constitution-accordion .constitution-chevron {
+    flex-shrink: 0;
+    color: var(--c-primary);
+    transition: transform 0.25s ease;
+  }
+  .constitution-accordion[open] .constitution-chevron { transform: rotate(180deg); }
+  .constitution-accordion[open] {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+  .constitution-accordion-panel {
+    border-top: 1px solid rgba(229, 231, 235, 0.8);
+    padding: 1.15rem 1.25rem 1.35rem;
+    background: linear-gradient(180deg, rgba(247,249,248,0.7), #fff);
+  }
+  .constitution-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .constitution-list > li {
+    padding: 0.85rem 1rem;
+    border-radius: 0.85rem;
+    background: var(--c-canvas);
+    border: 1px solid rgba(229, 231, 235, 0.7);
+  }
+  .constitution-list-ol {
+    margin: 1rem 0 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .constitution-list-ol > li::marker { color: var(--c-primary); font-weight: 700; }
+
+  /* Fee highlight */
+  .constitution-fee-card {
+    border-radius: var(--c-radius);
+    border: 1px solid rgba(11, 107, 58, 0.18);
+    background: linear-gradient(145deg, rgba(11,107,58,0.06), #fff 55%);
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(11,107,58,0.05);
+  }
+  .constitution-fee-card--accent {
+    border-color: rgba(212, 160, 23, 0.28);
+    background: linear-gradient(145deg, rgba(212,160,23,0.08), #fff 55%);
+  }
+
+  /* TOC — sticky lives on .constitution-toc-aside; this nav scrolls independently */
+  .constitution-toc {
+    width: 100%;
+    border: 1px solid var(--c-border);
+    border-radius: 1.1rem;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+    padding: 0.9rem 0.75rem 0.85rem;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .constitution-toc-progress {
+    height: 3px;
+    margin: 0 0.5rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(11, 107, 58, 0.1);
+    overflow: hidden;
+  }
+  .constitution-toc-progress > span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--c-primary), #0F766E);
+    transition: width 0.25s ease;
+  }
+  .constitution-toc-label {
+    padding: 0 0.55rem 0.55rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .constitution-toc a[data-toc-link] {
+    display: block;
+    position: relative;
+    margin: 0.12rem 0;
+    padding: 0.55rem 0.65rem 0.55rem 0.85rem;
+    border-radius: 0.7rem;
+    border-left: 2px solid transparent;
+    color: var(--c-muted);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .constitution-toc a[data-toc-link]:hover {
+    background: rgba(11, 107, 58, 0.05);
+    color: var(--c-primary);
+  }
+  .constitution-toc a[aria-current="true"] {
+    background: rgba(11, 107, 58, 0.08);
+    border-left-color: var(--c-primary);
+    color: var(--c-primary);
+  }
+  .constitution-toc a[data-toc-link] .toc-bn {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .constitution-toc a[data-toc-link] .toc-en {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.68rem;
+    opacity: 0.8;
+    line-height: 1.3;
+  }
+
+  /* Keep stacked bilingual inside compact list items & fee cards */
+  .constitution-list .constitution-bilingual,
+  .constitution-fee-card .constitution-bilingual,
+  .constitution-obj-card .constitution-bilingual {
+    display: flex;
+    flex-direction: column;
+  }
+  .constitution-list .constitution-lang-divider,
+  .constitution-fee-card .constitution-lang-divider,
+  .constitution-obj-card .constitution-lang-divider {
+    display: block;
+  }
+  .constitution-list .constitution-lang--en,
+  .constitution-fee-card .constitution-lang--en,
+  .constitution-obj-card .constitution-lang--en {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  /* Posts / founders grids */
+  .constitution-posts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  @media (min-width: 640px) {
+    .constitution-posts-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+  }
+  @media (min-width: 1280px) {
+    .constitution-posts-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  }
+  @media (min-width: 1536px) {
+    .constitution-posts-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .constitution-founders-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .constitution-founders-grid { grid-template-columns: repeat(2, 1fr); gap: 1.15rem; }
+  }
+  @media (min-width: 1280px) {
+    .constitution-founders-grid { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+  }
+
+  .constitution-founder-intro {
+    max-width: 46rem;
+    margin: -0.35rem 0 1.35rem;
+  }
+  .constitution-founder-intro .constitution-bilingual {
+    display: flex;
+    flex-direction: column;
+  }
+  .constitution-founder-intro .constitution-lang-divider { display: block; }
+  .constitution-founder-intro .constitution-lang--en {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .constitution-privacy-notice {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 1.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    background: rgba(37, 99, 235, 0.04);
+    max-width: 52rem;
+  }
+  .constitution-privacy-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.1);
+    color: #2563EB;
+    font-size: 0.95rem;
+  }
+  .constitution-privacy-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2563EB;
+    margin-bottom: 0.35rem;
+  }
+  .constitution-privacy-text {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: #4b5563;
+  }
+  .constitution-privacy-text + .constitution-privacy-text {
+    margin-top: 0.35rem;
+    color: #6b7280;
+    font-size: 0.78rem;
+  }
+
+  .constitution-founder-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem 1.35rem 1.4rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(229, 231, 235, 0.95);
+    background:
+      linear-gradient(180deg, rgba(247, 249, 248, 0.65) 0%, #fff 42%);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    overflow: hidden;
+  }
+  .constitution-founder-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(11, 107, 58, 0.22);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  }
+  .constitution-founder-card--officer {
+    border-color: rgba(11, 107, 58, 0.28);
+    background:
+      linear-gradient(160deg, rgba(11, 107, 58, 0.07) 0%, #fff 38%);
+    box-shadow: 0 8px 24px rgba(11, 107, 58, 0.07);
+  }
+  .constitution-founder-card--officer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0B6B3A, #0F766E, #D4A017);
+  }
+  .constitution-founder-card--secretary {
+    border-color: rgba(15, 118, 110, 0.3);
+  }
+
+  .constitution-founder-index {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.9rem;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: rgba(31, 41, 55, 0.05);
+    color: #9ca3af;
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .constitution-founder-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 999px;
+    background: linear-gradient(145deg, rgba(11, 107, 58, 0.12), rgba(15, 118, 110, 0.08));
+    border: 2px solid rgba(11, 107, 58, 0.14);
+    color: #0B6B3A;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .constitution-founder-card--officer .constitution-founder-avatar {
+    background: linear-gradient(145deg, rgba(11, 107, 58, 0.18), rgba(212, 160, 23, 0.12));
+    border-color: rgba(11, 107, 58, 0.28);
+    color: #084F2C;
+  }
+
+  .constitution-founder-name {
+    margin: 1.15rem 0 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    color: #1F2937;
+  }
+  .constitution-founder-role-bn {
+    margin: 0.55rem 0 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: #0B6B3A;
+  }
+  .constitution-founder-role-en {
+    margin: 0.2rem 0 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.45;
+    color: #6B7280;
+  }
+
+  .constitution-founder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: auto;
+    padding-top: 1.1rem;
+  }
+  .constitution-founder-badge span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .constitution-founder-badge--chairman span {
+    background: rgba(11, 107, 58, 0.12);
+    color: #084F2C;
+  }
+  .constitution-founder-badge--secretary span {
+    background: rgba(15, 118, 110, 0.12);
+    color: #0F766E;
+  }
+  .constitution-founder-badge--founder span {
+    background: rgba(212, 160, 23, 0.14);
+    color: #92650a;
+  }
+  .constitution-founder-badge--member span {
+    background: rgba(107, 114, 128, 0.12);
+    color: #4b5563;
+  }
+  .constitution-founder-badge--officer span {
+    background: rgba(37, 99, 235, 0.1);
+    color: #1d4ed8;
+  }
+
+  .constitution-nature-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  @media (min-width: 640px) {
+    .constitution-nature-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1280px) {
+    .constitution-nature-grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  }
+
+  .constitution-fees-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 640px) {
+    .constitution-fees-grid { grid-template-columns: repeat(2, 1fr); gap: 1.15rem; }
+  }
+  @media (min-width: 1536px) {
+    .constitution-fees-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+  }
+
+  /* Soft band between major parts */
+  .constitution-band {
+    margin: 0.5rem 0 0;
+    padding: 2rem 0 0.25rem;
+    border-top: 1px solid rgba(229, 231, 235, 0.8);
+  }
+
+  /* Download document card */
+  .constitution-download {
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+    border-radius: 1.35rem;
+    border: 1px solid rgba(11, 107, 58, 0.2);
+    background: linear-gradient(135deg, #084F2C 0%, #0B6B3A 45%, #0F766E 100%);
+    color: #fff;
+    padding: 1.75rem;
+    box-shadow: 0 18px 50px rgba(8, 79, 44, 0.25);
+  }
+  @media (min-width: 768px) {
+    .constitution-download {
+      grid-template-columns: auto 1fr auto;
+      padding: 2rem 2.15rem;
+    }
+  }
+  .constitution-download-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 1.1rem;
+    background: rgba(255,255,255,0.12);
+    font-size: 2rem;
+  }
+  .constitution-download-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+  .constitution-download-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .constitution-download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    border-radius: 0.9rem;
+    background: #D4A017;
+    color: #fff;
+    font-weight: 700;
+    padding: 0.85rem 1.25rem;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .constitution-download-btn:hover {
+    background: #EAB308;
+    transform: translateY(-1px);
+  }
+
+  /* Callouts */
+  .constitution-callout {
+    border-radius: var(--c-radius);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.06);
+    padding: 1.35rem 1.4rem;
+  }
+  .constitution-callout-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--c-ink);
+  }
+
+  /* Hero refinements */
+  .constitution-hero-title {
+    font-size: clamp(2.5rem, 6vw, 3.75rem);
+    line-height: 1.12;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .constitution-hero-subtitle-en {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 600;
+    opacity: 0.88;
+  }
+
+  /* Hero bilingual intro: stacked on mobile, two equal columns from tablet up */
+  .constitution-hero-copy {
+    width: 100%;
+    max-width: none;
+  }
+  .constitution-hero-copy .constitution-bilingual {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .constitution-hero-copy .constitution-lang-divider {
+    display: block;
+    background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08) 50%, transparent);
+  }
+  .constitution-hero-copy .constitution-lang--en {
+    border-left: none;
+    padding-left: 0;
+  }
+  @media (min-width: 768px) {
+    .constitution-hero-copy .constitution-bilingual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem; /* 48px */
+      align-items: start;
+    }
+    .constitution-hero-copy .constitution-lang-divider {
+      display: none;
+    }
+  }
+  @media (min-width: 1024px) {
+    .constitution-hero-copy .constitution-bilingual {
+      gap: 4rem; /* 64px */
+    }
+  }
+  .constitution-hero-copy .constitution-lang-label { color: rgba(255,255,255,0.65); }
+  .constitution-hero-copy .constitution-lang-text { color: rgba(255,255,255,0.95); }
+  .constitution-hero-copy .constitution-lang--en .constitution-lang-text { color: rgba(255,255,255,0.78); }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .constitution-obj-card,
+    .constitution-download-btn,
+    .constitution-clause { transition: none; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Constitution — Zarrah Foundation",
+  "description": "Memorandum of Association and Articles of Association of Zarrah Foundation under the Societies Registration Act, 1860.",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'constitution' %}",
+  "isPartOf": {
+    "@type": "NGO",
+    "name": "{{ site_settings.localized_name|default:'Zarrah Foundation'|escapejs }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}/"
+  },
+  "about": {
+    "@type": "Legislation",
+    "name": "The Societies Registration Act, 1860"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="constitution-doc">
+
+{# ---- Hero ---- #}
+<section class="relative overflow-hidden bg-gradient-to-br from-primary-dark via-primary to-secondary text-white" aria-labelledby="constitution-hero-heading">
+  <div class="bg-pattern-dots absolute inset-0 opacity-25" aria-hidden="true"></div>
+  <div class="constitution-container constitution-container--hero relative py-16">
+    <nav aria-label="{% trans 'Breadcrumb' %}" class="mb-8 text-sm text-white/70">
+      <ol class="flex flex-wrap items-center gap-2">
+        <li><a href="{% url 'home' %}" class="transition-colors hover:text-white">{% trans "Home" %}</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="font-semibold text-white" aria-current="page">
+          <span lang="bn">গঠনতন্ত্র</span>
+          <span class="mx-1 text-white/40" aria-hidden="true">·</span>
+          <span lang="en">Constitution</span>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="constitution-hero-inner">
+      <h1 id="constitution-hero-heading" class="mt-2">
+        <span lang="bn" class="constitution-hero-title text-white">{{ constitution_hero.title_bn }}</span>
+        <span lang="en" class="constitution-hero-subtitle-en text-white">{{ constitution_hero.title_en }}</span>
+      </h1>
+
+      <div class="constitution-hero-copy mt-7">
+        {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_hero.subtitle_bn en=constitution_hero.subtitle_en size="lead" %}
+      </div>
+
+      <dl class="mt-9 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3.5 backdrop-blur-sm">
+          <dt class="text-[11px] font-bold uppercase tracking-wider text-white/55">
+            <span lang="bn">নিবন্ধন নম্বর</span> · <span lang="en">Reg. No.</span>
+          </dt>
+          <dd lang="en" class="mt-1.5 text-lg font-bold tracking-wide text-white">{{ constitution_registration.number }}</dd>
+        </div>
+        <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3.5 backdrop-blur-sm">
+          <dt class="text-[11px] font-bold uppercase tracking-wider text-white/55">
+            <span lang="bn">নিবন্ধনের তারিখ</span> · <span lang="en">Registered</span>
+          </dt>
+          <dd class="mt-1.5 text-sm font-semibold text-white">
+            <span lang="bn">{{ constitution_registration.date_bn }}</span>
+            <span class="text-white/40"> · </span>
+            <span lang="en">{{ constitution_registration.date_en }}</span>
+          </dd>
+        </div>
+        <div class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3.5 backdrop-blur-sm">
+          <dt class="text-[11px] font-bold uppercase tracking-wider text-white/55">
+            <span lang="bn">আইন</span> · <span lang="en">Act</span>
+          </dt>
+          <dd lang="en" class="mt-1.5 text-sm font-semibold text-white">Act XXI of 1860</dd>
+        </div>
+      </dl>
+
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="{{ constitution_pdf_url }}" class="btn-accent btn-lg" download target="_blank" rel="noopener noreferrer">
+          <i class="bi bi-file-earmark-pdf-fill" aria-hidden="true"></i>
+          <span lang="bn">অফিসিয়াল পিডিএফ ডাউনলোড</span>
+        </a>
+        <a href="#about" class="btn-outline-white btn-lg">
+          <i class="bi bi-arrow-down" aria-hidden="true"></i>
+          <span lang="bn">পড়ুন</span>
+          <span class="opacity-50" aria-hidden="true">·</span>
+          <span lang="en">Read</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% include "includes/ui/sections/_wave_divider.html" with color="text-canvas" %}
+</section>
+
+{# ---- Body + TOC ---- #}
+<div class="bg-canvas">
+  <div class="constitution-container constitution-container--body py-12">
+    <div class="constitution-layout">
+
+      <aside class="constitution-toc-aside" aria-label="{% trans 'Table of contents' %}">
+        <nav class="constitution-toc" aria-label="{% trans 'On this page' %}">
+          <div class="constitution-toc-progress" aria-hidden="true"><span id="constitution-toc-bar"></span></div>
+          <p class="constitution-toc-label">
+            <span lang="bn">সূচিপত্র</span>
+            <span aria-hidden="true"> · </span>
+            <span lang="en">Contents</span>
+          </p>
+          {% for item in constitution_toc %}
+          <a href="#{{ item.id }}" data-toc-link="{{ item.id }}">
+            <span lang="bn" class="toc-bn">{{ item.bn }}</span>
+            <span lang="en" class="toc-en">{{ item.en }}</span>
+          </a>
+          {% endfor %}
+          <a href="{{ constitution_pdf_url }}" class="mt-2 flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5" download target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-download" aria-hidden="true"></i>
+            <span lang="bn">পিডিএফ</span>
+            <span class="text-xs font-medium text-ink-light">{{ constitution_pdf_meta.size_approx }}</span>
+          </a>
+        </nav>
+      </aside>
+
+      <details class="constitution-accordion constitution-toc-mobile">
+        <summary>
+          <span>
+            <span lang="bn" class="block font-bold text-ink">সূচিপত্র</span>
+            <span lang="en" class="block text-sm text-ink-light">Table of contents</span>
+          </span>
+          <i class="bi bi-list constitution-chevron text-xl" aria-hidden="true"></i>
+        </summary>
+        <nav class="constitution-accordion-panel space-y-1" aria-label="{% trans 'Mobile table of contents' %}">
+          {% for item in constitution_toc %}
+          <a href="#{{ item.id }}" class="block rounded-lg px-3 py-2 text-sm text-ink-light hover:bg-primary/5 hover:text-primary">
+            <span lang="bn">{{ item.bn }}</span>
+            <span class="text-ink/30"> · </span>
+            <span lang="en">{{ item.en }}</span>
+          </a>
+          {% endfor %}
+        </nav>
+      </details>
+
+      <div class="constitution-main constitution-stack min-w-0">
+
+        {# About #}
+        <section id="about" class="anchor-offset" aria-labelledby="about-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="about-heading" title_bn=constitution_about.title_bn title_en=constitution_about.title_en %}
+          <article class="constitution-clause">
+            {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_about.bn en=constitution_about.en size="lead" %}
+            <div class="mt-6">
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_registration.act_bn en=constitution_registration.act_en size="sm" tone="note" %}
+            </div>
+          </article>
+        </section>
+
+        {# Memorandum #}
+        <section id="memorandum" class="anchor-offset constitution-band" aria-labelledby="moa-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="moa-heading" eyebrow="Part I · সংঘস্মারক" title_bn="সংঘস্মারক" title_en="Memorandum of Association" %}
+
+          <div class="constitution-clause-stack">
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <span class="constitution-clause-num">{{ constitution_moa_name.clause_bn }}</span>
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_moa_name.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_moa_name.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_moa_name.bn en=constitution_moa_name.en %}
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <span class="constitution-clause-num">{{ constitution_moa_office.clause_bn }}</span>
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_moa_office.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_moa_office.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_moa_office.bn en=constitution_moa_office.en %}
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <span class="constitution-clause-num">{{ constitution_moa_area.clause_bn }}</span>
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_moa_area.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_moa_area.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_moa_area.bn en=constitution_moa_area.en %}
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <span class="constitution-clause-num">{{ constitution_moa_nature.clause_bn }}</span>
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_moa_nature.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_moa_nature.title_en }}</span>
+                </h3>
+              </header>
+              <div class="constitution-nature-grid">
+                {% for item in constitution_moa_nature.items %}
+                <div class="flex items-start gap-3 rounded-2xl border border-border/60 bg-canvas px-4 py-3.5">
+                  <span class="constitution-obj-icon shrink-0" aria-hidden="true"><i class="bi {{ item.icon }}"></i></span>
+                  <div>
+                    <p lang="bn" class="font-semibold text-ink">{{ item.bn }}</p>
+                    <p lang="en" class="mt-0.5 text-sm text-ink-light">{{ item.en }}</p>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <span class="constitution-clause-num">{{ constitution_moa_income.clause_bn }}</span>
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_moa_income.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_moa_income.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_moa_income.bn en=constitution_moa_income.en tone="clause" %}
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <span class="constitution-clause-num">{{ constitution_moa_dissolution.clause_bn }}</span>
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_moa_dissolution.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_moa_dissolution.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_moa_dissolution.bn en=constitution_moa_dissolution.en tone="warning" %}
+            </article>
+          </div>
+        </section>
+
+        {# Objectives #}
+        <section id="objectives" class="anchor-offset" aria-labelledby="objectives-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="objectives-heading" title_bn="লক্ষ্য ও উদ্দেশ্য" title_en="Aims & Objectives" note_bn="ধারা-৫" note_en="Article 5" %}
+          <div class="constitution-obj-grid">
+            {% for obj in constitution_objectives %}
+            <article class="constitution-obj-card">
+              <div class="flex items-start justify-between gap-3">
+                <span class="constitution-obj-icon" aria-hidden="true"><i class="bi {{ obj.icon }}"></i></span>
+                <span class="rounded-full bg-canvas px-2.5 py-1 text-xs font-bold text-primary" lang="bn">({{ obj.code }})</span>
+              </div>
+              <h3 class="mt-4 text-lg font-bold leading-snug text-ink">
+                <span lang="bn" class="block">{{ obj.title_bn }}</span>
+                <span lang="en" class="mt-1 block text-sm font-semibold text-primary">{{ obj.title_en }}</span>
+              </h3>
+              <div class="mt-3 flex-1">{% include "pages/includes/constitution/_bilingual.html" with bn=obj.bn en=obj.en size="sm" %}</div>
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# Structure #}
+        <section id="structure" class="anchor-offset constitution-band" aria-labelledby="structure-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="structure-heading" eyebrow="Part II · গঠনতন্ত্র" title_bn="সাংগঠনিক কাঠামো" title_en="Organisational Structure" %}
+
+          <div class="constitution-hierarchy">
+            {% for board in constitution_org %}
+            <article class="constitution-hierarchy-card">
+              <div class="mb-3 flex items-center gap-3">
+                <span class="constitution-obj-icon" aria-hidden="true"><i class="bi {{ board.icon }}"></i></span>
+                <h3 class="text-xl font-bold text-ink">
+                  <span lang="bn" class="block">{{ board.title_bn }}</span>
+                  <span lang="en" class="mt-0.5 block text-sm font-semibold text-ink-light">{{ board.title_en }}</span>
+                </h3>
+              </div>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=board.summary_bn en=board.summary_en size="sm" tone="note" %}
+              <div class="mt-4">{% include "pages/includes/constitution/_bilingual.html" with bn=board.details_bn en=board.details_en size="sm" %}</div>
+            </article>
+            {% endfor %}
+          </div>
+
+          <details class="constitution-accordion mt-6">
+            <summary>
+              <span>
+                <span lang="bn" class="block font-bold text-ink">{{ constitution_advisory_powers.title_bn }}</span>
+                <span lang="en" class="block text-sm text-ink-light">{{ constitution_advisory_powers.title_en }}</span>
+              </span>
+              <i class="bi bi-chevron-down constitution-chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="constitution-accordion-panel">
+              <ul class="constitution-list">
+                {% for item in constitution_advisory_powers.items %}
+                <li>{% include "pages/includes/constitution/_bilingual.html" with bn=item.bn en=item.en size="sm" %}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </details>
+        </section>
+
+        {# Executive #}
+        <section id="executive" class="anchor-offset" aria-labelledby="executive-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="executive-heading" title_bn="কার্যনির্বাহী পরিষদের কাঠামো" title_en="Executive Council Structure" note_bn="১৪ সদস্যবিশিষ্ট নমুনা কাঠামো (ধারা ৪.২.১-ক)" note_en="Illustrative 14-member structure (Clause 4.2.1-a)" %}
+
+          <div class="constitution-posts-grid">
+            {% for post in constitution_executive_posts %}
+            <article class="flex gap-3 rounded-[1.1rem] border border-border/70 bg-surface p-4 shadow-soft-sm transition-shadow hover:shadow-soft-md">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white" aria-hidden="true">{{ forloop.counter }}</span>
+              <div class="min-w-0">
+                <h3 class="font-bold leading-snug text-ink">
+                  <span lang="bn" class="block">{{ post.bn }}</span>
+                  <span lang="en" class="mt-0.5 block text-sm font-semibold text-primary">{{ post.en }}</span>
+                </h3>
+                <p class="mt-1.5 text-xs text-ink-light">
+                  <span lang="bn">{{ post.elect_bn }}</span>
+                  <span class="opacity-40" aria-hidden="true"> · </span>
+                  <span lang="en">{{ post.elect_en }}</span>
+                </p>
+              </div>
+            </article>
+            {% endfor %}
+          </div>
+
+          <details class="constitution-accordion mt-6">
+            <summary>
+              <span>
+                <span lang="bn" class="block font-bold text-ink">{{ constitution_executive_duties.title_bn }}</span>
+                <span lang="en" class="block text-sm text-ink-light">{{ constitution_executive_duties.title_en }}</span>
+              </span>
+              <i class="bi bi-chevron-down constitution-chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="constitution-accordion-panel">
+              <ul class="constitution-list">
+                {% for item in constitution_executive_duties.items %}
+                <li>{% include "pages/includes/constitution/_bilingual.html" with bn=item.bn en=item.en size="sm" %}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </details>
+
+          <div class="mt-4 space-y-3">
+            {% for role in constitution_officer_roles %}
+            <details class="constitution-accordion">
+              <summary>
+                <span>
+                  <span lang="bn" class="block font-bold text-ink">{{ role.title_bn }}</span>
+                  <span lang="en" class="block text-sm text-ink-light">{{ role.title_en }}</span>
+                </span>
+                <i class="bi bi-chevron-down constitution-chevron" aria-hidden="true"></i>
+              </summary>
+              <div class="constitution-accordion-panel">
+                <ul class="constitution-list">
+                  {% for item in role.items %}
+                  <li>{% include "pages/includes/constitution/_bilingual.html" with bn=item.bn en=item.en size="sm" %}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </details>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# Membership #}
+        <section id="membership" class="anchor-offset constitution-band" aria-labelledby="membership-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="membership-heading" title_bn="সদস্যপদ" title_en="Membership" %}
+
+          <div class="constitution-fees-grid mb-5">
+            <div class="constitution-fee-card">
+              <p class="text-xs font-bold uppercase tracking-wider text-primary">
+                <span lang="bn">ভর্তি ফি</span> · <span lang="en">Admission Fee</span>
+              </p>
+              <p class="mt-3 text-4xl font-extrabold tracking-tight text-ink">৳১০০</p>
+              <div class="mt-3">
+                {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_fees.admission_bn en=constitution_fees.admission_en size="sm" %}
+              </div>
+            </div>
+            <div class="constitution-fee-card constitution-fee-card--accent">
+              <p class="text-xs font-bold uppercase tracking-wider text-accent">
+                <span lang="bn">মাসিক চাঁদা</span> · <span lang="en">Monthly Subscription</span>
+              </p>
+              <p class="mt-3 text-4xl font-extrabold tracking-tight text-ink">৳৫০</p>
+              <div class="mt-3">
+                {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_fees.monthly_bn en=constitution_fees.monthly_en size="sm" %}
+              </div>
+            </div>
+          </div>
+          <div class="mb-6">
+            {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_fees.note_bn en=constitution_fees.note_en size="sm" tone="note" %}
+          </div>
+
+          <div class="space-y-3">
+            <details class="constitution-accordion" open>
+              <summary>
+                <span>
+                  <span lang="bn" class="block font-bold text-ink">{{ constitution_eligibility.title_bn }}</span>
+                  <span lang="en" class="block text-sm text-ink-light">{{ constitution_eligibility.title_en }}</span>
+                </span>
+                <i class="bi bi-chevron-down constitution-chevron" aria-hidden="true"></i>
+              </summary>
+              <div class="constitution-accordion-panel">
+                {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_eligibility.intro_bn en=constitution_eligibility.intro_en size="sm" %}
+                <ol class="constitution-list-ol">
+                  {% for item in constitution_eligibility.items %}
+                  <li>
+                    <p lang="bn" class="text-[15px] leading-7 text-ink">{{ item.bn }}</p>
+                    <p lang="en" class="mt-1 text-sm leading-6 text-ink-light">{{ item.en }}</p>
+                  </li>
+                  {% endfor %}
+                </ol>
+                <div class="mt-4">{% include "pages/includes/constitution/_bilingual.html" with bn=constitution_eligibility.outro_bn en=constitution_eligibility.outro_en size="sm" tone="clause" %}</div>
+              </div>
+            </details>
+
+            <details class="constitution-accordion">
+              <summary>
+                <span>
+                  <span lang="bn" class="block font-bold text-ink">{{ constitution_cancel.title_bn }}</span>
+                  <span lang="en" class="block text-sm text-ink-light">{{ constitution_cancel.title_en }}</span>
+                </span>
+                <i class="bi bi-chevron-down constitution-chevron" aria-hidden="true"></i>
+              </summary>
+              <div class="constitution-accordion-panel">
+                <ul class="constitution-list">
+                  {% for item in constitution_cancel.items %}
+                  <li>{% include "pages/includes/constitution/_bilingual.html" with bn=item.bn en=item.en size="sm" %}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </details>
+
+            <details class="constitution-accordion">
+              <summary>
+                <span>
+                  <span lang="bn" class="block font-bold text-ink">{{ constitution_restore.title_bn }}</span>
+                  <span lang="en" class="block text-sm text-ink-light">{{ constitution_restore.title_en }}</span>
+                </span>
+                <i class="bi bi-chevron-down constitution-chevron" aria-hidden="true"></i>
+              </summary>
+              <div class="constitution-accordion-panel">
+                {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_restore.bn en=constitution_restore.en size="sm" %}
+              </div>
+            </details>
+
+            <details class="constitution-accordion">
+              <summary>
+                <span>
+                  <span lang="bn" class="block font-bold text-ink">{{ constitution_definitions.title_bn }}</span>
+                  <span lang="en" class="block text-sm text-ink-light">{{ constitution_definitions.title_en }}</span>
+                </span>
+                <i class="bi bi-chevron-down constitution-chevron" aria-hidden="true"></i>
+              </summary>
+              <div class="constitution-accordion-panel">
+                {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_definitions.intro_bn en=constitution_definitions.intro_en size="sm" %}
+                <ol class="constitution-list-ol">
+                  {% for item in constitution_definitions.items %}
+                  <li>
+                    <p lang="bn" class="text-[15px] leading-7 text-ink">{{ item.bn }}</p>
+                    <p lang="en" class="mt-1 text-sm leading-6 text-ink-light">{{ item.en }}</p>
+                  </li>
+                  {% endfor %}
+                </ol>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        {# Governance #}
+        <section id="governance" class="anchor-offset" aria-labelledby="governance-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="governance-heading" title_bn="সভা ও পরিচালনা" title_en="Meetings & Governance" %}
+          <div class="constitution-clause-stack">
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_meetings.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_meetings.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_meetings.bn en=constitution_meetings.en size="sm" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_quorum.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_quorum.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_quorum.bn en=constitution_quorum.en size="sm" tone="clause" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_adjourned.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_adjourned.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_adjourned.bn en=constitution_adjourned.en size="sm" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_elections.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_elections.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_elections.bn en=constitution_elections.en size="sm" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_term_year.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_term_year.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_term_year.bn en=constitution_term_year.en size="sm" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_sub_committee.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_sub_committee.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_sub_committee.bn en=constitution_sub_committee.en size="sm" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_legal_rep.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_legal_rep.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_legal_rep.bn en=constitution_legal_rep.en size="sm" %}
+            </article>
+          </div>
+        </section>
+
+        {# Finance #}
+        <section id="finance" class="anchor-offset" aria-labelledby="finance-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="finance-heading" title_bn="অর্থ ও নিরীক্ষা" title_en="Finance & Audit" %}
+          <div class="constitution-clause-stack">
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_finance_sources.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_finance_sources.title_en }}</span>
+                </h3>
+              </header>
+              <ul class="constitution-list">
+                {% for item in constitution_finance_sources.items %}
+                <li>{% include "pages/includes/constitution/_bilingual.html" with bn=item.bn en=item.en size="sm" %}</li>
+                {% endfor %}
+              </ul>
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_finance_expense.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_finance_expense.title_en }}</span>
+                </h3>
+              </header>
+              <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {% for item in constitution_finance_expense.items %}
+                <div class="rounded-xl border border-border/60 bg-canvas px-4 py-3">
+                  <p lang="bn" class="text-sm font-medium leading-6 text-ink">{{ item.bn }}</p>
+                  <p lang="en" class="mt-1 text-xs leading-5 text-ink-light">{{ item.en }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_accounts.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_accounts.title_en }}</span>
+                </h3>
+              </header>
+              <ul class="constitution-list">
+                {% for item in constitution_accounts.items %}
+                <li>{% include "pages/includes/constitution/_bilingual.html" with bn=item.bn en=item.en size="sm" %}</li>
+                {% endfor %}
+              </ul>
+            </article>
+
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_audit.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_audit.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_audit.bn en=constitution_audit.en size="sm" tone="note" %}
+            </article>
+          </div>
+        </section>
+
+        {# Amendments #}
+        <section id="amendments" class="anchor-offset" aria-labelledby="amendments-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="amendments-heading" title_bn="সংশোধন, বিলুপ্তি ও আইন" title_en="Amendments, Dissolution & Law" %}
+          <div class="constitution-clause-stack">
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_amendments.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_amendments.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_amendments.bn en=constitution_amendments.en size="sm" tone="clause" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_aoa_dissolution.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_aoa_dissolution.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_aoa_dissolution.bn en=constitution_aoa_dissolution.en size="sm" tone="warning" %}
+            </article>
+            <article class="constitution-clause">
+              <header class="constitution-clause-header">
+                <h3 class="constitution-clause-title">
+                  <span lang="bn" class="block">{{ constitution_law.title_bn }}</span>
+                  <span lang="en" class="constitution-clause-title-en">{{ constitution_law.title_en }}</span>
+                </h3>
+              </header>
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_law.bn en=constitution_law.en size="sm" tone="note" %}
+            </article>
+          </div>
+        </section>
+
+        {# Founders #}
+        <section id="founders" class="anchor-offset constitution-band" aria-labelledby="founders-heading">
+          {% include "pages/includes/constitution/_section_heading.html" with heading_id="founders-heading" title_bn="প্রতিষ্ঠাকালীন সদস্যবৃন্দ" title_en="Founding Members" %}
+
+          <div class="constitution-founder-intro">
+            {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_founders_intro.bn en=constitution_founders_intro.en size="sm" %}
+          </div>
+
+          <aside class="constitution-privacy-notice" aria-label="{% trans 'Privacy notice' %}">
+            <span class="constitution-privacy-icon" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+            <div>
+              <p class="constitution-privacy-title">
+                <span lang="en">Privacy Notice</span>
+                <span aria-hidden="true"> · </span>
+                <span lang="bn">গোপনীয়তা নোটিশ</span>
+              </p>
+              <p lang="en" class="constitution-privacy-text">{{ constitution_founders_privacy.en }}</p>
+              <p lang="bn" class="constitution-privacy-text">{{ constitution_founders_privacy.bn }}</p>
+            </div>
+          </aside>
+
+          <div class="constitution-founders-grid">
+            {% for person in constitution_founders %}
+            <article class="constitution-founder-card{% if person.is_officer %} constitution-founder-card--officer{% endif %}{% if person.tier == 'secretary' %} constitution-founder-card--secretary{% endif %}">
+              <span class="constitution-founder-index" aria-hidden="true">{{ forloop.counter }}</span>
+              <div class="constitution-founder-avatar" aria-hidden="true">{{ person.initials }}</div>
+              <h3 lang="en" class="constitution-founder-name">{{ person.name }}</h3>
+              <p lang="bn" class="constitution-founder-role-bn">{{ person.role_bn }}</p>
+              <p lang="en" class="constitution-founder-role-en">{{ person.role_en }}</p>
+              <div class="constitution-founder-badge constitution-founder-badge--{{ person.tier }}">
+                <span>
+                  <i class="bi bi-award" aria-hidden="true"></i>
+                  <span lang="bn">{{ person.badge_bn }}</span>
+                  <span aria-hidden="true">·</span>
+                  <span lang="en">{{ person.badge_en }}</span>
+                </span>
+              </div>
+            </article>
+            {% endfor %}
+          </div>
+        </section>
+
+        {# Download #}
+        <section id="download" class="anchor-offset" aria-labelledby="download-heading">
+          <div class="constitution-download">
+            <div class="constitution-download-icon" aria-hidden="true">
+              <i class="bi bi-file-earmark-pdf-fill"></i>
+            </div>
+            <div>
+              <h2 id="download-heading" class="text-2xl font-bold leading-tight sm:text-[1.65rem]">
+                <span lang="bn" class="block">অফিসিয়াল গঠনতন্ত্র পিডিএফ</span>
+                <span lang="en" class="mt-1 block text-base font-semibold text-white/80">Official Constitution PDF</span>
+              </h2>
+              <p class="mt-3 max-w-xl text-sm leading-relaxed text-white/85">
+                <span lang="bn" class="block">নিবন্ধিত সংঘস্মারক ও গঠনতন্ত্রের সম্পূর্ণ অফিসিয়াল কপি ডাউনলোড করুন।</span>
+                <span lang="en" class="mt-1 block text-white/70">Download the complete officially registered Memorandum and Articles of Association.</span>
+              </p>
+              <div class="constitution-download-meta">
+                <span class="constitution-download-chip"><i class="bi bi-filetype-pdf" aria-hidden="true"></i> {{ constitution_pdf_meta.size_label }}</span>
+                <span class="constitution-download-chip"><i class="bi bi-hdd" aria-hidden="true"></i> {{ constitution_pdf_meta.size_approx }}</span>
+                <span class="constitution-download-chip"><i class="bi bi-file-text" aria-hidden="true"></i> {{ constitution_pdf_meta.pages_label }}</span>
+                <span class="constitution-download-chip">
+                  <i class="bi bi-calendar3" aria-hidden="true"></i>
+                  <span lang="bn">{{ constitution_pdf_meta.updated_bn }}</span>
+                  <span aria-hidden="true">·</span>
+                  <span lang="en">{{ constitution_pdf_meta.updated_en }}</span>
+                </span>
+              </div>
+            </div>
+            <a href="{{ constitution_pdf_url }}" class="constitution-download-btn" download target="_blank" rel="noopener noreferrer">
+              <i class="bi bi-download" aria-hidden="true"></i>
+              <span lang="bn">ডাউনলোড</span>
+              <span aria-hidden="true">·</span>
+              <span lang="en">Download</span>
+            </a>
+          </div>
+        </section>
+
+        {# Legal notice #}
+        <section id="legal-notice" class="anchor-offset" aria-labelledby="legal-notice-heading">
+          <div class="constitution-callout">
+            <h2 id="legal-notice-heading" class="constitution-callout-title">
+              <i class="bi bi-exclamation-triangle-fill text-warning" aria-hidden="true"></i>
+              <span lang="bn">{{ constitution_legal_notice.title_bn }}</span>
+              <span class="text-ink/30" aria-hidden="true">·</span>
+              <span lang="en" class="font-semibold text-ink-light">{{ constitution_legal_notice.title_en }}</span>
+            </h2>
+            <div class="mt-4">
+              {% include "pages/includes/constitution/_bilingual.html" with bn=constitution_legal_notice.bn en=constitution_legal_notice.en size="sm" %}
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/constitution-toc.js' %}" defer></script>
+{% endblock %}

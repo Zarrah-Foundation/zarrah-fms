@@ -1,0 +1,95 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% if is_create %}{% trans "New election" %}{% else %}{% trans "Edit election" %}{% endif %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% if is_create %}{% trans "New election" %}{% else %}{% trans "Edit election" %}{% endif %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mx-auto max-w-4xl">
+  <div class="dash-page-header">
+    <h1 class="dash-page-title">{% if is_create %}{% trans "New election" %}{% else %}{% trans "Edit election" %}{% endif %}</h1>
+    {% if locked %}<p class="text-sm text-warning">{% trans "Configuration is locked after open / freeze." %}</p>{% endif %}
+  </div>
+
+  {% if preview %}
+  <div class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-card border border-border/60 bg-surface p-4">
+      <p class="text-xs uppercase text-ink-light">{% trans "Eligible" %}</p>
+      <p class="text-xl font-bold">{{ preview.eligible_count }}</p>
+    </div>
+    <div class="rounded-card border border-border/60 bg-surface p-4">
+      <p class="text-xs uppercase text-ink-light">{% trans "Founders" %}</p>
+      <p class="text-xl font-bold">{{ preview.founder_count }}</p>
+    </div>
+    <div class="rounded-card border border-border/60 bg-surface p-4">
+      <p class="text-xs uppercase text-ink-light">{% trans "Quorum" %}</p>
+      <p class="text-xl font-bold">{{ preview.quorum_required }}</p>
+    </div>
+    <div class="rounded-card border border-border/60 bg-surface p-4">
+      <p class="text-xs uppercase text-ink-light">{% trans "Founder seats" %}</p>
+      <p class="text-xl font-bold">{{ preview.reserved_founder_seats }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="post" class="space-y-6">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="card-flat">
+      <h2 class="mb-5 text-h4">{% trans "Details" %}</h2>
+      <div class="dash-form-grid">
+        {% for field in form %}
+        {% include "dashboard/includes/_form_field.html" with field=field %}
+        {% endfor %}
+      </div>
+      <p class="mt-3 text-xs text-ink-light">
+        {% trans "Advisory Council (hard rules): exactly 2/3 quorum of the frozen electorate, fixed 48-hour window, every approved member is voter and candidate, self-voting forbidden, founder-reserved seats = ceil(seats/2). Quorum cannot be weakened to 1/2." %}
+      </p>
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-5 text-h4">{% trans "Manual candidates (optional)" %}</h2>
+      <p class="mb-3 text-sm text-ink-light">{% trans "Leave empty for Advisory Council / auto-candidate elections." %}</p>
+      {{ formset.management_form }}
+      {% if formset.non_form_errors %}<div class="alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+      <div class="space-y-4">
+        {% for f in formset %}
+        <div class="grid grid-cols-1 gap-3 border-b border-border/50 pb-4 md:grid-cols-4">
+          {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+          {% include "dashboard/includes/_form_field.html" with field=f.name %}
+          {% include "dashboard/includes/_form_field.html" with field=f.member %}
+          {% include "dashboard/includes/_form_field.html" with field=f.display_order %}
+          {% include "dashboard/includes/_form_field.html" with field=f.is_active %}
+          {% if f.DELETE %}{% include "dashboard/includes/_form_field.html" with field=f.DELETE %}{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-5 text-h4">{% trans "Questions (Yes/No & Multi-choice)" %}</h2>
+      {{ qformset.management_form }}
+      {% if qformset.non_form_errors %}<div class="alert-danger">{{ qformset.non_form_errors }}</div>{% endif %}
+      <div class="space-y-4">
+        {% for f in qformset %}
+        <div class="grid grid-cols-1 gap-3 border-b border-border/50 pb-4 md:grid-cols-2">
+          {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+          {% include "dashboard/includes/_form_field.html" with field=f.question_en %}
+          {% include "dashboard/includes/_form_field.html" with field=f.question_bn %}
+          {% include "dashboard/includes/_form_field.html" with field=f.display_order %}
+          {% include "dashboard/includes/_form_field.html" with field=f.is_active %}
+          {% if f.DELETE %}{% include "dashboard/includes/_form_field.html" with field=f.DELETE %}{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <p class="mt-2 text-xs text-ink-light">{% trans "Yes/No options are created automatically on open if none exist. Add Multi-choice options in Django admin or detail tools if needed." %}</p>
+    </div>
+
+    <div class="flex justify-end gap-3">
+      <a href="{% if election %}{% url 'dashboard-election-detail' election.pk %}{% else %}{% url 'dashboard-elections' %}{% endif %}" class="btn-ghost">{% trans "Cancel" %}</a>
+      <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

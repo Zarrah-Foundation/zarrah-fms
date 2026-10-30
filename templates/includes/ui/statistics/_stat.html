@@ -1,0 +1,18 @@
+{% load i18n_extras %}
+{% comment %}
+Reusable animated statistic (About: hero stat row, Impact Statistics).
+Usage:
+  {% include "includes/ui/statistics/_stat.html" with stat=item on_dark=True %}
+Params:
+  stat    - {icon, value, suffix, label_en/label_bn}
+  on_dark - True when placed on a colored/gradient background
+{% endcomment %}
+<div class="stat-block">
+  {% if stat.icon %}
+  <i class="bi {{ stat.icon }} mb-1 text-2xl {% if on_dark %}text-white/70{% else %}text-primary/60{% endif %}" aria-hidden="true"></i>
+  {% endif %}
+  <p class="stat-value {% if on_dark %}stat-value-on-dark{% endif %}">
+    <span data-counter data-counter-target="{{ stat.value }}" data-counter-suffix="{{ stat.suffix }}">0{{ stat.suffix }}</span>
+  </p>
+  <p class="stat-label {% if on_dark %}stat-label-on-dark{% endif %}">{{ stat|bl:"label" }}</p>
+</div>

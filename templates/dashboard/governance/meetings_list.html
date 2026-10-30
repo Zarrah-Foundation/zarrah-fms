@@ -1,0 +1,78 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Meetings" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Meetings" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-calendar-event"></i> {% trans "Meetings" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Schedule meetings, manage participants, agenda and resolutions." %}</p>
+  </div>
+  {% if can_create %}
+  <a href="{% url 'dashboard-meeting-create' %}" class="btn-primary"><i class="bi bi-plus-lg"></i>{% trans "New meeting" %}</a>
+  {% endif %}
+</div>
+
+<form method="get" class="mb-5 flex flex-wrap gap-3">
+  <input type="search" name="q" value="{{ search_query }}" class="form-input max-w-xs" placeholder="{% trans 'Search…' %}">
+  <select name="status" class="form-select max-w-xs">
+    <option value="">{% trans "All statuses" %}</option>
+    {% for val, label in status_choices %}
+    <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn-secondary">{% trans "Filter" %}</button>
+</form>
+
+{# Desktop table #}
+<div class="card-flat hidden overflow-x-auto md:block">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>{% trans "Reference" %}</th>
+        <th>{% trans "Title" %}</th>
+        <th>{% trans "Type" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Starts" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in meetings %}
+      <tr>
+        <td class="font-mono text-sm">{{ m.reference_id }}</td>
+        <td class="font-medium">{{ m.title_en|default:m.title_bn }}</td>
+        <td>{{ m.meeting_type.name_en }}</td>
+        <td><span class="badge">{{ m.get_status_display }}</span></td>
+        <td class="text-sm text-ink-light">{{ m.starts_at|date:"Y-m-d H:i" }}</td>
+        <td class="text-right"><a href="{% url 'dashboard-meeting-detail' m.pk %}" class="btn-ghost btn-sm">{% trans "Open" %}</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-ink-light">{% trans "No meetings yet." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{# Mobile cards #}
+<div class="space-y-3 md:hidden">
+  {% for m in meetings %}
+  <a href="{% url 'dashboard-meeting-detail' m.pk %}" class="block rounded-card border border-border/60 bg-surface p-4 shadow-sm transition hover:border-primary/40">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="font-mono text-xs text-ink-light">{{ m.reference_id }}</p>
+        <p class="mt-1 font-medium text-ink">{{ m.title_en|default:m.title_bn }}</p>
+        <p class="mt-1 text-sm text-ink-light">{{ m.meeting_type.name_en }} · {{ m.starts_at|date:"Y-m-d H:i" }}</p>
+      </div>
+      <span class="badge shrink-0">{{ m.get_status_display }}</span>
+    </div>
+  </a>
+  {% empty %}
+  <p class="rounded-card border border-dashed border-border p-6 text-center text-sm text-ink-light">{% trans "No meetings yet." %}</p>
+  {% endfor %}
+</div>
+
+{% include "dashboard/includes/_pagination.html" with page_obj=page_obj %}
+{% endblock %}

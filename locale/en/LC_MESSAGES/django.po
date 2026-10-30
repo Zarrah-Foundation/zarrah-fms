@@ -1,0 +1,32 @@
+# English translations (default strings).
+msgid ""
+msgstr ""
+"Project-Id-Version: zarrah_foundation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Zarrah Foundation"
+msgstr "Zarrah Foundation"
+
+msgid "About"
+msgstr "About"
+
+msgid "Membership"
+msgstr "Membership"
+
+msgid "Donate"
+msgstr "Donate"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Account is deactivated"
+msgstr "Account is deactivated"

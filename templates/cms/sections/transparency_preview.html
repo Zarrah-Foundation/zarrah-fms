@@ -1,0 +1,49 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section" aria-labelledby="home-transparency-title">
+  <div class="container-app">
+    <div class="zf-trust-panel">
+      <div class="zf-trust-panel__copy">
+        <p class="zf-home-eyebrow">{% zf_label "Accountability" %}</p>
+        <h2 id="home-transparency-title" class="zf-home-title text-left">
+          {{ section|bl:"title" }}
+        </h2>
+        {% if section.content_en or section.content_bn %}
+        <p class="zf-home-lead mt-4 text-left">{{ section|bl:"content" }}</p>
+        {% endif %}
+        {% if home_yearly_summaries or home_monthly_summaries %}
+        <p class="mt-4 text-sm text-ink-light">{% zf_label "Financial summaries are published periodically as available." %}</p>
+        {% if home_yearly_summaries %}
+        <ul class="mt-3 space-y-1 text-sm text-ink">
+          {% for s in home_yearly_summaries %}
+          <li>{% zf_label "Yearly summary" %} {{ s.year }} — {% zf_label "Income" %} {{ s.total_income|floatformat:0 }} BDT</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if home_monthly_summaries %}
+        <ul class="mt-2 space-y-1 text-sm text-ink">
+          {% for s in home_monthly_summaries %}
+          <li>{% zf_label "Monthly summary" %} {{ s.year }}-{{ s.month|stringformat:"02d" }} — {% zf_label "Income" %} {{ s.total_income|floatformat:0 }} BDT</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% endif %}
+        <div class="zf-trust-panel__pills" role="list">
+          <span class="zf-trust-pill" role="listitem">{% zf_label "Governance" %}</span>
+          <span class="zf-trust-pill" role="listitem">{% zf_label "Financial summaries" %}</span>
+          <span class="zf-trust-pill" role="listitem">{% zf_label "Legal documents" %}</span>
+          <span class="zf-trust-pill" role="listitem">{% zf_label "Public policies" %}</span>
+        </div>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="{% if section.button_link %}{{ section.button_link }}{% else %}{% url 'transparency' %}{% endif %}" class="btn-primary">
+            {% if section.button_text_en or section.button_text_bn %}
+              {{ section|bl:"button_text" }}
+            {% else %}
+              {% zf_label "View Transparency" %}
+            {% endif %}
+          </a>
+          <a href="{% url 'reports' %}" class="btn-secondary">{% zf_label "View Reports" %}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

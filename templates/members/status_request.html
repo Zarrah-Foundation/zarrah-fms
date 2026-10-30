@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Check Application Status" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="legal-hero" aria-labelledby="status-hero-heading">
+  <div class="container-app legal-hero__inner">
+    <nav aria-label="{% zf_label 'Breadcrumb' %}" class="legal-breadcrumb">
+      <a href="{% url 'home' %}">{% zf_label "Home" %}</a>
+      <span aria-hidden="true">/</span>
+      <a href="{% url 'membership' %}">{% zf_label "Membership" %}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{% zf_label "Check Application Status" %}</span>
+    </nav>
+    <p class="legal-hero__eyebrow">{% zf_label "Application Status" %}</p>
+    <h1 id="status-hero-heading" class="legal-hero__title">{% zf_label "Check Application Status" %}</h1>
+    <p class="legal-hero__lead">
+      {% zf_label "Enter your application reference and the email address used on the application. If they match, we will email you a one-time link to view your status." %}
+    </p>
+  </div>
+</section>
+
+<section class="zf-public-stack bg-canvas">
+  <div class="container-app">
+  <form method="post" class="card mx-auto max-w-xl space-y-5" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <div>
+      <label class="form-label" for="{{ form.reference_code.id_for_label }}">{{ form.reference_code.label }}</label>
+      {{ form.reference_code }}
+      {% for error in form.reference_code.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div>
+      <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+      {{ form.email }}
+      {% for error in form.email.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+    </div>
+    <button type="submit" class="btn-primary w-full">
+      <i class="bi bi-envelope-check" aria-hidden="true"></i>{% zf_label "Send status link" %}
+    </button>
+    <p class="text-center text-sm text-ink-light">
+      <a href="{% url 'membership-apply' %}" class="text-primary hover:underline">{% zf_label "Apply for membership" %}</a>
+      ·
+      <a href="{% url 'contact' %}" class="text-primary hover:underline">{% zf_label "Contact Admin" %}</a>
+    </p>
+  </form>
+  </div>
+</section>
+{% endblock %}

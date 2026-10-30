@@ -1,0 +1,22 @@
+{% comment %}
+Bilingual language cards: Bangla first, then English.
+Labels make each language instantly scannable.
+Params: bn, en, size (body|sm|lead), tone (default|note|warning|clause)
+{% endcomment %}
+{% with text_size=size|default:"body" card_tone=tone|default:"default" %}
+<div class="constitution-bilingual{% if card_tone != 'default' %} constitution-bilingual--{{ card_tone }}{% endif %}">
+  {% if bn %}
+  <div class="constitution-lang" lang="bn">
+    <span class="constitution-lang-label" aria-hidden="true">বাংলা</span>
+    <p class="constitution-lang-text{% if text_size == 'lead' %} constitution-lang-text--lead{% elif text_size == 'sm' %} constitution-lang-text--sm{% endif %}">{{ bn }}</p>
+  </div>
+  {% endif %}
+  {% if bn and en %}<div class="constitution-lang-divider" role="separator" aria-hidden="true"></div>{% endif %}
+  {% if en %}
+  <div class="constitution-lang constitution-lang--en" lang="en">
+    <span class="constitution-lang-label" aria-hidden="true">English</span>
+    <p class="constitution-lang-text{% if text_size == 'lead' %} constitution-lang-text--lead{% elif text_size == 'sm' %} constitution-lang-text--sm{% endif %}">{{ en }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endwith %}

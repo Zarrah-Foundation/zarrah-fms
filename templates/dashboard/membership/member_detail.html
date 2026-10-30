@@ -1,0 +1,329 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras fee_extras %}
+
+{% block title %}{{ member.first_name }} {{ member.last_name }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Member Profile" %}{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'dashboard-members' %}" class="mb-4 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Back to members" %}</a>
+
+<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+  <div class="flex items-center gap-4">
+    <span class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary-dark">{{ member.first_name|slice:":1"|upper }}</span>
+    <div>
+      <h1 class="dash-page-title">{{ member.first_name }} {{ member.last_name }}</h1>
+      <p class="text-sm text-ink-light"><span lang="en">{{ member.member_id }}</span> · {% status_badge member.status member.get_status_display %}</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    {% if can_profile_download %}
+    <a href="{% url 'dashboard-member-pdf' member.pk %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-pdf"></i>{% trans "PDF" %}</a>
+    {% endif %}
+    {% if can_edit %}<a href="{% url 'dashboard-member-edit' member.pk %}" class="btn-secondary btn-sm"><i class="bi bi-pencil"></i>{% trans "Edit" %}</a>{% endif %}
+    {% if can_delete %}
+    <form method="post" action="{% url 'dashboard-member-delete' member.pk %}" onsubmit="return confirm('{% trans "Delete this member?" %}');">
+      {% csrf_token %}
+      <button type="submit" class="btn-danger btn-sm"><i class="bi bi-trash"></i>{% trans "Delete" %}</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Personal Information" %}</h2>
+      <dl class="dash-dl">
+        <div><dt class="dash-dl-term">{% trans "Phone" %}</dt><dd class="dash-dl-desc" lang="en">{{ member.phone|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Email" %}</dt><dd class="dash-dl-desc" lang="en">{{ account.email|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Gender" %}</dt><dd class="dash-dl-desc">{{ member.get_gender_display|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Date of Birth" %}</dt><dd class="dash-dl-desc">{{ member.date_of_birth|date:"M d, Y"|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Blood Group" %}</dt><dd class="dash-dl-desc">{{ member.blood_group|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "NID" %}</dt><dd class="dash-dl-desc" lang="en">{{ member.nid_number|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Occupation" %}</dt><dd class="dash-dl-desc">{{ member.occupation|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Organization" %}</dt><dd class="dash-dl-desc">{{ member.organization|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Education" %}</dt><dd class="dash-dl-desc">{{ member.education|default:"—" }}</dd></div>
+      </dl>
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Address" %}</h2>
+      <dl class="dash-dl">
+        <div><dt class="dash-dl-term">{% trans "District" %}</dt><dd class="dash-dl-desc">{{ member.district|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Upazila" %}</dt><dd class="dash-dl-desc">{{ member.upazila|default:"—" }}</dd></div>
+        <div class="sm:col-span-2"><dt class="dash-dl-term">{% trans "Present Address" %}</dt><dd class="dash-dl-desc">{{ member.present_address|default:"—" }}</dd></div>
+        <div class="sm:col-span-2"><dt class="dash-dl-term">{% trans "Permanent Address" %}</dt><dd class="dash-dl-desc">{{ member.permanent_address|default:"—" }}</dd></div>
+      </dl>
+    </div>
+
+    <div class="card-flat" id="positions">
+      <h2 class="mb-4 text-h4">{% trans "Organizational Positions" %}</h2>
+      {% if effective_assignments %}
+      <ul class="mb-4 space-y-2">
+        {% for a in effective_assignments %}
+        <li class="flex flex-wrap items-center justify-between gap-2 rounded-field border border-border/60 p-3">
+          <div>
+            <p class="font-medium">{{ a.position.name_en }}{% if a.position.name_bn %} <span class="text-ink-light">/ {{ a.position.name_bn }}</span>{% endif %}</p>
+            <p class="text-xs text-ink-light">{{ a.position.get_council_body_display }} · {{ a.start_date|date:"M d, Y" }}{% if a.end_date %} – {{ a.end_date|date:"M d, Y" }}{% endif %}
+              {% if a.is_primary %}<span class="badge-primary ml-1">{% trans "Primary" %}</span>{% endif %}
+            </p>
+          </div>
+          {% if can_manage_positions %}
+          <div class="flex flex-wrap gap-1">
+            <a href="{% url 'dashboard-member-position-edit' member.pk a.pk %}" class="btn-ghost btn-sm">{% trans "Edit" %}</a>
+            <form method="post" action="{% url 'dashboard-member-position-end' member.pk a.pk %}" onsubmit="return confirm('{% trans "End this position assignment?" %}');">
+              {% csrf_token %}
+              <button type="submit" class="btn-secondary btn-sm">{% trans "End" %}</button>
+            </form>
+          </div>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="mb-4 text-sm text-ink-light">{% trans "No active organizational positions." %}</p>
+      {% endif %}
+
+      {% if all_assignments %}
+      <details class="mb-4">
+        <summary class="cursor-pointer text-sm font-medium text-primary">{% trans "Assignment history" %} ({{ all_assignments|length }})</summary>
+        <ul class="mt-2 space-y-1 text-sm text-ink-light">
+          {% for a in all_assignments %}
+          <li>
+            {{ a.position.name_en }} — {{ a.start_date|date:"Y-m-d" }}{% if a.end_date %} → {{ a.end_date|date:"Y-m-d" }}{% else %} → {% trans "ongoing" %}{% endif %}
+            {% if not a.is_active %}· {% trans "ended" %}{% endif %}
+            {% if a.is_primary %}· {% trans "primary" %}{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </details>
+      {% endif %}
+
+      {% if can_manage_positions %}
+      <form method="post" action="{% url 'dashboard-member-position-assign' member.pk %}" class="space-y-3 border-t border-border/60 pt-4">
+        {% csrf_token %}
+        <h3 class="text-h5">{% trans "Add position" %}</h3>
+        <div class="dash-form-grid">
+          {% for field in position_form %}
+          {% include "dashboard/includes/_form_field.html" with field=field %}
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Assign position" %}</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="card-flat">
+      <div class="mb-3 flex flex-wrap items-start justify-between gap-2">
+        <h2 class="text-h4">{% trans "Membership Fees" %}</h2>
+        {% if can_view_fees %}
+        <a href="{% url 'dashboard-membership-fee-detail' member.pk %}" class="btn-secondary btn-sm">{% trans "View Fee Details" %}</a>
+        {% endif %}
+      </div>
+      <dl class="mb-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+        <div>
+          <dt class="text-xs text-ink-light">{% trans "Monthly fee" %}</dt>
+          <dd class="font-medium">৳{{ fee_summary.monthly_fee|floatformat:0 }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-ink-light">{% trans "Paid through" %}</dt>
+          <dd class="font-medium">{% if fee_summary.paid_through %}{{ fee_summary.paid_through_label_short }}{% else %}—{% endif %}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-ink-light">{% trans "Pending" %}</dt>
+          <dd class="font-medium">{{ fee_summary.pending_months }} {% trans "months" %} · ৳{{ fee_summary.pending_amount|floatformat:0 }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-ink-light">{% trans "Autopay" %}</dt>
+          <dd class="font-medium">{% if fee_summary.autopay_enabled %}{% trans "ON" %}{% else %}{% trans "OFF" %}{% endif %}</dd>
+        </div>
+      </dl>
+      {% if can_manage_autopay and autopay.is_enabled %}
+      <form method="post" action="{% url 'dashboard-member-fee-autopay-deactivate' member.pk %}" class="mb-4">
+        {% csrf_token %}
+        <button type="submit" class="btn-secondary btn-sm">{% trans "Deactivate auto-payment" %}</button>
+      </form>
+      {% endif %}
+      {% if fees %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th></th><th>{% trans "Period" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th><th>{% trans "Paid" %}</th></tr></thead>
+          <tbody>
+            {% for fee in fees %}
+            <tr>
+              <td>{% if can_record_fee and fee.status != "COMPLETED" %}<input type="checkbox" form="admin-fee-record" name="months" value="{{ fee.year }}-{{ fee.month }}">{% endif %}</td>
+              <td>{{ fee|fee_period }}</td>
+              <td>৳{{ fee.amount|floatformat:0 }}</td>
+              <td>{% status_badge fee.status fee.get_status_display %}</td>
+              <td>{{ fee.paid_at|date:"M d, Y"|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<p class="text-sm text-ink-light">{% trans "No fee records." %}</p>{% endif %}
+      {% if can_record_fee %}
+      <form id="admin-fee-record" method="post" action="{% url 'dashboard-member-fee-record' member.pk %}" class="mt-4 space-y-3 border-t border-border/50 pt-4">
+        {% csrf_token %}
+        <div class="dash-form-grid">
+          <div>
+            <label class="form-label">{% trans "Payment method" %}</label>
+            <select name="payment_method" class="form-input">
+              {% for code, label in offline_methods %}
+              <option value="{{ code }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">{% trans "Reference / transaction ID" %}</label>
+            <input type="text" name="transaction_id" class="form-input">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="form-label">{% trans "Notes" %}</label>
+            <textarea name="notes" class="form-textarea" rows="2"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary btn-sm"><i class="bi bi-cash"></i>{% trans "Record offline payment" %}</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Donation History" %}</h2>
+      {% if donations %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Category" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th></tr></thead>
+          <tbody>
+            {% for d in donations %}
+            <tr><td>{{ d.created_at|date:"M d, Y" }}</td><td>{{ d.category.name_en }}</td><td>{{ d.amount|floatformat:0 }} {{ d.currency }}</td><td>{% status_badge d.status d.get_status_display %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}<p class="text-sm text-ink-light">{% trans "No donations." %}</p>{% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Documents" %}</h2>
+      <div class="space-y-2">
+        {% for doc in documents %}
+        <div class="flex items-center justify-between rounded-field border border-border/60 p-3">
+          <span class="flex items-center gap-2 text-sm"><i class="bi bi-file-earmark text-primary"></i>{{ doc.title }}</span>
+          <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="text-sm font-medium text-primary hover:underline">{% trans "Download" %}</a>
+        </div>
+        {% empty %}<p class="text-sm text-ink-light">{% trans "No documents." %}</p>{% endfor %}
+      </div>
+      {% if can_edit %}
+      <form method="post" action="{% url 'dashboard-member-document' member.pk %}" enctype="multipart/form-data" class="mt-4 flex flex-wrap items-end gap-3 border-t border-border/60 pt-4">
+        {% csrf_token %}
+        <div class="flex-1">{% include "dashboard/includes/_form_field.html" with field=document_form.title %}</div>
+        <div class="flex-1">{% include "dashboard/includes/_form_field.html" with field=document_form.file %}</div>
+        <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-upload"></i>{% trans "Upload" %}</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Notes" %}</h2>
+      <div class="space-y-3">
+        {% for note in notes %}
+        <div class="rounded-field border border-border/60 p-3">
+          <p class="text-sm text-ink">{{ note.body|linebreaksbr }}</p>
+          <p class="mt-1 text-xs text-ink-light">{% if note.author %}{{ note.author.name|default:note.author.email }}{% else %}{% trans "System" %}{% endif %} · {{ note.created_at|date:"M d, Y H:i" }}</p>
+        </div>
+        {% empty %}<p class="text-sm text-ink-light">{% trans "No notes yet." %}</p>{% endfor %}
+      </div>
+      {% if can_edit %}
+      <form method="post" action="{% url 'dashboard-member-note' member.pk %}" class="mt-4 border-t border-border/60 pt-4">
+        {% csrf_token %}
+        {% include "dashboard/includes/_form_field.html" with field=note_form.body %}
+        <button type="submit" class="btn-secondary btn-sm mt-2"><i class="bi bi-plus-lg"></i>{% trans "Add note" %}</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Membership" %}</h2>
+      <dl class="space-y-3">
+        <div><dt class="dash-dl-term">{% trans "Type" %}</dt><dd class="dash-dl-desc">{{ member.membership_type.name_en|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Status" %}</dt><dd class="dash-dl-desc">{% status_badge member.status member.get_status_display %}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Joined" %}</dt><dd class="dash-dl-desc">{{ member.joined_at|date:"M d, Y"|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Approved by" %}</dt><dd class="dash-dl-desc">{{ member.approved_by.name|default:member.approved_by.email|default:"—" }}</dd></div>
+      </dl>
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Roles" %}</h2>
+      <div class="flex flex-wrap gap-2">
+        {% if account.role %}<span class="badge-primary">{{ account.get_role_display }}</span>{% endif %}
+        {% for ur in roles %}<span class="badge-accent">{{ ur.role.name }}</span>{% endfor %}
+      </div>
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Login Information" %}</h2>
+      {% if login_history %}
+      <ul class="space-y-2 text-sm">
+        {% for lh in login_history %}
+        <li class="text-ink-light">{{ lh.logged_in_at|date:"M d, Y H:i" }} · <span lang="en">{{ lh.ip_address|default:"—" }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="text-sm text-ink-light">{% trans "No login history." %}</p>{% endif %}
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Activity Timeline" %}</h2>
+      {% if timeline %}
+      <ul class="space-y-2 text-sm">
+        {% for log in timeline %}
+        <li class="text-ink-light"><span class="font-medium text-ink">{{ log.action }}</span> — {{ log.created_at|date:"M d, H:i" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="text-sm text-ink-light">{% trans "No activity recorded." %}</p>{% endif %}
+    </div>
+
+    <div class="card-flat" id="edit-history">
+      <h2 class="mb-4 text-h4">{% trans "Edit History" %}</h2>
+      {% if edit_history %}
+      <ol class="space-y-3 border-l border-border/70 pl-4">
+        {% for item in edit_history %}
+        <li class="relative text-sm">
+          <span class="absolute -left-[1.3rem] top-1 h-2 w-2 rounded-full bg-primary"></span>
+          <p class="font-medium text-ink">{{ item.log.action }} · {{ item.log.created_at|date:"M d, Y H:i" }}</p>
+          <p class="text-xs text-ink-light">{% if item.log.user %}{{ item.log.user.email }}{% else %}—{% endif %}</p>
+          {% if item.log.reason %}<p class="mt-1 text-xs"><span class="font-medium">{% trans "Reason" %}:</span> {{ item.log.reason }}</p>{% endif %}
+          {% if item.changes %}
+          <ul class="mt-1 space-y-0.5 text-xs text-ink-light">
+            {% for change in item.changes %}
+            <li>
+              <span class="font-medium text-ink">{{ change.field }}</span>:
+              <span class="line-through opacity-60">{{ change.old|default:"—" }}</span>
+              → {{ change.new|default:"—" }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+      {% if edit_history_page.has_other_pages %}
+      <div class="mt-3 flex gap-2 text-sm">
+        {% if edit_history_page.has_previous %}
+        <a href="?history_page={{ edit_history_page.previous_page_number }}#edit-history" class="btn-ghost btn-sm">{% trans "Newer" %}</a>
+        {% endif %}
+        {% if edit_history_page.has_next %}
+        <a href="?history_page={{ edit_history_page.next_page_number }}#edit-history" class="btn-ghost btn-sm">{% trans "Older" %}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% else %}
+      <p class="text-sm text-ink-light">{% trans "No field edits recorded." %}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

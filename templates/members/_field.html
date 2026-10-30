@@ -1,0 +1,58 @@
+{% load i18n %}
+{% comment %}
+Renders one bound form field with a consistent label / control / help
+text / error layout.
+
+Context:
+  field          - the BoundField to render (required)
+  image          - True for image file fields (enables an image preview
+                   instead of a generic file icon in the upload widget)
+  formats_hint   - short "Supported: ... · Max ...MB" text shown under a
+                   file field's drop zone
+
+Label text and placeholders are set upstream (once, near the top of the
+form template) via the {% set_label %} / {% set_placeholder %} tags in
+core/templatetags/form_extras.py — this partial just renders whatever
+field.label / widget already carries, so it works unmodified for any
+form on the site.
+{% endcomment %}
+<div class="form-group{% if field.field.widget.input_type == 'checkbox' %} form-group-checkbox{% endif %}">
+  {% if field.field.widget.input_type == 'checkbox' %}
+    <label class="form-checkbox-label" for="{{ field.id_for_label }}">
+      {{ field }}
+      <span>{{ field.label }}</span>
+    </label>
+  {% elif field.field.widget.input_type == 'file' %}
+    <label class="form-label" for="{{ field.id_for_label }}">
+      <span class="form-label-text">{{ field.label }}</span>
+      {% if field.field.required %}<span class="form-required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    {% comment %}
+    Progressive enhancement: file-upload.js wraps this raw input with a
+    drag & drop zone, filename/image preview, replace & remove buttons and
+    a progress indicator. Without JS this renders as a plain, fully
+    functional file input.
+    {% endcomment %}
+    <div class="upload-field upload-card" data-upload-field data-image="{% if image %}true{% else %}false{% endif %}"
+      {% if formats_hint %}data-formats="{{ formats_hint }}"{% endif %}
+      {% if field.value %}data-existing-name="{{ field.value }}"{% endif %}>
+      {{ field }}
+    </div>
+    {% if formats_hint %}
+    <p class="form-hint"><i class="bi bi-info-circle" aria-hidden="true"></i> {{ formats_hint }}</p>
+    {% endif %}
+  {% else %}
+    <label class="form-label" for="{{ field.id_for_label }}">
+      <span class="form-label-text">{{ field.label }}</span>
+      {% if field.field.required %}<span class="form-required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    <div class="field-wrap">
+      {{ field }}
+      <i class="bi field-wrap-icon validation-icon" data-field-icon aria-hidden="true"></i>
+    </div>
+  {% endif %}
+  {% if field.help_text %}<p class="form-hint">{{ field.help_text }}</p>{% endif %}
+  {% for error in field.errors %}
+  <p class="form-error" role="alert"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>{{ error }}</p>
+  {% endfor %}
+</div>

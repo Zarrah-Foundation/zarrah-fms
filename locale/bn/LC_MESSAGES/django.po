@@ -1,0 +1,1242 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: zarrah_foundation\n"
+"Language: bn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Zarrah Foundation"
+msgstr "জার্‌রাহ ফাউন্ডেশন"
+
+msgid "About"
+msgstr "আমাদের সম্পর্কে"
+
+msgid "Zarrah Skills"
+msgstr "জাররাহ স্কিলস"
+
+msgid "Membership"
+msgstr "সদস্যপদ"
+
+msgid "Donate"
+msgstr "দান করুন"
+
+msgid "News"
+msgstr "সংবাদ"
+
+msgid "Reports"
+msgstr "প্রতিবেদন"
+
+msgid "Transparency"
+msgstr "স্বচ্ছতা"
+
+msgid "Contact"
+msgstr "যোগাযোগ"
+
+msgid "Login"
+msgstr "লগইন"
+
+msgid "Logout"
+msgstr "লগআউট"
+
+msgid "Register"
+msgstr "নিবন্ধন"
+
+msgid "Dashboard"
+msgstr "ড্যাশবোর্ড"
+
+msgid "Account is deactivated"
+msgstr "অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে"
+
+msgid "Invalid email or password."
+msgstr "ভুল ইমেইল বা পাসওয়ার্ড।"
+
+msgid "Welcome to Zarrah Foundation"
+msgstr "জার্‌রাহ ফাউন্ডেশনে স্বাগতম"
+
+msgid "Donate Now"
+msgstr "দান করুন"
+
+msgid "Become a Member"
+msgstr "সদস্য হোন"
+
+msgid "Make a Donation"
+msgstr "দান করুন"
+
+msgid "Thank You!"
+msgstr "ধন্যবাদ!"
+
+msgid "Financial Transparency"
+msgstr "আর্থিক স্বচ্ছতা"
+
+msgid "Serving humanity through compassion and community."
+msgstr "মানবতার সেবায় নিষ্ঠার সাথে কাজ করছি।"
+
+msgid "%(count)d application(s) approved."
+msgstr "%(count)d টি আবেদন অনুমোদিত হয়েছে।"
+
+msgid "%(count)d application(s) rejected."
+msgstr "%(count)d টি আবেদন প্রত্যাখ্যাত হয়েছে।"
+
+msgid "1. Apply"
+msgstr "১. আবেদন করুন"
+
+msgid "2. Review"
+msgstr "২. পর্যালোচনা"
+
+msgid "3. Approved"
+msgstr "৩. অনুমোদিত"
+
+msgid "A registered nonprofit organization in Bangladesh, serving humanity through compassion, transparency and community."
+msgstr "বাংলাদেশে নিবন্ধিত একটি বেসরকারি সংস্থা, যা সহানুভূতি, স্বচ্ছতা ও সম্প্রদায়ের মাধ্যমে মানবতার সেবা করে।"
+
+msgid "About Zarrah Foundation"
+msgstr "জার্‌রাহ ফাউন্ডেশন সম্পর্কে"
+
+msgid "Access denied."
+msgstr "প্রবেশাধিকার নিষিদ্ধ।"
+
+msgid "Active Votes"
+msgstr "চলমান ভোট"
+
+msgid "Additional Information"
+msgstr "অতিরিক্ত তথ্য"
+
+msgid "Address"
+msgstr "ঠিকানা"
+
+msgid "Alia Madrasah"
+msgstr "আলিয়া মাদ্রাসা"
+
+msgid "Already have an account?"
+msgstr "ইতিমধ্যে অ্যাকাউন্ট আছে?"
+
+msgid "Amount"
+msgstr "পরিমাণ"
+
+msgid "Application sections"
+msgstr "আবেদনের বিভাগ"
+
+msgid "Applications"
+msgstr "আবেদনসমূহ"
+
+msgid "Apply for Membership"
+msgstr "সদস্যপদের জন্য আবেদন করুন"
+
+msgid "Approve selected applications"
+msgstr "নির্বাচিত আবেদনসমূহ অনুমোদন করুন"
+
+msgid "Back"
+msgstr "পেছনে"
+
+msgid "Back to News"
+msgstr "সংবাদে ফিরে যান"
+
+msgid "Balance"
+msgstr "ব্যালেন্স"
+
+msgid "Bangla name must contain only Bangla characters."
+msgstr "বাংলা নামে শুধুমাত্র বাংলা অক্ষর থাকতে হবে।"
+
+msgid "Bangladesh"
+msgstr "বাংলাদেশ"
+
+msgid "Buddhist"
+msgstr "বৌদ্ধ"
+
+msgid "By submitting, you confirm the information provided is accurate. Your application will remain pending until reviewed by an administrator."
+msgstr "জমা দেওয়ার মাধ্যমে আপনি নিশ্চিত করছেন যে প্রদত্ত তথ্য সঠিক। প্রশাসকের পর্যালোচনা না হওয়া পর্যন্ত আপনার আবেদনটি অপেক্ষমান থাকবে।"
+
+msgid "By using Zarrah Foundation's website and services, you agree to comply with our terms and applicable laws of Bangladesh."
+msgstr "জার্‌রাহ ফাউন্ডেশনের ওয়েবসাইট ও সেবা ব্যবহার করে আপনি আমাদের শর্তাবলী এবং বাংলাদেশের প্রযোজ্য আইন মেনে চলতে সম্মত হচ্ছেন।"
+
+msgid "Cast Vote"
+msgstr "ভোট দিন"
+
+msgid "Check your email"
+msgstr "আপনার ইমেইল চেক করুন"
+
+msgid "Christian"
+msgstr "খ্রিস্টান"
+
+msgid "Class"
+msgstr "শ্রেণি"
+
+msgid "Close menu"
+msgstr "মেনু বন্ধ করুন"
+
+msgid "Community"
+msgstr "সম্প্রদায়"
+
+msgid "Completed"
+msgstr "সম্পন্ন"
+
+msgid "Confirm Password"
+msgstr "পাসওয়ার্ড নিশ্চিত করুন"
+
+msgid "Constitution"
+msgstr "গঠনতন্ত্র"
+
+msgid "Contact Us"
+msgstr "যোগাযোগ করুন"
+
+msgid "Content"
+msgstr "বিষয়বস্তু"
+
+msgid "Country"
+msgstr "দেশ"
+
+msgid "Create Account"
+msgstr "অ্যাকাউন্ট তৈরি করুন"
+
+msgid "Currently Studying"
+msgstr "অধ্যয়নরত"
+
+msgid "Dashboard navigation"
+msgstr "ড্যাশবোর্ড নেভিগেশন"
+
+msgid "Date of birth cannot be in the future."
+msgstr "জন্ম তারিখ ভবিষ্যতের হতে পারবে না।"
+
+msgid "District"
+msgstr "জেলা"
+
+msgid "Division"
+msgstr "বিভাগ"
+
+msgid "Divorced"
+msgstr "তালাকপ্রাপ্ত"
+
+msgid "Don't have an account?"
+msgstr "অ্যাকাউন্ট নেই?"
+
+msgid "Donation Form"
+msgstr "দান ফর্ম"
+
+msgid "Donation Successful"
+msgstr "দান সফল হয়েছে"
+
+msgid "Donation Trends"
+msgstr "দানের প্রবণতা"
+
+msgid "Donation not found."
+msgstr "দান খুঁজে পাওয়া যায়নি।"
+
+msgid "Donations"
+msgstr "দানসমূহ"
+
+msgid "Donations (BDT)"
+msgstr "দান (টাকা)"
+
+msgid "Donor"
+msgstr "দাতা"
+
+msgid "Download"
+msgstr "ডাউনলোড"
+
+msgid "Education"
+msgstr "শিক্ষা"
+
+msgid "Email"
+msgstr "ইমেইল"
+
+msgid "Email address"
+msgstr "ইমেইল ঠিকানা"
+
+msgid "Email verified successfully. You can now log in."
+msgstr "ইমেইল সফলভাবে যাচাই করা হয়েছে। আপনি এখন লগইন করতে পারেন।"
+
+msgid "English name must contain only English characters."
+msgstr "ইংরেজি নামে শুধুমাত্র ইংরেজি অক্ষর থাকতে হবে।"
+
+msgid "Enter a valid Bangladeshi phone number (e.g. 01XXXXXXXXX)."
+msgstr "একটি সঠিক বাংলাদেশি ফোন নম্বর দিন (যেমন ০১XXXXXXXXX)।"
+
+msgid "Expatriates"
+msgstr "প্রবাসী"
+
+msgid "Expense"
+msgstr "খরচ"
+
+msgid "FAQ"
+msgstr "সচরাচর জিজ্ঞাসা"
+
+msgid "Female"
+msgstr "মহিলা"
+
+msgid "File size must not exceed %(max)sMB."
+msgstr "ফাইলের আকার %(max)sMB এর বেশি হতে পারবে না।"
+
+msgid "Fill out every section carefully. Fields marked with an asterisk (*) are required. Your application will be reviewed by our team before approval."
+msgstr "প্রতিটি বিভাগ সতর্কতার সাথে পূরণ করুন। তারকা চিহ্নিত (*) ক্ষেত্রগুলো আবশ্যক। অনুমোদনের আগে আমাদের টিম আপনার আবেদনটি পর্যালোচনা করবে।"
+
+msgid "Fill out the membership application form"
+msgstr "সদস্য হওয়ার জন্য আবেদন ফর্ম পূরণ করুন"
+
+msgid "Finance"
+msgstr "অর্থ"
+
+msgid "Finance & Transparency"
+msgstr "অর্থ ও স্বচ্ছতা"
+
+msgid "Forgot Password"
+msgstr "পাসওয়ার্ড ভুলে গেছেন"
+
+msgid "Forgot password?"
+msgstr "পাসওয়ার্ড ভুলে গেছেন?"
+
+msgid "Frequently Asked Questions"
+msgstr "সচরাচর জিজ্ঞাসিত প্রশ্ন"
+
+msgid "General Education"
+msgstr "সাধারণ শিক্ষা"
+
+msgid "Get in touch"
+msgstr "যোগাযোগ করুন"
+
+msgid "Get your Member ID and dashboard access"
+msgstr "আপনার সদস্য আইডি ও ড্যাশবোর্ড অ্যাক্সেস পান"
+
+msgid "Go to Login"
+msgstr "লগইনে যান"
+
+msgid "Hijra"
+msgstr "হিজড়া"
+
+msgid "Hindu"
+msgstr "হিন্দু"
+
+msgid "Home"
+msgstr "হোম"
+
+msgid "How can I donate?"
+msgstr "আমি কীভাবে দান করতে পারি?"
+
+msgid "How do I become a member?"
+msgstr "আমি কীভাবে সদস্য হতে পারি?"
+
+msgid "Identity"
+msgstr "পরিচয়"
+
+msgid "If an account exists, a reset link has been sent."
+msgstr "অ্যাকাউন্টটি থাকলে একটি রিসেট লিংক পাঠানো হয়েছে।"
+
+msgid "Income"
+msgstr "আয়"
+
+msgid "Income vs Expense"
+msgstr "আয় বনাম খরচ"
+
+msgid "Invalid payment response."
+msgstr "অবৈধ পেমেন্ট প্রতিক্রিয়া।"
+
+msgid "Invalid reset link."
+msgstr "অবৈধ রিসেট লিংক।"
+
+msgid "Invalid verification link."
+msgstr "অবৈধ যাচাইকরণ লিংক।"
+
+msgid "Islam"
+msgstr "ইসলাম"
+
+msgid "Join Us"
+msgstr "আমাদের সাথে যোগ দিন"
+
+msgid "Join Zarrah Foundation"
+msgstr "জার্‌রাহ ফাউন্ডেশনে যোগ দিন"
+
+msgid "Join Zarrah Foundation as a member and contribute to our humanitarian mission across Bangladesh."
+msgstr "জার্‌রাহ ফাউন্ডেশনের সদস্য হিসেবে যোগ দিন এবং বাংলাদেশ জুড়ে আমাদের মানবিক কার্যক্রমে অবদান রাখুন।"
+
+msgid "Join our volunteer network and make a difference in your community."
+msgstr "আমাদের স্বেচ্ছাসেবক নেটওয়ার্কে যোগ দিন এবং আপনার সম্প্রদায়ে পরিবর্তন আনুন।"
+
+msgid "Language"
+msgstr "ভাষা"
+
+msgid "Latest Applications"
+msgstr "সাম্প্রতিক আবেদনসমূহ"
+
+msgid "Legal"
+msgstr "আইনগত"
+
+msgid "Login to access your Zarrah Foundation account"
+msgstr "আপনার জার্‌রাহ ফাউন্ডেশন অ্যাকাউন্ট অ্যাক্সেস করতে লগইন করুন"
+
+msgid "Main menu"
+msgstr "মূল মেনু"
+
+msgid "Male"
+msgstr "পুরুষ"
+
+msgid "Married"
+msgstr "বিবাহিত"
+
+msgid "Member ID:"
+msgstr "সদস্য আইডি:"
+
+msgid "Members"
+msgstr "সদস্যবৃন্দ"
+
+msgid "Membership Application"
+msgstr "সদস্য হওয়ার আবেদন"
+
+msgid "Membership Fees"
+msgstr "সদস্য ফি"
+
+msgid "Message"
+msgstr "বার্তা"
+
+msgid "Mobile navigation"
+msgstr "মোবাইল নেভিগেশন"
+
+msgid "Monthly Membership Growth"
+msgstr "মাসিক সদস্য বৃদ্ধি"
+
+msgid "My Account"
+msgstr "আমার অ্যাকাউন্ট"
+
+msgid "My Donations"
+msgstr "আমার দানসমূহ"
+
+msgid "My Profile"
+msgstr "আমার প্রোফাইল"
+
+msgid "Name"
+msgstr "নাম"
+
+msgid "Name:"
+msgstr "নাম:"
+
+msgid "New Members"
+msgstr "নতুন সদস্য"
+
+msgid "New Password"
+msgstr "নতুন পাসওয়ার্ড"
+
+msgid "Newsletter"
+msgstr "নিউজলেটার"
+
+msgid "Next"
+msgstr "পরবর্তী"
+
+msgid "No active votes at this time."
+msgstr "এই মুহূর্তে কোনো চলমান ভোট নেই।"
+
+msgid "No data available."
+msgstr "কোনো তথ্য উপলব্ধ নেই।"
+
+msgid "No donation categories available at this time."
+msgstr "এই মুহূর্তে কোনো দান বিভাগ উপলব্ধ নেই।"
+
+msgid "No donations yet."
+msgstr "এখনো কোনো দান নেই।"
+
+msgid "No news articles yet."
+msgstr "এখনো কোনো সংবাদ নেই।"
+
+msgid "No pending applications."
+msgstr "কোনো অপেক্ষমান আবেদন নেই।"
+
+msgid "No reports available."
+msgstr "কোনো প্রতিবেদন উপলব্ধ নেই।"
+
+msgid "No votes recorded."
+msgstr "কোনো ভোট রেকর্ড করা হয়নি।"
+
+msgid "Occupation"
+msgstr "পেশা"
+
+msgid "Open menu"
+msgstr "মেনু খুলুন"
+
+msgid "Other"
+msgstr "অন্যান্য"
+
+msgid "Our team reviews your application"
+msgstr "আমাদের টিম আপনার আবেদন পর্যালোচনা করে"
+
+msgid "Overview"
+msgstr "সংক্ষিপ্ত বিবরণ"
+
+msgid "Password"
+msgstr "পাসওয়ার্ড"
+
+msgid "Password Reset - Zarrah Foundation"
+msgstr "পাসওয়ার্ড রিসেট - জার্‌রাহ ফাউন্ডেশন"
+
+msgid "Password reset successfully."
+msgstr "পাসওয়ার্ড সফলভাবে রিসেট হয়েছে।"
+
+msgid "Passwords do not match."
+msgstr "পাসওয়ার্ড মিলছে না।"
+
+msgid "Payment Cancelled"
+msgstr "পেমেন্ট বাতিল করা হয়েছে"
+
+msgid "Payment Failed"
+msgstr "পেমেন্ট ব্যর্থ হয়েছে"
+
+msgid "Payment cancelled."
+msgstr "পেমেন্ট বাতিল করা হয়েছে।"
+
+msgid "Payment failed."
+msgstr "পেমেন্ট ব্যর্থ হয়েছে।"
+
+msgid "Payment initialization failed."
+msgstr "পেমেন্ট শুরু করা যায়নি।"
+
+msgid "Payment validation failed."
+msgstr "পেমেন্ট যাচাই ব্যর্থ হয়েছে।"
+
+msgid "Pending"
+msgstr "অপেক্ষমান"
+
+msgid "Pending Applications"
+msgstr "অপেক্ষমান আবেদনসমূহ"
+
+msgid "Period"
+msgstr "সময়কাল"
+
+msgid "Permanent Address"
+msgstr "স্থায়ী ঠিকানা"
+
+msgid "Personal Information"
+msgstr "ব্যক্তিগত তথ্য"
+
+msgid "Phone"
+msgstr "ফোন"
+
+msgid "Please select an option."
+msgstr "একটি অপশন নির্বাচন করুন।"
+
+msgid "Please verify your email by visiting: %(url)s"
+msgstr "নিচের লিংকে গিয়ে আপনার ইমেইল যাচাই করুন: %(url)s"
+
+msgid "Present Address"
+msgstr "বর্তমান ঠিকানা"
+
+msgid "Previous"
+msgstr "পূর্ববর্তী"
+
+msgid "Primary navigation"
+msgstr "মূল নেভিগেশন"
+
+msgid "Privacy Policy"
+msgstr "গোপনীয়তা নীতি"
+
+msgid "Proceed to Payment"
+msgstr "পেমেন্টে এগিয়ে যান"
+
+msgid "Public Reports"
+msgstr "সর্বজনীন প্রতিবেদন"
+
+msgid "Qaumi Madrasah"
+msgstr "কওমি মাদ্রাসা"
+
+msgid "Menu"
+msgstr "মেনু"
+
+msgid "Recent Activity"
+msgstr "সাম্প্রতিক কার্যক্রম"
+
+msgid "Recent Donations"
+msgstr "সাম্প্রতিক দানসমূহ"
+
+msgid "Recent Monthly Summary"
+msgstr "সাম্প্রতিক মাসিক সারসংক্ষেপ"
+
+msgid "Registered under the Societies Registration Act 1860"
+msgstr "সোসাইটি নিবন্ধন আইন ১৮৬০ এর অধীনে নিবন্ধিত"
+
+msgid "Registered under the Societies Registration Act 1860."
+msgstr "সোসাইটি নিবন্ধন আইন ১৮৬০ এর অধীনে নিবন্ধিত।"
+
+msgid "Reject selected applications"
+msgstr "নির্বাচিত আবেদনসমূহ প্রত্যাখ্যান করুন"
+
+msgid "Reset Password"
+msgstr "পাসওয়ার্ড রিসেট করুন"
+
+msgid "Reset link has expired."
+msgstr "রিসেট লিংকের মেয়াদ শেষ হয়ে গেছে।"
+
+msgid "Reset your password: %(url)s"
+msgstr "আপনার পাসওয়ার্ড রিসেট করুন: %(url)s"
+
+msgid "Results"
+msgstr "ফলাফল"
+
+msgid "Return Home"
+msgstr "হোমে ফিরে যান"
+
+msgid "Return to Donation"
+msgstr "দানে ফিরে যান"
+
+msgid "Review"
+msgstr "পর্যালোচনা"
+
+msgid "Send Message"
+msgstr "বার্তা পাঠান"
+
+msgid "Send Reset Link"
+msgstr "রিসেট লিংক পাঠান"
+
+msgid "Single"
+msgstr "অবিবাহিত"
+
+msgid "Skip to main content"
+msgstr "মূল কন্টেন্টে যান"
+
+msgid "Stage / Marhala / Level"
+msgstr "স্তর / মারহালা / লেভেল"
+
+msgid "Status"
+msgstr "অবস্থা"
+
+msgid "Status:"
+msgstr "অবস্থা:"
+
+msgid "Subject"
+msgstr "বিষয়"
+
+msgid "Submit"
+msgstr "জমা দিন"
+
+msgid "Submit Application"
+msgstr "আবেদন জমা দিন"
+
+msgid "Submit Vote"
+msgstr "ভোট জমা দিন"
+
+msgid "Subscribe"
+msgstr "সাবস্ক্রাইব করুন"
+
+msgid "Technical / Vocational"
+msgstr "কারিগরি / ভোকেশনাল"
+
+msgid "Terms of Service"
+msgstr "সেবার শর্তাবলী"
+
+msgid "Thank you for your donation!"
+msgstr "আপনার দানের জন্য ধন্যবাদ!"
+
+msgid "Thank you for your interest in volunteering!"
+msgstr "স্বেচ্ছাসেবক হতে আগ্রহ প্রকাশের জন্য ধন্যবাদ!"
+
+msgid "The constitution of Zarrah Foundation governs our organizational structure, membership, and operations in accordance with the Societies Registration Act 1860."
+msgstr "জার্‌রাহ ফাউন্ডেশনের গঠনতন্ত্র সোসাইটি নিবন্ধন আইন ১৮৬০ অনুযায়ী আমাদের সংগঠনের কাঠামো, সদস্যপদ ও কার্যক্রম নিয়ন্ত্রণ করে।"
+
+msgid "This email is already registered."
+msgstr "এই ইমেইলটি ইতিমধ্যে নিবন্ধিত।"
+
+msgid "This field is required for a completed education level."
+msgstr "সম্পন্ন শিক্ষা স্তরের জন্য এই ক্ষেত্রটি আবশ্যক।"
+
+msgid "This field is required for expatriate applicants."
+msgstr "প্রবাসী আবেদনকারীদের জন্য এই ক্ষেত্রটি আবশ্যক।"
+
+msgid "This field is required unless the permanent address is the same as present address."
+msgstr "স্থায়ী ঠিকানা বর্তমান ঠিকানার মতো না হলে এই ক্ষেত্রটি আবশ্যক।"
+
+msgid "This field is required."
+msgstr "এই ক্ষেত্রটি আবশ্যক।"
+
+msgid "Total Expenses"
+msgstr "মোট খরচ"
+
+msgid "Total Income"
+msgstr "মোট আয়"
+
+msgid "Total Members"
+msgstr "মোট সদস্য"
+
+msgid "Transaction ID:"
+msgstr "লেনদেন আইডি:"
+
+msgid "Try Again"
+msgstr "আবার চেষ্টা করুন"
+
+msgid "Type your Union Parishad or Ward name."
+msgstr "আপনার ইউনিয়ন পরিষদ বা ওয়ার্ডের নাম লিখুন।"
+
+msgid "Union / Ward"
+msgstr "ইউনিয়ন / ওয়ার্ড"
+
+msgid "Unsupported file extension \"%(ext)s\". Allowed types: %(allowed)s."
+msgstr "অসমর্থিত ফাইল এক্সটেনশন \"%(ext)s\"। অনুমোদিত ধরন: %(allowed)s।"
+
+msgid "Unsupported file type \"%(type)s\"."
+msgstr "অসমর্থিত ফাইল ধরন \"%(type)s\"।"
+
+msgid "Upazila"
+msgstr "উপজেলা"
+
+msgid "Upload a valid image. The file you uploaded was either not an image or was corrupted."
+msgstr "একটি সঠিক ছবি আপলোড করুন। আপনার আপলোড করা ফাইলটি ছবি নয় বা ক্ষতিগ্রস্ত।"
+
+msgid "Use Django Admin to approve or reject applications — approving automatically generates a Member ID, creates a login account and emails the applicant."
+msgstr "আবেদন অনুমোদন বা প্রত্যাখ্যান করতে জ্যাঙ্গো অ্যাডমিন ব্যবহার করুন — অনুমোদন করলে স্বয়ংক্রিয়ভাবে একটি সদস্য আইডি তৈরি হয়, লগইন অ্যাকাউন্ট খোলা হয় এবং আবেদনকারীকে ইমেইল পাঠানো হয়।"
+
+msgid "Verification link has expired."
+msgstr "যাচাইকরণ লিংকের মেয়াদ শেষ হয়ে গেছে।"
+
+msgid "Verify Email"
+msgstr "ইমেইল যাচাই করুন"
+
+msgid "Verify your email - Zarrah Foundation"
+msgstr "আপনার ইমেইল যাচাই করুন - জার্‌রাহ ফাউন্ডেশন"
+
+msgid "View All"
+msgstr "সব দেখুন"
+
+msgid "View Transparency Report"
+msgstr "স্বচ্ছতা প্রতিবেদন দেখুন"
+
+msgid "View all"
+msgstr "সব দেখুন"
+
+msgid "Visit our membership page and submit an application. Our team will review and approve eligible applicants."
+msgstr "আমাদের সদস্যপদ পৃষ্ঠায় যান এবং একটি আবেদন জমা দিন। আমাদের টিম যোগ্য আবেদনকারীদের পর্যালোচনা ও অনুমোদন করবে।"
+
+msgid "Visit our news page for the latest updates."
+msgstr "সর্বশেষ আপডেটের জন্য আমাদের সংবাদ পৃষ্ঠা দেখুন।"
+
+msgid "Volunteer"
+msgstr "স্বেচ্ছাসেবক"
+
+msgid "Volunteer With Us"
+msgstr "আমাদের সাথে স্বেচ্ছাসেবক হন"
+
+msgid "Vote"
+msgstr "ভোট"
+
+msgid "Vote integrity check failed."
+msgstr "ভোটের অখণ্ডতা যাচাই ব্যর্থ হয়েছে।"
+
+msgid "Voting"
+msgstr "ভোটদান"
+
+msgid "We sent a verification link to your email address. Please click the link to verify your account."
+msgstr "আমরা আপনার ইমেইল ঠিকানায় একটি যাচাইকরণ লিংক পাঠিয়েছি। আপনার অ্যাকাউন্ট যাচাই করতে লিংকে ক্লিক করুন।"
+
+msgid "Welcome Back"
+msgstr "স্বাগতম"
+
+msgid "Welcome back"
+msgstr "স্বাগতম"
+
+msgid "Widowed"
+msgstr "বিধবা/বিপত্নীক"
+
+msgid "Year"
+msgstr "বছর"
+
+msgid "Yearly Summary"
+msgstr "বার্ষিক সারসংক্ষেপ"
+
+msgid "You can donate online via SSLCommerz on our donation page."
+msgstr "আপনি আমাদের দান পৃষ্ঠায় SSLCommerz এর মাধ্যমে অনলাইনে দান করতে পারেন।"
+
+msgid "You cancelled the payment. No charges were made."
+msgstr "আপনি পেমেন্ট বাতিল করেছেন। কোনো চার্জ কাটা হয়নি।"
+
+msgid "You have already voted."
+msgstr "আপনি ইতিমধ্যে ভোট দিয়েছেন।"
+
+msgid "You have voted"
+msgstr "আপনি ভোট দিয়েছেন"
+
+msgid "You must be at least 18 years old to apply."
+msgstr "আবেদন করতে আপনার বয়স কমপক্ষে ১৮ বছর হতে হবে।"
+
+msgid "Your application has been submitted. We will review it shortly."
+msgstr "আপনার আবেদন জমা দেওয়া হয়েছে। আমরা শীঘ্রই এটি পর্যালোচনা করব।"
+
+msgid "Your donation of"
+msgstr "আপনার দান"
+
+msgid "Your email"
+msgstr "আপনার ইমেইল"
+
+msgid "Your message has been sent. We will get back to you soon."
+msgstr "আপনার বার্তা পাঠানো হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।"
+
+msgid "Your payment could not be processed. Please try again."
+msgstr "আপনার পেমেন্ট প্রক্রিয়া করা যায়নি। আবার চেষ্টা করুন।"
+
+msgid "Your vote has been recorded."
+msgstr "আপনার ভোট রেকর্ড করা হয়েছে।"
+
+msgid "Zarrah Foundation is a registered NGO in Bangladesh operating under the Societies Registration Act 1860. We are committed to serving humanity through compassion, community development, and social welfare programs."
+msgstr "জার্‌রাহ ফাউন্ডেশন বাংলাদেশে সোসাইটি নিবন্ধন আইন ১৮৬০ এর অধীনে পরিচালিত একটি নিবন্ধিত এনজিও। আমরা সহানুভূতি, সম্প্রদায় উন্নয়ন এবং সামাজিক কল্যাণ কর্মসূচির মাধ্যমে মানবতার সেবায় প্রতিশ্রুতিবদ্ধ।"
+
+msgid "Zarrah Foundation respects your privacy. We collect only the information necessary to provide our services and do not share personal data with third parties without consent."
+msgstr "জার্‌রাহ ফাউন্ডেশন আপনার গোপনীয়তাকে সম্মান করে। আমরা আমাদের সেবা প্রদানের জন্য প্রয়োজনীয় তথ্যই সংগ্রহ করি এবং সম্মতি ছাড়া তৃতীয় পক্ষের সাথে ব্যক্তিগত তথ্য শেয়ার করি না।"
+
+msgid "Zarrah Foundation — a registered nonprofit organization in Bangladesh serving humanity through compassion, transparency and community."
+msgstr "জার্‌রাহ ফাউন্ডেশন — বাংলাদেশে একটি নিবন্ধিত বেসরকারি সংস্থা যা সহানুভূতি, স্বচ্ছতা ও সম্প্রদায়ের মাধ্যমে মানবতার সেবা করে।"
+
+msgid "Zarrah Foundation. All rights reserved."
+msgstr "জার্‌রাহ ফাউন্ডেশন। সর্বস্বত্ব সংরক্ষিত।"
+
+msgid "has been received."
+msgstr "গ্রহণ করা হয়েছে।"
+
+msgid "new notifications"
+msgstr "নতুন বিজ্ঞপ্তি"
+
+msgid "pending"
+msgstr "অপেক্ষমান"
+
+msgid "views"
+msgstr "ভিউ"
+
+msgid "votes"
+msgstr "ভোট"
+
+
+msgid "Name (in Bangla)"
+msgstr "বাংলা নাম"
+
+msgid "Name (in English)"
+msgstr "ইংরেজি নাম"
+
+msgid "Father's Name"
+msgstr "পিতার নাম"
+
+msgid "Mother's Name"
+msgstr "মাতার নাম"
+
+msgid "Gender"
+msgstr "লিঙ্গ"
+
+msgid "Blood Group"
+msgstr "রক্তের গ্রুপ"
+
+msgid "Marital Status"
+msgstr "বৈবাহিক অবস্থা"
+
+msgid "Religion"
+msgstr "ধর্ম"
+
+msgid "Photo"
+msgstr "ছবি"
+
+msgid "Email Address"
+msgstr "ইমেইল ঠিকানা"
+
+msgid "Mobile Number"
+msgstr "মোবাইল নম্বর"
+
+msgid "Emergency Contact Name"
+msgstr "জরুরি যোগাযোগের নাম"
+
+msgid "Emergency Contact Number"
+msgstr "জরুরি যোগাযোগের নম্বর"
+
+msgid "Relation"
+msgstr "সম্পর্ক"
+
+msgid "Identity Type"
+msgstr "পরিচয়পত্রের ধরন"
+
+msgid "ID Number"
+msgstr "পরিচয়পত্র নম্বর"
+
+msgid "Identity Document"
+msgstr "পরিচয়পত্রের কপি"
+
+msgid "Present Address (Details)"
+msgstr "বর্তমান ঠিকানা (বিস্তারিত)"
+
+msgid "Permanent address same as present address"
+msgstr "স্থায়ী ঠিকানা বর্তমান ঠিকানার মতোই"
+
+msgid "Permanent Address (Details)"
+msgstr "স্থায়ী ঠিকানা (বিস্তারিত)"
+
+msgid "I am an expatriate"
+msgstr "আমি একজন প্রবাসী"
+
+msgid "State / Province"
+msgstr "রাজ্য / প্রদেশ"
+
+msgid "City"
+msgstr "শহর"
+
+msgid "Postal Code"
+msgstr "পোস্ট কোড"
+
+msgid "Full Foreign Address"
+msgstr "সম্পূর্ণ প্রবাসী ঠিকানা"
+
+msgid "Passport Number"
+msgstr "পাসপোর্ট নম্বর"
+
+msgid "Education Type"
+msgstr "শিক্ষার ধরন"
+
+msgid "Current Status"
+msgstr "শিক্ষার বর্তমান অবস্থা"
+
+msgid "Institution Name"
+msgstr "শিক্ষা প্রতিষ্ঠানের নাম"
+
+msgid "Passing Year"
+msgstr "পাসের সাল"
+
+msgid "Result"
+msgstr "ফলাফল"
+
+msgid "I am a student"
+msgstr "আমি একজন শিক্ষার্থী"
+
+msgid "Designation"
+msgstr "পদবি"
+
+msgid "Organization Name"
+msgstr "প্রতিষ্ঠানের নাম"
+
+msgid "Workplace Address"
+msgstr "কর্মস্থলের ঠিকানা"
+
+msgid "Facebook Profile Link"
+msgstr "ফেসবুক প্রোফাইল লিংক"
+
+msgid "Volunteer Experience"
+msgstr "স্বেচ্ছাসেবী অভিজ্ঞতা"
+
+msgid "CV / Resume"
+msgstr "সিভি / জীবনবৃত্তান্ত"
+
+msgid "Date of Birth"
+msgstr "জন্ম তারিখ"
+
+msgid "Full Name in English"
+msgstr "ইংরেজিতে আপনার পূর্ণ নাম"
+
+msgid "e.g. Mohammad Abdul Karim"
+msgstr "যেমন: মোহাম্মদ আব্দুল করিম"
+
+msgid "e.g. Rahima Begum"
+msgstr "যেমন: রহিমা বেগম"
+
+msgid "e.g. karim@example.com"
+msgstr "যেমন: karim@example.com"
+
+msgid "e.g. 01XXXXXXXXX"
+msgstr "যেমন: ০১XXXXXXXXX"
+
+msgid "Name of a close relative or contact"
+msgstr "নিকটাত্মীয় অথবা পরিচিত কারো নাম"
+
+msgid "e.g. Father, Brother, Spouse"
+msgstr "যেমন: পিতা, ভাই, স্বামী"
+
+msgid "Enter your NID / Birth Registration / Passport number"
+msgstr "আপনার এনআইডি / জন্ম নিবন্ধন / পাসপোর্ট নম্বর লিখুন"
+
+msgid "House/holding no., road, village/moholla"
+msgstr "বাড়ি/হোল্ডিং নম্বর, রোড, গ্রাম/মহল্লা"
+
+msgid "e.g. California"
+msgstr "যেমন: California"
+
+msgid "e.g. Los Angeles"
+msgstr "যেমন: Los Angeles"
+
+msgid "e.g. 90001"
+msgstr "যেমন: 90001"
+
+msgid "Apartment/house, street, city"
+msgstr "অ্যাপার্টমেন্ট/বাড়ি, সড়ক, শহর"
+
+msgid "e.g. AB1234567"
+msgstr "যেমন: AB1234567"
+
+msgid "e.g. Dhaka University"
+msgstr "যেমন: ঢাকা বিশ্ববিদ্যালয়"
+
+msgid "e.g. 2024"
+msgstr "যেমন: ২০২৪"
+
+msgid "e.g. GPA 4.80 / First Class"
+msgstr "যেমন: জিপিএ ৪.৮০ / প্রথম বিভাগ"
+
+msgid "e.g. Businessman, Service holder"
+msgstr "যেমন: ব্যবসায়ী, চাকরিজীবী"
+
+msgid "e.g. Manager"
+msgstr "যেমন: ব্যবস্থাপক"
+
+msgid "e.g. ABC Ltd."
+msgstr "যেমন: এবিসি লিমিটেড"
+
+msgid "Full address of your workplace"
+msgstr "আপনার কর্মস্থলের সম্পূর্ণ ঠিকানা"
+
+msgid "https://facebook.com/your.profile"
+msgstr "https://facebook.com/আপনার.প্রোফাইল"
+
+msgid "Briefly describe any past volunteer work"
+msgstr "পূর্বের স্বেচ্ছাসেবী কাজের সংক্ষিপ্ত বিবরণ লিখুন"
+
+msgid "e.g. Ward No. 5"
+msgstr "যেমন: ৫নং ওয়ার্ড"
+
+msgid "Please review and correct the following before submitting:"
+msgstr "জমা দেওয়ার আগে অনুগ্রহ করে নিচের বিষয়গুলো পর্যালোচনা করে ঠিক করুন:"
+
+msgid "Supported: JPG, PNG, WEBP · Max 3MB"
+msgstr "সমর্থিত ফরম্যাট: JPG, PNG, WEBP · সর্বোচ্চ ৩ এমবি"
+
+msgid "Supported: JPG, PNG, WEBP, PDF · Max 3MB"
+msgstr "সমর্থিত ফরম্যাট: JPG, PNG, WEBP, PDF · সর্বোচ্চ ৩ এমবি"
+
+msgid "example@gmail.com"
+msgstr "example@gmail.com"
+
+msgid "01XXXXXXXXX"
+msgstr "01XXXXXXXXX"
+
+msgid "1234567890123"
+msgstr "1234567890123"
+
+msgid "AB1234567"
+msgstr "AB1234567"
+
+msgid "dd/mm/yyyy"
+msgstr "৩১/১২/২০০৪ (দিন/মাস/বছর)"
+
+msgid "Format: dd/mm/yyyy"
+msgstr "ফরম্যাট: ৩১/১২/২০০৪ (দিন/মাস/বছর)"
+
+msgid "বাংলায় পূর্ণ নাম"
+msgstr "Full Name in Bangla"
+
+msgid "বাংলায় পিতার পূর্ণ নাম"
+msgstr "Father's Full Name in Bangla"
+
+msgid "বাংলায় মাতার পূর্ণ নাম"
+msgstr "Mother's Full Name in Bangla"
+
+msgid "All rights reserved."
+msgstr "সর্বস্বত্ব সংরক্ষিত।"
+
+msgid "Support Our Work"
+msgstr "আমাদের কাজকে সমর্থন করুন"
+
+msgid "Your contribution helps %(name)s serve communities with compassion, transparency and care."
+msgstr "আপনার অবদান %(name)s-কে সহানুভূতি, স্বচ্ছতা ও যত্নের সাথে সম্প্রদায়ের সেবায় সহায়তা করে।"
+
+msgid "Choose a category, pick a suggested amount or enter your own, then proceed to secure payment."
+msgstr "একটি বিভাগ বেছে নিন, প্রস্তাবিত পরিমাণ নির্বাচন করুন অথবা নিজের পরিমাণ লিখুন, তারপর নিরাপদ পেমেন্টে এগিয়ে যান।"
+
+msgid "Select a suggested amount or type any amount in BDT."
+msgstr "একটি প্রস্তাবিত পরিমাণ নির্বাচন করুন অথবা যেকোনো পরিমাণ টাকায় লিখুন।"
+
+msgid "You will be redirected to a secure payment page. Payment gateway options will expand as additional providers are enabled."
+msgstr "আপনি একটি নিরাপদ পেমেন্ট পেজে নিয়ে যাওয়া হবে। অতিরিক্ত পেমেন্ট গেটওয়ে চালু হলে আরও বিকল্প যুক্ত হবে।"
+
+msgid "Full Name"
+msgstr "পূর্ণ নাম"
+
+msgid "Donation Amount (BDT)"
+msgstr "দানের পরিমাণ (টাকা)"
+
+msgid "Donation Category"
+msgstr "দানের বিভাগ"
+
+msgid "Message (optional)"
+msgstr "বার্তা (ঐচ্ছিক)"
+
+msgid "Donate anonymously"
+msgstr "নামগোপন রেখে দান করুন"
+
+msgid "Select a category"
+msgstr "একটি বিভাগ নির্বাচন করুন"
+
+msgid "Please correct the errors below."
+msgstr "অনুগ্রহ করে নিচের ত্রুটিগুলো ঠিক করুন।"
+
+msgid "Welcome to %(name)s"
+msgstr "%(name)s-এ স্বাগতম"
+
+msgid "Our Mission"
+msgstr "আমাদের লক্ষ্য"
+
+msgid "Our Vision"
+msgstr "আমাদের অভিলক্ষ্য"
+
+msgid "Objectives"
+msgstr "উদ্দেশ্যসমূহ"
+
+msgid "Privacy"
+msgstr "গোপনীয়তা"
+
+msgid "Terms"
+msgstr "শর্তাবলি"
+
+msgid "Learn About Us"
+msgstr "আমাদের সম্পর্কে জানুন"
+
+msgid "Areas of Work"
+msgstr "কর্মক্ষেত্রসমূহ"
+
+msgid "Read the Constitution / Memorandum"
+msgstr "গঠনতন্ত্র / সংঘস্মারক পড়ুন"
+
+msgid "Organizations & platforms supporting our work"
+msgstr "আমাদের কাজকে সহায়তা করা সংস্থা ও প্ল্যাটফর্ম"
+
+msgid "Download document"
+msgstr "দলিল ডাউনলোড"
+
+msgid "Last updated"
+msgstr "সর্বশেষ হালনাগাদ"
+
+msgid "Contents"
+msgstr "সূচি"
+
+msgid "Terms sections"
+msgstr "শর্তাবলির ধারা"
+
+msgid "Organizational Nature"
+msgstr "সাংগঠনিক পরিচিতি"
+
+msgid "Financial Principles"
+msgstr "আর্থিক নীতিমালা"
+
+msgid "View Transparency"
+msgstr "স্বচ্ছতা দেখুন"
+
+msgid "Governance & Accountability"
+msgstr "সুশাসন ও জবাবদিহিতা"
+
+msgid "Transparency & Accountability"
+msgstr "স্বচ্ছতা ও জবাবদিহিতা"
+
+msgid "Meeting Quorum"
+msgstr "সভায় কোরাম"
+
+msgid "View Reports & publications"
+msgstr "প্রতিবেদন ও প্রকাশনা দেখুন"
+
+msgid "View Governance Documents"
+msgstr "শাসন ও নীতিমালার নথি দেখুন"
+
+msgid "(opens in a new tab)"
+msgstr "(নতুন ট্যাবে খুলবে)"
+
+msgid "Back to top"
+msgstr "উপরে যান"
+
+msgid "Registration No."
+msgstr "নিবন্ধন নম্বর"
+
+msgid "Registration Date"
+msgstr "নিবন্ধনের তারিখ"
+
+msgid "Become a Member"
+msgstr "সদস্য হোন"
+
+msgid "Check Application Status"
+msgstr "আবেদনের অবস্থা দেখুন"
+
+msgid "Pay Membership Fee"
+msgstr "সদস্যপদ ফি পরিশোধ করুন"
+
+msgid "Membership Requirements"
+msgstr "সদস্যপদের যোগ্যতা"
+
+msgid "Contact Admin"
+msgstr "প্রশাসনের সাথে যোগাযোগ করুন"
+
+msgid "Contact Us"
+msgstr "যোগাযোগ করুন"
+
+msgid "Send Message"
+msgstr "বার্তা পাঠান"
+
+msgid "Submit"
+msgstr "জমা দিন"
+
+msgid "Office Address"
+msgstr "অফিসের ঠিকানা"
+
+msgid "Phone"
+msgstr "ফোন"
+
+msgid "Email"
+msgstr "ইমেইল"
+
+msgid "Donation"
+msgstr "অনুদান"
+
+msgid "Donate Now"
+msgstr "এখনই অনুদান দিন"
+
+msgid "Donation Amount"
+msgstr "অনুদানের পরিমাণ"
+
+msgid "Custom Amount"
+msgstr "নিজস্ব পরিমাণ"
+
+msgid "One-time Donation"
+msgstr "এককালীন অনুদান"
+
+msgid "Recurring Donation"
+msgstr "নিয়মিত অনুদান"
+
+msgid "Monthly Donation"
+msgstr "মাসিক অনুদান"
+
+msgid "One-time"
+msgstr "এককালীন"
+
+msgid "Monthly"
+msgstr "মাসিক"
+
+msgid "Donor information"
+msgstr "দাতার তথ্য"
+
+msgid "Payment Method"
+msgstr "পেমেন্ট পদ্ধতি"
+
+msgid "Continue"
+msgstr "এগিয়ে যান"
+
+msgid "Pay Now"
+msgstr "এখনই পরিশোধ করুন"
+
+msgid "Secure Payment"
+msgstr "নিরাপদ পেমেন্ট"
+
+msgid "Payment Successful"
+msgstr "পেমেন্ট সফল হয়েছে"
+
+msgid "Payment Failed"
+msgstr "পেমেন্ট ব্যর্থ হয়েছে"
+
+msgid "Payment Cancelled"
+msgstr "পেমেন্ট বাতিল করা হয়েছে"
+
+msgid "Recurring Donations"
+msgstr "নিয়মিত অনুদান"
+
+msgid "Enabled"
+msgstr "সক্রিয়"
+
+msgid "Disabled"
+msgstr "নিষ্ক্রিয়"
+
+msgid "When disabled, the recurring/monthly donation option is hidden from the public donation page and new recurring subscriptions cannot be started."
+msgstr "এটি বন্ধ থাকলে পাবলিক অনুদান পৃষ্ঠায় নিয়মিত/মাসিক অনুদানের বিকল্প দেখানো হবে না এবং নতুন নিয়মিত অনুদান শুরু করা যাবে না।"
+
+msgid "New recurring donations disabled"
+msgstr "নতুন নিয়মিত অনুদান বন্ধ আছে"
+

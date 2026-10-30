@@ -1,0 +1,14 @@
+{% comment %}
+Reusable pill badge.
+Usage:
+  {% include "includes/ui/badges/_badge.html" with icon="bi-patch-check-fill" text=about_hero|bl:"eyebrow" on_dark=True %}
+Params:
+  text     - visible label (required)
+  icon     - Bootstrap Icons class (optional)
+  variant  - primary | accent | success | warning | danger (default: primary)
+  on_dark  - True when placed on a dark/gradient background
+{% endcomment %}
+<span class="{% if on_dark %}section-eyebrow-on-dark{% else %}badge-{{ variant|default:'primary' }}{% endif %}">
+  {% if icon %}<i class="bi {{ icon }}" aria-hidden="true"></i>{% endif %}
+  {{ text }}
+</span>

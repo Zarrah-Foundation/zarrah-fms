@@ -1,0 +1,52 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n static form_extras %}
+
+{% block title %}{{ page_title }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-6">
+  <a href="{{ cancel_url }}" class="mb-4 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Back to members" %}</a>
+  <h1 class="dash-page-title">{{ page_title }}</h1>
+  <p class="mt-1 text-sm text-ink-light">{% trans "Uses the same fields and validation as the public membership application. This is an administrative create path and does not require the public email-verification registration workflow." %}</p>
+</div>
+
+<form id="membership-application-form" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+  {% csrf_token %}
+
+  <div class="card-flat space-y-4">
+    <h2 class="text-h4">{% trans "Admin options" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.membership_type %}
+      {% include "dashboard/includes/_form_field.html" with field=form.auto_approve %}
+    </div>
+  </div>
+
+  <script type="application/json" id="education-data">{{ education_data_json|safe }}</script>
+
+  {% if form.non_field_errors %}
+  <div class="alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  {% for key, label, icon, fields in form.sections %}
+  <section id="section-{{ key }}" class="card-flat">
+    <h2 class="mb-4 flex items-center gap-2 text-h4"><i class="bi {{ icon }}"></i>{{ label }}</h2>
+    <div class="dash-form-grid">
+      {% for field in fields %}
+      {% include "dashboard/includes/_form_field.html" with field=field %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <div class="flex justify-end gap-3">
+    <a href="{{ cancel_url }}" class="btn-ghost">{% trans "Cancel" %}</a>
+    <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save member application" %}</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/bd-address.js' %}" data-base-url="{% static 'data/bd/' %}"></script>
+<script src="{% static 'js/membership-form.js' %}"></script>
+{% endblock %}

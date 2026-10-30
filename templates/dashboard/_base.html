@@ -1,0 +1,11 @@
+{% extends "dashboard/_shell.html" %}
+
+<!--
+Backward-compatible alias.
+Existing dashboard pages extend "dashboard/_base.html"
+and fill the "dashboard_content" block.
+-->
+
+{% block content %}
+    {% block dashboard_content %}{% endblock %}
+{% endblock %}

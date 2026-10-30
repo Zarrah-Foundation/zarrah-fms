@@ -1,0 +1,20 @@
+{{ foundation_name }}
+Meeting invitation
+
+You are invited to a meeting.
+
+Title: {{ meeting_title }}
+Reference: {{ reference }}
+Type: {{ meeting_type }}
+Date & time: {{ datetime_display }} ({{ timezone_name }})
+Mode: {{ mode }}
+{% if venue %}Venue: {{ venue }}
+{% endif %}{% if online_url %}Online: {{ online_url }}
+{% endif %}
+{% if agenda_titles %}Agenda:
+{% for title in agenda_titles %}{{ forloop.counter }}. {{ title }}
+{% endfor %}{% endif %}
+{% if rsvp_url %}View meeting & RSVP:
+{{ rsvp_url }}
+{% endif %}
+— {{ foundation_name }}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Payment Cancelled" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="section container-app">
+  <div class="mx-auto max-w-xl text-center">
+    <h1 class="text-h3">{% zf_label "Payment Cancelled" %}</h1>
+    <p class="mt-3 text-ink-light">{% zf_label "You cancelled before completing authorization. No monthly donation was set up." %}</p>
+    <a href="{% url 'donation' %}" class="btn-primary mt-6 inline-flex">{% zf_label "Start again" %}</a>
+  </div>
+</section>
+{% endblock %}

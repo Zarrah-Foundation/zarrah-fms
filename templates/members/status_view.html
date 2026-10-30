@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Application Status" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="zf-public-stack bg-canvas">
+  <div class="container-app">
+  <div class="mx-auto max-w-2xl">
+    <h1 class="text-h2">{% zf_label "Application Status" %}</h1>
+    <p class="mt-2 text-ink-light">{% zf_label "Reference" %}: <span lang="en">{{ application.reference_code }}</span></p>
+
+    <div class="card mt-6 space-y-4">
+      <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% zf_label "Submitted" %}</dt>
+          <dd class="mt-1 text-ink">{{ application.created_at|date:"M d, Y" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% zf_label "Status" %}</dt>
+          <dd class="mt-1 font-semibold text-ink">{{ application.get_status_display }}</dd>
+        </div>
+      </dl>
+
+      {% if application.admin_message %}
+      <div class="rounded-xl border border-border/60 bg-canvas p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% zf_label "Message from admin" %}</p>
+        <p class="mt-1 text-ink">{{ application.admin_message }}</p>
+      </div>
+      {% endif %}
+
+      {% if application.status == "APPROVED" %}
+      <div class="alert-success"><i class="bi bi-check-circle"></i><span>{% zf_label "Your application has been approved. Check your email for login details if an email was provided." %}</span></div>
+      {% elif application.status == "REJECTED" %}
+      <div class="alert-danger"><i class="bi bi-x-circle"></i><span>{% zf_label "Your application was rejected." %}{% if application.rejection_reason %} {{ application.rejection_reason }}{% endif %}</span></div>
+      {% elif open_requests %}
+      <div class="alert-warning"><i class="bi bi-file-earmark-plus"></i><span>{% zf_label "Additional documents were requested. Please upload only the documents listed below." %}</span></div>
+      {% elif application.status == "UNDER_REVIEW" %}
+      <p class="text-sm text-ink-light">{% zf_label "Your application is under review." %}</p>
+      {% else %}
+      <p class="text-sm text-ink-light">{% zf_label "Your application is pending review." %}</p>
+      {% endif %}
+    </div>
+
+    {% if open_requests %}
+    <div class="mt-8 space-y-6">
+      <h2 class="text-h4">{% zf_label "Requested documents" %}</h2>
+      {% for req in open_requests %}
+      <div class="card space-y-3">
+        <div>
+          <p class="font-semibold text-ink">{{ req.document_label }}</p>
+          {% if req.instruction %}<p class="mt-1 text-sm text-ink-light">{{ req.instruction }}</p>{% endif %}
+        </div>
+        <form method="post" action="{% url 'membership-status-upload' req.pk %}" enctype="multipart/form-data" class="space-y-3">
+          {% csrf_token %}
+          <input type="file" name="uploaded_file" class="form-input" required>
+          <button type="submit" class="btn-primary btn-sm"><i class="bi bi-upload"></i>{% zf_label "Upload" %}</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <p class="mt-8">
+      <a href="{% url 'contact' %}" class="text-primary hover:underline">{% zf_label "Contact Admin" %}</a>
+    </p>
+  </div>
+  </div>
+</section>
+{% endblock %}

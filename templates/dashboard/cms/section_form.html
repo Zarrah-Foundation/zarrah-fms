@@ -1,0 +1,273 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mx-auto max-w-4xl">
+  <div class="dash-page-header">
+    <div>
+      <h1 class="dash-page-title">{{ page_title }}</h1>
+      {% if source_help %}
+      <p class="mt-2 max-w-2xl text-sm text-ink-light">{{ source_help }}</p>
+      {% endif %}
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <a href="{{ preview_home_url }}" class="btn-secondary btn-sm" target="_blank" rel="noopener">
+        <i class="bi bi-eye"></i>{% trans "View Homepage" %}
+      </a>
+      {% if manage_url %}
+      <a href="{{ manage_url }}" class="btn-ghost btn-sm">{% trans "Open content source" %}</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-5 js-dash-form" novalidate id="cms-section-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    {% if form.section_type %}
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold text-ink">{% trans "Section type &amp; publish status" %}</summary>
+      <div class="dash-form-grid mt-4">
+        {% include "dashboard/includes/_form_field.html" with field=form.section_type %}
+        {% if form.order %}{% include "dashboard/includes/_form_field.html" with field=form.order %}{% endif %}
+        {% if form.is_published %}{% include "dashboard/includes/_form_field.html" with field=form.is_published %}{% endif %}
+        {% if form.is_visible %}{% include "dashboard/includes/_form_field.html" with field=form.is_visible %}{% endif %}
+      </div>
+      <p class="form-hint mt-2">
+        {% trans "Published = visible publicly when content/data exists. Draft = not public. Uncheck Visible to disable intentionally." %}
+      </p>
+    </details>
+    {% else %}
+    <div class="card-flat p-4">
+      <div class="dash-form-grid">
+        {% if form.order %}{% include "dashboard/includes/_form_field.html" with field=form.order %}{% endif %}
+        {% if form.is_published %}{% include "dashboard/includes/_form_field.html" with field=form.is_published %}{% endif %}
+        {% if form.is_visible %}{% include "dashboard/includes/_form_field.html" with field=form.is_visible %}{% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if editor_key == "mission_vision" %}
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Section heading" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.title_en %}{% include "dashboard/includes/_form_field.html" with field=form.title_en %}{% endif %}
+        {% if form.title_bn %}{% include "dashboard/includes/_form_field.html" with field=form.title_bn %}{% endif %}
+      </div>
+    </details>
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Our Mission / আমাদের লক্ষ্য" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.mission_title_en %}{% include "dashboard/includes/_form_field.html" with field=form.mission_title_en %}{% endif %}
+        {% if form.mission_title_bn %}{% include "dashboard/includes/_form_field.html" with field=form.mission_title_bn %}{% endif %}
+        {% if form.mission_content_en %}{% include "dashboard/includes/_form_field.html" with field=form.mission_content_en wrap_class="md:col-span-2" %}{% endif %}
+        {% if form.mission_content_bn %}{% include "dashboard/includes/_form_field.html" with field=form.mission_content_bn wrap_class="md:col-span-2" %}{% endif %}
+      </div>
+    </details>
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Our Vision / আমাদের অভিলক্ষ্য" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.vision_title_en %}{% include "dashboard/includes/_form_field.html" with field=form.vision_title_en %}{% endif %}
+        {% if form.vision_title_bn %}{% include "dashboard/includes/_form_field.html" with field=form.vision_title_bn %}{% endif %}
+        {% if form.vision_content_en %}{% include "dashboard/includes/_form_field.html" with field=form.vision_content_en wrap_class="md:col-span-2" %}{% endif %}
+        {% if form.vision_content_bn %}{% include "dashboard/includes/_form_field.html" with field=form.vision_content_bn wrap_class="md:col-span-2" %}{% endif %}
+      </div>
+    </details>
+    <details class="card-flat p-4">
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Optional CTA" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.button_text_en %}{% include "dashboard/includes/_form_field.html" with field=form.button_text_en %}{% endif %}
+        {% if form.button_text_bn %}{% include "dashboard/includes/_form_field.html" with field=form.button_text_bn %}{% endif %}
+        {% if form.button_link %}{% include "dashboard/includes/_form_field.html" with field=form.button_link wrap_class="md:col-span-2" %}{% endif %}
+      </div>
+    </details>
+
+    {% elif editor_key == "hero" %}
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Hero copy" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.eyebrow_en %}{% include "dashboard/includes/_form_field.html" with field=form.eyebrow_en %}{% endif %}
+        {% if form.eyebrow_bn %}{% include "dashboard/includes/_form_field.html" with field=form.eyebrow_bn %}{% endif %}
+        {% if form.title_en %}{% include "dashboard/includes/_form_field.html" with field=form.title_en %}{% endif %}
+        {% if form.title_bn %}{% include "dashboard/includes/_form_field.html" with field=form.title_bn %}{% endif %}
+        {% if form.content_en %}{% include "dashboard/includes/_form_field.html" with field=form.content_en wrap_class="md:col-span-2" %}{% endif %}
+        {% if form.content_bn %}{% include "dashboard/includes/_form_field.html" with field=form.content_bn wrap_class="md:col-span-2" %}{% endif %}
+      </div>
+    </details>
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Calls to action" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.button_text_en %}{% include "dashboard/includes/_form_field.html" with field=form.button_text_en %}{% endif %}
+        {% if form.button_text_bn %}{% include "dashboard/includes/_form_field.html" with field=form.button_text_bn %}{% endif %}
+        {% if form.button_link %}{% include "dashboard/includes/_form_field.html" with field=form.button_link wrap_class="md:col-span-2" %}{% endif %}
+        {% if form.secondary_button_text_en %}{% include "dashboard/includes/_form_field.html" with field=form.secondary_button_text_en %}{% endif %}
+        {% if form.secondary_button_text_bn %}{% include "dashboard/includes/_form_field.html" with field=form.secondary_button_text_bn %}{% endif %}
+        {% if form.secondary_button_link %}{% include "dashboard/includes/_form_field.html" with field=form.secondary_button_link wrap_class="md:col-span-2" %}{% endif %}
+      </div>
+    </details>
+    {% if form.image %}
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Hero image" %}</summary>
+      <div class="mt-4">
+        {% include "dashboard/includes/_form_field.html" with field=form.image %}
+        {% if form.instance.image %}
+        <img src="{{ form.instance.image.url }}" alt="" class="mt-3 max-h-48 rounded-lg object-cover">
+        {% endif %}
+      </div>
+    </details>
+    {% endif %}
+
+    {% elif editor_key == "gallery" or show_gallery_formset %}
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Gallery heading" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.title_en %}{% include "dashboard/includes/_form_field.html" with field=form.title_en %}{% endif %}
+        {% if form.title_bn %}{% include "dashboard/includes/_form_field.html" with field=form.title_bn %}{% endif %}
+        {% if form.content_en %}{% include "dashboard/includes/_form_field.html" with field=form.content_en wrap_class="md:col-span-2" %}{% endif %}
+        {% if form.content_bn %}{% include "dashboard/includes/_form_field.html" with field=form.content_bn wrap_class="md:col-span-2" %}{% endif %}
+      </div>
+    </details>
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Slider settings" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% if form.gallery_autoplay %}{% include "dashboard/includes/_form_field.html" with field=form.gallery_autoplay %}{% endif %}
+        {% if form.gallery_autoplay_interval %}{% include "dashboard/includes/_form_field.html" with field=form.gallery_autoplay_interval %}{% endif %}
+        {% if form.gallery_show_arrows %}{% include "dashboard/includes/_form_field.html" with field=form.gallery_show_arrows %}{% endif %}
+        {% if form.gallery_show_dots %}{% include "dashboard/includes/_form_field.html" with field=form.gallery_show_dots %}{% endif %}
+        {% if form.gallery_show_captions %}{% include "dashboard/includes/_form_field.html" with field=form.gallery_show_captions %}{% endif %}
+      </div>
+    </details>
+
+    <section class="card-flat space-y-4 p-4" aria-labelledby="gallery-manager-title">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 id="gallery-manager-title" class="text-base font-semibold text-ink">{% trans "Gallery Manager" %}</h2>
+          <p class="form-hint mt-1">
+            {% trans "Add new images or reuse images from the library. Remove from Gallery keeps the file available for reuse." %}
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <label class="btn-primary btn-sm cursor-pointer">
+            <i class="bi bi-upload"></i>{% trans "Add New Images" %}
+            {% if form.new_gallery_images %}{{ form.new_gallery_images }}{% endif %}
+          </label>
+          <button type="button" class="btn-secondary btn-sm" id="open-media-library" data-library-url="{{ media_library_url }}">
+            <i class="bi bi-images"></i>{% trans "Select Existing Images" %}
+          </button>
+        </div>
+      </div>
+      {% if form.new_gallery_images.errors %}
+      <div class="alert-danger">{{ form.new_gallery_images.errors }}</div>
+      {% endif %}
+      <div id="new-upload-preview" class="grid grid-cols-2 gap-2 sm:grid-cols-4" hidden></div>
+      {% if form.attach_media_ids %}{{ form.attach_media_ids }}{% endif %}
+      <input type="hidden" name="gallery_order" id="gallery-order" value="">
+
+      {{ image_formset.management_form }}
+      <div class="space-y-3" id="gallery-cards" data-gallery-cards>
+        {% for f in image_formset %}
+        <article class="rounded-lg border border-border/70 p-3" data-membership-id="{{ f.instance.pk }}">
+          {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <div class="shrink-0">
+              {% if f.instance.pk and f.instance.media and f.instance.media.image %}
+              <img src="{{ f.instance.media.image.url }}" alt="" class="h-28 w-40 rounded object-cover" width="160" height="112">
+              {% endif %}
+              <p class="mt-1 max-w-[10rem] truncate text-xs text-ink-light">
+                {% if f.instance.media %}{{ f.instance.media.display_name }}{% endif %}
+              </p>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="mb-2 flex flex-wrap items-center gap-2">
+                <button type="button" class="btn-ghost btn-sm" data-move="up" aria-label="{% trans 'Move up' %}">↑</button>
+                <button type="button" class="btn-ghost btn-sm" data-move="down" aria-label="{% trans 'Move down' %}">↓</button>
+                {% if f.instance.media_id %}
+                <a href="{% url 'dashboard-cms-media-delete' f.instance.media_id %}?next={{ request.path|urlencode }}" class="btn-ghost btn-sm text-danger">
+                  {% trans "Delete Permanently" %}
+                </a>
+                {% endif %}
+              </div>
+              <div class="dash-form-grid md:grid-cols-2">
+                {% for field in f.visible_fields %}
+                  {% if field.name == "DELETE" %}
+                  <div class="form-group form-group-checkbox md:col-span-2">
+                    <label class="form-checkbox-label">
+                      {{ field }}
+                      <span>{% trans "Remove from Gallery" %}</span>
+                    </label>
+                    <p class="form-hint">{% trans "Removes this image from this gallery only. The uploaded image remains available for reuse." %}</p>
+                  </div>
+                  {% else %}
+                    {% include "dashboard/includes/_form_field.html" with field=field %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </article>
+        {% empty %}
+        <p class="text-sm text-ink-light">{% trans "No images in this gallery yet." %}</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% else %}
+    <details class="card-flat p-4" open>
+      <summary class="cursor-pointer text-sm font-semibold">{% trans "Content" %}</summary>
+      <div class="dash-form-grid mt-4 md:grid-cols-2">
+        {% for field in form %}
+          {% if field.name != "section_type" and field.name != "order" and field.name != "is_published" and field.name != "is_visible" %}
+            {% include "dashboard/includes/_form_field.html" with field=field wrap_class="md:col-span-1" %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </details>
+    {% endif %}
+
+    {% if show_gallery_formset and editor_key != "gallery" %}
+    {# fallback if type unlocked to gallery mid-create #}
+    {% endif %}
+
+    <div class="flex flex-wrap justify-end gap-3 border-t border-border/60 pt-5">
+      {% if cancel_url %}<a href="{{ cancel_url }}" class="btn-ghost">{% trans "Cancel" %}</a>{% endif %}
+      <button type="submit" name="save_continue" value="1" class="btn-secondary">
+        {% trans "Save &amp; continue" %}
+      </button>
+      <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% if show_gallery_formset %}{% trans "Save Gallery" %}{% else %}{% trans "Save" %}{% endif %}</button>
+    </div>
+  </form>
+</div>
+
+<dialog id="media-library-dialog" class="w-[min(920px,94vw)] max-h-[85vh] overflow-auto rounded-xl border border-border p-0 shadow-lg">
+  <div class="sticky top-0 z-10 flex items-center justify-between border-b border-border/60 bg-white px-4 py-3">
+    <h2 class="text-base font-semibold">{% trans "Media Library" %}</h2>
+    <button type="button" class="btn-ghost btn-sm" id="close-media-library" aria-label="{% trans 'Close' %}">✕</button>
+  </div>
+  <div class="p-4" id="media-library-body">
+    <p class="text-sm text-ink-light">{% trans "Loading…" %}</p>
+  </div>
+  <div class="sticky bottom-0 flex justify-end gap-2 border-t border-border/60 bg-white px-4 py-3">
+    <button type="button" class="btn-ghost" id="cancel-media-library">{% trans "Cancel" %}</button>
+    <button type="button" class="btn-primary" id="add-selected-media">{% trans "Add Selected Images" %}</button>
+  </div>
+</dialog>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/gallery-manager.js"></script>
+<script>
+(function () {
+  var typeSelect = document.getElementById("id_section_type");
+  if (typeSelect && !typeSelect.disabled) {
+    typeSelect.addEventListener("change", function () {
+      var url = new URL(window.location.href);
+      url.searchParams.set("type", typeSelect.value);
+      window.location.href = url.toString();
+    });
+  }
+})();
+</script>
+{% endblock %}

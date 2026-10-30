@@ -1,0 +1,126 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras fee_extras static %}
+
+{% block title %}{% trans "Membership Fees" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Membership Fees" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-cash-stack mr-2 text-primary"></i>{% trans "Membership Fees" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">
+      {% blocktrans with fee=monthly_fee|floatformat:0 %}One row per member · Monthly fee ৳{{ fee }}. Open a member for period detail and offline recording.{% endblocktrans %}
+    </p>
+  </div>
+  {% if can_edit_settings %}
+  <a href="{% url 'dashboard-membership-fees-settings' %}" class="btn-secondary btn-sm">
+    <i class="bi bi-gear"></i>{% trans "Settings" %}
+  </a>
+  {% endif %}
+</div>
+
+<form method="get" class="dash-toolbar">
+  <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Search member, ID, or email…' %}" class="dash-search">
+  <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "Approved members" %}</option>
+    {% for code, label in status_choices %}
+    <option value="{{ code }}" {% if status == code %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <label class="inline-flex items-center gap-2 text-sm text-ink-light">
+    <input type="checkbox" name="pending" value="1" {% if pending_only %}checked{% endif %} onchange="this.form.submit()">
+    {% trans "Pending only" %}
+  </label>
+  <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-search"></i>{% trans "Search" %}</button>
+  {% if q or status or pending_only %}<a href="?" class="btn-ghost btn-sm">{% trans "Clear" %}</a>{% endif %}
+</form>
+
+{% if rows %}
+{# Desktop / tablet: resizable columns + horizontal scroll #}
+<div class="table-wrap fee-table-wrap hidden md:block">
+  <table class="table fee-resizable-table" id="membership-fees-table" data-storage-key="zf-membership-fees-cols-v1">
+    <thead>
+      <tr>
+        <th data-col="member">{% trans "Member" %}</th>
+        <th data-col="type">{% trans "Membership Type" %}</th>
+        <th data-col="status">{% trans "Status" %}</th>
+        <th data-col="pending_months">{% trans "Pending Months" %}</th>
+        <th data-col="pending_amount">{% trans "Pending Amount" %}</th>
+        <th data-col="paid_through">{% trans "Paid Through" %}</th>
+        <th data-col="registration">{% trans "Registration Fee Status" %}</th>
+        <th data-col="autopay">{% trans "Autopay" %}</th>
+        <th data-col="last_payment">{% trans "Last Payment" %}</th>
+        <th data-col="actions">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>
+          <div class="font-medium text-ink">{{ row.member.first_name }} {{ row.member.last_name }}</div>
+          <div class="text-xs text-ink-light" lang="en">{{ row.member.member_id }}</div>
+        </td>
+        <td class="text-sm">{{ row.member.membership_type.name_en|default:"—" }}</td>
+        <td>{% status_badge row.member.status row.member.get_status_display %}</td>
+        <td>{{ row.summary.pending_months }}</td>
+        <td>৳{{ row.summary.pending_amount|floatformat:0 }}</td>
+        <td>{% if row.summary.paid_through %}{{ row.summary.paid_through_label_short }}{% else %}—{% endif %}</td>
+        <td>
+          {% if row.summary.registration_fee_status == "COMPLETED" %}
+            {% trans "Paid" %}
+          {% elif row.summary.registration_fee_status %}
+            {% trans "Pending" %}
+          {% else %}—{% endif %}
+        </td>
+        <td>{% if row.summary.autopay_enabled %}{% trans "ON" %}{% else %}{% trans "OFF" %}{% endif %}</td>
+        <td>{% if row.summary.last_payment %}{{ row.summary.last_payment.created_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
+        <td>
+          <a href="{% url 'dashboard-membership-fee-detail' row.member.pk %}" class="btn-secondary btn-sm">
+            {% trans "View Details" %}
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{# Mobile: card list #}
+<div class="space-y-3 md:hidden">
+  {% for row in rows %}
+  <article class="card-flat p-4">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h2 class="font-semibold text-ink">{{ row.member.first_name }} {{ row.member.last_name }}</h2>
+        <p class="text-xs text-ink-light" lang="en">{{ row.member.member_id }}</p>
+        <p class="mt-1 text-sm text-ink-light">{{ row.member.membership_type.name_en|default:"—" }}</p>
+      </div>
+      {% status_badge row.member.status row.member.get_status_display %}
+    </div>
+    <dl class="mt-3 grid grid-cols-2 gap-2 text-sm">
+      <div><dt class="text-ink-light">{% trans "Pending" %}</dt><dd>{{ row.summary.pending_months }} {% trans "months" %}</dd></div>
+      <div><dt class="text-ink-light">{% trans "Amount" %}</dt><dd>৳{{ row.summary.pending_amount|floatformat:0 }}</dd></div>
+      <div><dt class="text-ink-light">{% trans "Paid through" %}</dt><dd>{% if row.summary.paid_through %}{{ row.summary.paid_through_label_short }}{% else %}—{% endif %}</dd></div>
+      <div><dt class="text-ink-light">{% trans "Registration" %}</dt>
+        <dd>{% if row.summary.registration_fee_status == "COMPLETED" %}{% trans "Paid" %}{% else %}{% trans "Pending" %}{% endif %}</dd>
+      </div>
+      <div><dt class="text-ink-light">{% trans "Autopay" %}</dt><dd>{% if row.summary.autopay_enabled %}{% trans "ON" %}{% else %}{% trans "OFF" %}{% endif %}</dd></div>
+      <div><dt class="text-ink-light">{% trans "Last payment" %}</dt><dd>{% if row.summary.last_payment %}{{ row.summary.last_payment.created_at|date:"M d, Y" }}{% else %}—{% endif %}</dd></div>
+    </dl>
+    <a href="{% url 'dashboard-membership-fee-detail' row.member.pk %}" class="btn-secondary btn-sm mt-4 inline-flex">
+      {% trans "View Details" %}
+    </a>
+  </article>
+  {% endfor %}
+</div>
+
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No members found" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-cash-stack" title=empty_title %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/fee-table-resize.js' %}" defer></script>
+{% endblock %}

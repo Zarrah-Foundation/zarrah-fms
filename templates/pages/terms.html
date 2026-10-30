@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{{ terms_hero|bl:"title" }} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ terms_hero|bl:"subtitle" }}">
+{% endblock %}
+
+{% block content %}
+<div class="legal-page">
+  <section class="legal-hero" aria-labelledby="terms-hero-heading">
+    <div class="container-app legal-hero__inner">
+      <nav aria-label="{% zf_label 'Breadcrumb' %}" class="legal-breadcrumb">
+        <a href="{% url 'home' %}">{% zf_label "Home" %}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{{ terms_hero|bl:"title" }}</span>
+      </nav>
+      <p class="legal-hero__eyebrow">{{ terms_hero|bl:"eyebrow" }}</p>
+      <h1 id="terms-hero-heading" class="legal-hero__title">{{ terms_hero|bl:"title" }}</h1>
+      <p class="legal-hero__lead">{{ terms_hero|bl:"subtitle" }}</p>
+      <p class="legal-hero__meta">
+        {% zf_label "Last updated" %}:
+        {% if LANGUAGE_CODE == 'bn' %}{{ terms_last_updated.bn }}{% else %}{{ terms_last_updated.en }}{% endif %}
+      </p>
+    </div>
+  </section>
+
+  <div class="container-app legal-page__body">
+    <nav class="legal-toc" aria-label="{% trans 'Terms sections' %}">
+      <h2 class="legal-toc__label">{% zf_label "Contents" %}</h2>
+      <ol class="legal-toc__list">
+        {% for item in terms_toc %}
+        <li>
+          <a href="#{{ item.id }}">
+            <span class="legal-toc__num">{{ forloop.counter|stringformat:"02d" }}</span>
+            {{ item|bl:"title" }}
+          </a>
+        </li>
+        {% endfor %}
+      </ol>
+    </nav>
+
+    <div class="legal-sections">
+      {% for section in terms_sections %}
+      <section id="{{ section.id }}" class="legal-section" aria-labelledby="terms-{{ section.id }}-heading">
+        <header class="legal-section__header">
+          <span class="legal-section__num" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+          <h2 id="terms-{{ section.id }}-heading" class="legal-section__title">{{ section|bl:"title" }}</h2>
+        </header>
+        <p class="legal-section__text">{{ section|bl }}</p>
+      </section>
+      {% endfor %}
+    </div>
+
+    <aside class="legal-notice">
+      <p>
+        <a href="{% url 'privacy' %}" class="font-semibold text-primary hover:underline">{% zf_label "Privacy" %}</a>
+        ·
+        <a href="{% url 'contact' %}" class="font-semibold text-primary hover:underline">{% zf_label "Contact" %}</a>
+        ·
+        <a href="{% url 'constitution' %}" class="font-semibold text-primary hover:underline">{% zf_label "Constitution" %}</a>
+      </p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{{ objectives_page|bl:"title" }} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ objectives_page|bl:"intro" }}">
+{% endblock %}
+
+{% block content %}
+<section class="legal-hero" aria-labelledby="objectives-hero-heading">
+  <div class="container-app legal-hero__inner">
+    <nav aria-label="{% zf_label 'Breadcrumb' %}" class="legal-breadcrumb">
+      <a href="{% url 'home' %}">{% zf_label "Home" %}</a>
+      <span aria-hidden="true">/</span>
+      <a href="{% url 'about' %}">{% zf_label "About" %}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ objectives_page|bl:"title" }}</span>
+    </nav>
+    <p class="legal-hero__eyebrow">{% zf_label "Constitution" %}</p>
+    <h1 id="objectives-hero-heading" class="legal-hero__title">{{ objectives_page|bl:"title" }}</h1>
+    <p class="legal-hero__lead">{{ objectives_page|bl:"intro" }}</p>
+  </div>
+</section>
+
+<section class="section bg-canvas" aria-labelledby="objectives-areas-heading">
+  <div class="container-app">
+    <div class="legal-intro">
+      <p class="zf-home-eyebrow">{% zf_label "Constitution" %}</p>
+      <h2 id="objectives-areas-heading" class="text-h2 text-ink">{% zf_label "Areas of Work" %}</h2>
+      <p class="legal-intro__text">{{ objectives_page|bl:"areas_note" }}</p>
+    </div>
+
+    <ol class="zf-objective-grid">
+      {% for area in objective_areas %}
+      <li class="zf-objective-card">
+        <div class="zf-objective-card__top">
+          <span class="zf-objective-card__icon" aria-hidden="true">
+            <i class="bi {{ area.icon|default:'bi-heart' }}"></i>
+          </span>
+          <span class="zf-objective-card__num">{{ forloop.counter|stringformat:"02d" }}</span>
+        </div>
+        <h3 class="zf-objective-card__title">{{ area|bl:"title" }}</h3>
+        <p class="zf-objective-card__text">{{ area|bl:"text" }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section bg-surface" aria-labelledby="objectives-source-heading">
+  <div class="container-app">
+    <div class="legal-intro">
+      <h2 id="objectives-source-heading" class="text-h2 text-ink">{{ objectives_page|bl:"source_title" }}</h2>
+    </div>
+    <ol class="zf-objective-source">
+      {% for obj in objectives %}
+      <li class="zf-objective-source__item">
+        <p class="zf-objective-source__code">{{ obj.code }}</p>
+        <div>
+          <h3 class="zf-objective-source__title">{{ obj|bl:"title" }}</h3>
+          <p class="zf-objective-source__text">{{ obj|bl }}</p>
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="mt-10">
+      <a href="{% url 'constitution' %}" class="btn-secondary">{% zf_label "Read the Constitution / Memorandum" %}</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

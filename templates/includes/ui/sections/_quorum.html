@@ -1,0 +1,25 @@
+{% load i18n_extras %}
+<section id="quorum" class="section bg-canvas scroll-mt-24" aria-labelledby="quorum-heading">
+  <div class="container-app">
+    <div class="mx-auto mb-10 max-w-3xl text-center">
+      <p class="zf-home-eyebrow">{% zf_label "Governance & Accountability" %}</p>
+      <h2 id="quorum-heading" class="mt-4 text-h2 text-ink">{{ about_quorum_section|bl:"title" }}</h2>
+      <p class="mt-4 text-body leading-8 text-ink-light">{{ about_quorum_section|bl:"intro" }}</p>
+    </div>
+    <ul class="zf-quorum-grid">
+      {% for card in about_quorum_cards %}
+      <li class="zf-quorum-card">
+        <p class="zf-quorum-card__eyebrow">{{ card|bl:"title" }}</p>
+        <p class="zf-quorum-card__ratio" lang="en">{{ card.ratio }}</p>
+        <p class="zf-quorum-card__caption">{{ card|bl:"caption" }}</p>
+        {% if card.detail_en or card.detail_bn %}
+        <p class="zf-quorum-card__detail">{{ card|bl:"detail" }}</p>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% if about_adjourned %}
+    <p class="mt-8 max-w-3xl text-sm leading-7 text-ink-light">{{ about_adjourned|bl }}</p>
+    {% endif %}
+  </div>
+</section>

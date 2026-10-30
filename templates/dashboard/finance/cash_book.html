@@ -1,0 +1,36 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Cash Book" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Cash Book" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-journal-text mr-2 text-primary"></i>{% trans "Cash Book" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Closing balance" %}: <span class="font-semibold text-ink">{{ closing_balance|floatformat:0 }} BDT</span></p>
+  </div>
+  <a href="{% url 'dashboard-finance' %}" class="btn-ghost btn-sm">{% trans "Back" %}</a>
+</div>
+
+{% if entries %}
+<div class="table-wrap"><table class="table">
+  <thead><tr><th>{% trans "Date" %}</th><th>{% trans "Description" %}</th><th>{% trans "Debit" %}</th><th>{% trans "Credit" %}</th><th>{% trans "Balance" %}</th></tr></thead>
+  <tbody>
+    {% for e in entries %}
+    <tr>
+      <td>{{ e.date|date:"M d, Y" }}</td>
+      <td>{{ e.title }}{% if e.ref %} <span class="text-xs text-ink-light">({{ e.ref }})</span>{% endif %}</td>
+      <td class="text-danger">{% if e.type == "expense" %}{{ e.amount|floatformat:0 }}{% endif %}</td>
+      <td class="text-success">{% if e.type == "income" %}{{ e.amount|floatformat:0 }}{% endif %}</td>
+      <td class="font-semibold">{{ e.balance|floatformat:0 }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table></div>
+{% include "dashboard/includes/_pagination.html" with page_obj=page_obj %}
+{% else %}
+{% trans "No entries" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-journal-text" title=empty_title %}
+{% endif %}
+{% endblock %}

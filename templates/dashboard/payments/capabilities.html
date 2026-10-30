@@ -1,0 +1,64 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Provider capabilities" %}{% endblock %}
+{% block topbar_title %}{% trans "Capabilities" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <h1 class="dash-page-title">{% trans "Provider capability matrix" %}</h1>
+  <p class="mt-1 text-sm text-muted">{% trans "Honest status only — never treat forms or adapters as production proof." %}</p>
+</div>
+<div class="mb-4 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
+  <strong>LIVE VALIDATION PENDING</strong> —
+  {% trans "Production GO requires public HTTPS staging and real gateway evidence." %}
+</div>
+<div class="overflow-x-auto">
+  <table class="w-full min-w-[720px] border-collapse text-sm">
+    <thead>
+      <tr class="border-b border-border/60 text-left">
+        <th class="px-3 py-2">{% trans "Provider" %}</th>
+        <th class="px-3 py-2">{% trans "One-time" %}</th>
+        <th class="px-3 py-2">{% trans "Recurring" %}</th>
+        <th class="px-3 py-2">{% trans "Refund" %}</th>
+        <th class="px-3 py-2">{% trans "Webhook/IPN" %}</th>
+        <th class="px-3 py-2">{% trans "Sandbox" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in matrix %}
+      <tr class="border-b border-border/40 align-top">
+        <td class="px-3 py-3 font-semibold">{{ row.label }}</td>
+        <td class="px-3 py-3">
+          <div>{{ row.one_time.status }}</div>
+          {% if row.one_time.detail %}<div class="mt-1 text-xs text-muted">{{ row.one_time.detail }}</div>{% endif %}
+        </td>
+        <td class="px-3 py-3">
+          <div>{{ row.recurring.status }}</div>
+          {% if row.recurring.detail %}<div class="mt-1 text-xs text-muted">{{ row.recurring.detail }}</div>{% endif %}
+        </td>
+        <td class="px-3 py-3">
+          <div>{{ row.refund.status }}</div>
+          {% if row.refund.detail %}<div class="mt-1 text-xs text-muted">{{ row.refund.detail }}</div>{% endif %}
+        </td>
+        <td class="px-3 py-3">
+          <div>{{ row.webhook.status }}</div>
+          {% if row.webhook.detail %}<div class="mt-1 text-xs text-muted">{{ row.webhook.detail }}</div>{% endif %}
+        </td>
+        <td class="px-3 py-3">
+          {% if row.sandbox == True %}Sandbox{% elif row.sandbox == False %}Live{% else %}—{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% for row in matrix %}
+{% if row.notes %}
+<article class="mt-4 rounded-lg border border-border/60 bg-surface px-4 py-3 text-sm">
+  <strong>{{ row.label }}</strong>
+  <ul class="mt-2 list-disc pl-5 text-muted">
+    {% for note in row.notes %}<li>{{ note }}</li>{% endfor %}
+  </ul>
+</article>
+{% endif %}
+{% endfor %}
+{% endblock %}

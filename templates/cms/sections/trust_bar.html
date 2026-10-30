@@ -1,0 +1,42 @@
+{% load i18n %}
+<section class="zf-trust" aria-label="{% trans 'Foundation credentials' %}">
+  <div class="container-app">
+    <ul class="zf-trust__list">
+      <li class="zf-trust__item">
+        <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+        <span>{% trans "Registered Foundation" %}</span>
+      </li>
+      {% if site_settings.registration_number %}
+      <li class="zf-trust__item">
+        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+        <span>
+          {% trans "Reg. No." %}
+          <strong lang="en">{{ site_settings.registration_number }}</strong>
+        </span>
+      </li>
+      {% endif %}
+      {% if site_settings.registration_date %}
+      <li class="zf-trust__item">
+        <i class="bi bi-calendar3" aria-hidden="true"></i>
+        <span>
+          {% trans "Registered" %}
+          <strong>{{ site_settings.registration_date|date:"j M Y" }}</strong>
+        </span>
+      </li>
+      {% endif %}
+      <li class="zf-trust__item">
+        <i class="bi bi-shield-check" aria-hidden="true"></i>
+        <span>{% trans "Transparent Governance" %}</span>
+      </li>
+      <li class="zf-trust__item">
+        <i class="bi bi-people" aria-hidden="true"></i>
+        <span>{% trans "Community Focused" %}</span>
+      </li>
+    </ul>
+    {% if section.title_en or section.title_bn %}
+    <p class="zf-trust__note">
+      {% if LANGUAGE_CODE == 'bn' and section.title_bn %}{{ section.title_bn }}{% else %}{{ section.title_en|default:section.title_bn }}{% endif %}
+    </p>
+    {% endif %}
+  </div>
+</section>

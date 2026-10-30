@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras static form_extras %}
+
+{% block title %}{% zf_label "Membership Application" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<div class="section container-app">
+  <div class="mb-10 text-center">
+    <span class="badge-primary mx-auto mb-4">
+      <i class="bi bi-people-fill" aria-hidden="true"></i>{% zf_label "Join Zarrah Foundation" %}
+    </span>
+    <h1 class="text-h2">{% zf_label "Membership Application" %}</h1>
+    <p class="mx-auto mt-3 max-w-2xl text-ink-light">
+      {% zf_label "Fill out every section carefully. Fields marked with an asterisk (*) are required. Your application will be reviewed by our team before approval." %}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr]">
+    <nav aria-label="{% zf_label 'Application sections' %}" class="hidden lg:sticky lg:top-24 lg:flex lg:h-fit lg:flex-col lg:gap-1.5 lg:rounded-2xl lg:border lg:border-gray-200/80 lg:bg-white lg:p-3 lg:shadow-soft-sm">
+      {% for key, label, icon, fields in form.sections %}
+      <a href="#section-{{ key }}" class="form-section-nav-link{% if forloop.first %} form-section-nav-link-active{% endif %}">
+        <i class="bi {{ icon }}" aria-hidden="true"></i><span>{{ label }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+
+    <form id="membership-application-form" method="post" enctype="multipart/form-data" class="space-y-6" novalidate>
+      {% csrf_token %}
+
+      {% comment %}
+      Display-only label / placeholder overrides.
+
+      None of these fields have a translatable verbose_name in members/models.py
+      or members/forms.py (they use Django's auto-generated, English-only
+      "field_name" -> "Field name" label), so without this block every label
+      here would stay in English even when Bangla is active. {% set_label %}
+      mutates this per-request BoundField's label in place (see
+      core/templatetags/form_extras.py) — it never touches the Form/Model
+      class, and every later read of field.label in this same render (this
+      block's own {% include %}s below, and the error summary) sees the
+      same translated text. Fields declared with an explicit label=_(...)
+      in forms.py (Division, District, Upazila, Union, Country, Stage/
+      Marhala/Level, Class) already translate correctly and are left alone.
+      {% endcomment %}
+      {% zf_label "Name (in Bangla)" as l_bangla_name %}{% set_label form.bangla_name l_bangla_name %}
+      {% zf_label "Name (in English)" as l_english_name %}{% set_label form.english_name l_english_name %}
+      {% zf_label "Father's Name" as l_father_name %}{% set_label form.father_name l_father_name %}
+      {% zf_label "Mother's Name" as l_mother_name %}{% set_label form.mother_name l_mother_name %}
+      {% zf_label "Gender" as l_gender %}{% set_label form.gender l_gender %}
+      {% zf_label "Blood Group" as l_blood_group %}{% set_label form.blood_group l_blood_group %}
+      {% zf_label "Marital Status" as l_marital_status %}{% set_label form.marital_status l_marital_status %}
+      {% zf_label "Religion" as l_religion %}{% set_label form.religion l_religion %}
+      {% zf_label "Photo" as l_photo %}{% set_label form.photo l_photo %}
+      {% zf_label "Email Address" as l_email %}{% set_label form.email l_email %}
+      {% zf_label "Mobile Number" as l_phone %}{% set_label form.phone l_phone %}
+      {% zf_label "Emergency Contact Name" as l_emergency_name %}{% set_label form.emergency_name l_emergency_name %}
+      {% zf_label "Emergency Contact Number" as l_emergency_phone %}{% set_label form.emergency_phone l_emergency_phone %}
+      {% zf_label "Relation" as l_emergency_relation %}{% set_label form.emergency_relation l_emergency_relation %}
+      {% zf_label "Identity Type" as l_identity_type %}{% set_label form.identity_type l_identity_type %}
+      {% zf_label "ID Number" as l_identity_number %}{% set_label form.identity_number l_identity_number %}
+      {% zf_label "Identity Document" as l_identity_document %}{% set_label form.identity_document l_identity_document %}
+      {% zf_label "Present Address (Details)" as l_present_address %}{% set_label form.present_address l_present_address %}
+      {% zf_label "Permanent address same as present address" as l_permanent_same %}{% set_label form.permanent_same_as_present l_permanent_same %}
+      {% zf_label "Permanent Address (Details)" as l_permanent_address %}{% set_label form.permanent_address l_permanent_address %}
+      {% zf_label "I am an expatriate" as l_is_expat %}{% set_label form.is_expat l_is_expat %}
+      {% zf_label "State / Province" as l_expat_state %}{% set_label form.expat_state_province l_expat_state %}
+      {% zf_label "City" as l_expat_city %}{% set_label form.expat_city l_expat_city %}
+      {% zf_label "Postal Code" as l_expat_postal %}{% set_label form.expat_postal_code l_expat_postal %}
+      {% zf_label "Full Foreign Address" as l_full_foreign_address %}{% set_label form.full_foreign_address l_full_foreign_address %}
+      {% zf_label "Passport Number" as l_passport_number %}{% set_label form.passport_number l_passport_number %}
+      {% zf_label "Education Type" as l_education_type %}{% set_label form.education_type l_education_type %}
+      {% zf_label "Current Status" as l_education_status %}{% set_label form.education_status l_education_status %}
+      {% zf_label "Institution Name" as l_education_institution %}{% set_label form.education_institution l_education_institution %}
+      {% zf_label "Passing Year" as l_education_passing_year %}{% set_label form.education_passing_year l_education_passing_year %}
+      {% zf_label "Result" as l_education_result %}{% set_label form.education_result l_education_result %}
+      {% zf_label "I am a student" as l_is_student %}{% set_label form.is_student l_is_student %}
+      {% zf_label "Occupation" as l_occupation %}{% set_label form.occupation l_occupation %}
+      {% zf_label "Designation" as l_designation %}{% set_label form.designation l_designation %}
+      {% zf_label "Organization Name" as l_organization %}{% set_label form.organization l_organization %}
+      {% zf_label "Workplace Address" as l_workplace_address %}{% set_label form.workplace_address l_workplace_address %}
+      {% zf_label "Facebook Profile Link" as l_facebook_url %}{% set_label form.facebook_url l_facebook_url %}
+      {% zf_label "Volunteer Experience" as l_volunteer_experience %}{% set_label form.volunteer_experience l_volunteer_experience %}
+      {% zf_label "CV / Resume" as l_cv %}{% set_label form.cv l_cv %}
+      {% zf_label "Date of Birth" as l_date_of_birth %}{% set_label form.date_of_birth l_date_of_birth %}
+
+      {% zf_label "বাংলায় পূর্ণ নাম" as ph_bangla_name %}{% set_placeholder form.bangla_name ph_bangla_name %}
+      {% zf_label "Full Name in English" as ph_english_name %}{% set_placeholder form.english_name ph_english_name %}
+      {% zf_label "বাংলায় পিতার পূর্ণ নাম" as ph_father_name %}{% set_placeholder form.father_name ph_father_name %}
+      {% zf_label "বাংলায় মাতার পূর্ণ নাম" as ph_mother_name %}{% set_placeholder form.mother_name ph_mother_name %}
+      {% zf_label "example@gmail.com" as ph_email %}{% set_placeholder form.email ph_email %}
+      {% zf_label "01XXXXXXXXX" as ph_phone %}{% set_placeholder form.phone ph_phone %}
+      {% zf_label "Name of a close relative or contact" as ph_emergency_name %}{% set_placeholder form.emergency_name ph_emergency_name %}
+      {% zf_label "01XXXXXXXXX" as ph_emergency_phone %}{% set_placeholder form.emergency_phone ph_emergency_phone %}
+      {% zf_label "e.g. Father, Brother, Spouse" as ph_emergency_relation %}{% set_placeholder form.emergency_relation ph_emergency_relation %}
+      {% zf_label "1234567890123" as ph_identity_number %}{% set_placeholder form.identity_number ph_identity_number %}
+      {% zf_label "House/holding no., road, village/moholla" as ph_present_address %}{% set_placeholder form.present_address ph_present_address %}
+      {% zf_label "House/holding no., road, village/moholla" as ph_permanent_address %}{% set_placeholder form.permanent_address ph_permanent_address %}
+      {% zf_label "e.g. Ward No. 5" as ph_present_union %}{% set_placeholder form.present_union ph_present_union %}
+      {% zf_label "e.g. Ward No. 5" as ph_permanent_union %}{% set_placeholder form.permanent_union ph_permanent_union %}
+      {% zf_label "e.g. California" as ph_expat_state %}{% set_placeholder form.expat_state_province ph_expat_state %}
+      {% zf_label "e.g. Los Angeles" as ph_expat_city %}{% set_placeholder form.expat_city ph_expat_city %}
+      {% zf_label "e.g. 90001" as ph_expat_postal %}{% set_placeholder form.expat_postal_code ph_expat_postal %}
+      {% zf_label "Apartment/house, street, city" as ph_full_foreign_address %}{% set_placeholder form.full_foreign_address ph_full_foreign_address %}
+      {% zf_label "AB1234567" as ph_passport_number %}{% set_placeholder form.passport_number ph_passport_number %}
+      {% zf_label "dd/mm/yyyy" as ph_dob %}{% set_placeholder form.date_of_birth ph_dob %}
+      {% zf_label "e.g. Dhaka University" as ph_education_institution %}{% set_placeholder form.education_institution ph_education_institution %}
+      {% zf_label "e.g. 2024" as ph_education_passing_year %}{% set_placeholder form.education_passing_year ph_education_passing_year %}
+      {% zf_label "e.g. GPA 4.80 / First Class" as ph_education_result %}{% set_placeholder form.education_result ph_education_result %}
+      {% zf_label "e.g. Businessman, Service holder" as ph_occupation %}{% set_placeholder form.occupation ph_occupation %}
+      {% zf_label "e.g. Manager" as ph_designation %}{% set_placeholder form.designation ph_designation %}
+      {% zf_label "e.g. ABC Ltd." as ph_organization %}{% set_placeholder form.organization ph_organization %}
+      {% zf_label "Full address of your workplace" as ph_workplace_address %}{% set_placeholder form.workplace_address ph_workplace_address %}
+      {% zf_label "https://facebook.com/your.profile" as ph_facebook_url %}{% set_placeholder form.facebook_url ph_facebook_url %}
+      {% zf_label "Briefly describe any past volunteer work" as ph_volunteer_experience %}{% set_placeholder form.volunteer_experience ph_volunteer_experience %}
+
+      {% comment %}
+      Top validation summary — hidden entirely unless the form was actually
+      submitted and has at least one error (field-level or non-field). The
+      [hidden] attribute is authoritative (see the global fix in
+      static/src/input.css); membership-form.js rebuilds this same list for
+      the AJAX submission path so both flows look identical.
+      {% endcomment %}
+      <div id="form-error-summary" class="alert-danger" role="alert" {% if not form.errors %}hidden{% endif %}>
+        <i class="bi bi-exclamation-triangle-fill text-lg" aria-hidden="true"></i>
+        <div class="min-w-0 flex-1">
+          <p id="form-error-summary-title" class="font-semibold">
+            {% zf_label "Please review and correct the following before submitting:" %}
+          </p>
+          <ul id="form-error-summary-list" class="form-error-summary-list">
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+            {% for bound_field in form %}
+              {% for error in bound_field.errors %}
+              <li><a href="#{{ bound_field.id_for_label }}">{{ bound_field.label }}</a> — {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <script type="application/json" id="education-data">{{ education_data_json|safe }}</script>
+
+      <!-- ===== Personal Information ===== -->
+      <section id="section-personal" class="form-section step-card">
+        <div class="form-section-header">
+          <span class="form-section-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
+          <h2 class="text-h4">{% zf_label "Personal Information" %}</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-grid-full">
+            {% zf_label "Supported: JPG, PNG, WEBP · Max 3MB" as fh_photo %}
+            {% include "members/_field.html" with field=form.photo image=True formats_hint=fh_photo %}
+          </div>
+          {% include "members/_field.html" with field=form.bangla_name %}
+          {% include "members/_field.html" with field=form.english_name %}
+          {% include "members/_field.html" with field=form.father_name %}
+          {% include "members/_field.html" with field=form.mother_name %}
+          {% include "members/_field.html" with field=form.gender %}
+          <div class="form-group">
+            <label class="form-label" for="{{ form.date_of_birth.id_for_label }}">
+              <span class="form-label-text">{{ form.date_of_birth.label }}</span>
+              <span class="form-required" aria-hidden="true">*</span>
+            </label>
+            <div class="field-wrap">
+              {{ form.date_of_birth }}
+              <i class="bi field-wrap-icon validation-icon" data-field-icon aria-hidden="true"></i>
+            </div>
+            <p class="form-hint" data-dob-hint>{% zf_label "Format: dd/mm/yyyy" %}</p>
+            {% for error in form.date_of_birth.errors %}
+            <p class="form-error" role="alert"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% include "members/_field.html" with field=form.blood_group %}
+          {% include "members/_field.html" with field=form.marital_status %}
+          {% include "members/_field.html" with field=form.religion %}
+          {% include "members/_field.html" with field=form.email %}
+          {% include "members/_field.html" with field=form.phone %}
+          <div class="form-grid-full grid grid-cols-1 gap-5 sm:grid-cols-3">
+            {% include "members/_field.html" with field=form.emergency_name %}
+            {% include "members/_field.html" with field=form.emergency_phone %}
+            {% include "members/_field.html" with field=form.emergency_relation %}
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Identity ===== -->
+      <section id="section-identity" class="form-section step-card">
+        <div class="form-section-header">
+          <span class="form-section-icon"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+          <h2 class="text-h4">{% zf_label "Identity" %}</h2>
+        </div>
+        <div class="form-grid">
+          {% include "members/_field.html" with field=form.identity_type %}
+          {% include "members/_field.html" with field=form.identity_number %}
+          <div class="form-grid-full">
+            {% zf_label "Supported: JPG, PNG, WEBP, PDF · Max 3MB" as fh_identity_document %}
+            {% include "members/_field.html" with field=form.identity_document formats_hint=fh_identity_document %}
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Address ===== -->
+      <section id="section-address" class="form-section step-card">
+        <div class="form-section-header">
+          <span class="form-section-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
+          <h2 class="text-h4">{% zf_label "Address" %}</h2>
+        </div>
+
+        <div id="bd-address-fields">
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-light">{% zf_label "Present Address" %}</h3>
+          <div class="form-grid mb-6">
+            {% include "members/_field.html" with field=form.present_division %}
+            {% include "members/_field.html" with field=form.present_district %}
+            {% include "members/_field.html" with field=form.present_upazila %}
+            {% include "members/_field.html" with field=form.present_union %}
+            <div class="form-grid-full">
+              {% include "members/_field.html" with field=form.present_address %}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            {% include "members/_field.html" with field=form.permanent_same_as_present %}
+          </div>
+
+          <div id="permanent-address-fields">
+            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-light">{% zf_label "Permanent Address" %}</h3>
+            <div class="form-grid">
+              {% include "members/_field.html" with field=form.permanent_division %}
+              {% include "members/_field.html" with field=form.permanent_district %}
+              {% include "members/_field.html" with field=form.permanent_upazila %}
+              {% include "members/_field.html" with field=form.permanent_union %}
+              <div class="form-grid-full">
+                {% include "members/_field.html" with field=form.permanent_address %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Expatriates ===== -->
+      <section id="section-expat" class="form-section step-card">
+        <div class="form-section-header">
+          <span class="form-section-icon"><i class="bi bi-airplane" aria-hidden="true"></i></span>
+          <h2 class="text-h4">{% zf_label "Expatriates" %}</h2>
+        </div>
+        <div class="mb-4">
+          {% include "members/_field.html" with field=form.is_expat %}
+        </div>
+        <div id="expat-fields" hidden>
+          <div class="form-grid">
+            {% include "members/_field.html" with field=form.country %}
+            {% include "members/_field.html" with field=form.expat_state_province %}
+            {% include "members/_field.html" with field=form.expat_city %}
+            {% include "members/_field.html" with field=form.expat_postal_code %}
+            {% include "members/_field.html" with field=form.passport_number %}
+            <div class="form-grid-full">
+              {% include "members/_field.html" with field=form.full_foreign_address %}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Education ===== -->
+      <section id="section-education" class="form-section step-card">
+        <div class="form-section-header">
+          <span class="form-section-icon"><i class="bi bi-mortarboard" aria-hidden="true"></i></span>
+          <h2 class="text-h4">{% zf_label "Education" %}</h2>
+        </div>
+        <div class="form-grid">
+          {% include "members/_field.html" with field=form.education_type %}
+          {% include "members/_field.html" with field=form.education_level %}
+          <div id="education-class-field" hidden>
+            {% include "members/_field.html" with field=form.education_class %}
+          </div>
+          {% include "members/_field.html" with field=form.education_status %}
+        </div>
+        <div id="education-detail-fields" class="form-grid mt-5" hidden>
+          {% include "members/_field.html" with field=form.education_institution %}
+          {% include "members/_field.html" with field=form.education_passing_year %}
+          {% include "members/_field.html" with field=form.education_result %}
+        </div>
+      </section>
+
+      <!-- ===== Occupation ===== -->
+      <section id="section-occupation" class="form-section step-card">
+        <div class="form-section-header">
+          <span class="form-section-icon"><i class="bi bi-briefcase" aria-hidden="true"></i></span>
+          <h2 class="text-h4">{% zf_label "Occupation" %}</h2>
+        </div>
+        <div class="mb-4">
+          {% include "members/_field.html" with field=form.is_student %}
+        </div>
+        <div class="form-grid">
+          {% include "members/_field.html" with field=form.occupation %}
+          <div id="workplace-fields" class="contents">
+            {% include "members/_field.html" with field=form.designation %}
+            {% include "members/_field.html" with field=form.organization %}
+            <div class="form-grid-full">
+              {% include "members/_field.html" with field=form.workplace_address %}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Additional Information ===== -->
+      <section id="section-additional" class="form-section step-card">
+        <div class="form-section-header">
+          <span class="form-section-icon"><i class="bi bi-award" aria-hidden="true"></i></span>
+          <h2 class="text-h4">{% zf_label "Additional Information" %}</h2>
+        </div>
+        <div class="form-grid">
+          {% include "members/_field.html" with field=form.facebook_url %}
+          <div class="form-grid-full">
+            {% include "members/_field.html" with field=form.volunteer_experience %}
+          </div>
+          <div class="form-grid-full">
+            {% zf_label "Supported: JPG, PNG, WEBP, PDF · Max 3MB" as fh_cv %}
+            {% include "members/_field.html" with field=form.cv formats_hint=fh_cv %}
+          </div>
+        </div>
+      </section>
+
+      <div class="step-card flex flex-col items-center gap-4 text-center">
+        <p class="text-sm text-ink-light">
+          {% zf_label "By submitting, you confirm the information provided is accurate. Your application will remain pending until reviewed by an administrator." %}
+        </p>
+        <button type="submit" class="btn-primary btn-lg">
+          <i class="bi bi-send-check-fill" aria-hidden="true"></i>{% zf_label "Submit Application" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+<script src="{% static 'js/date-picker.js' %}"></script>
+<script src="{% static 'js/file-upload.js' %}"></script>
+<script src="{% static 'js/bd-address.js' %}" data-base-url="{% static 'data/bd/' %}"></script>
+<script src="{% static 'js/membership-form.js' %}"></script>
+{% endblock %}

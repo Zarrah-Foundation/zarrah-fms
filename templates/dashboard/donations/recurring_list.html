@@ -1,0 +1,71 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Recurring Donations" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Recurring Donations" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "Recurring Donations" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "General monthly donations (not membership AutoPay)." %}</p>
+  </div>
+</div>
+
+{% if not recurring_configured %}
+<div class="alert-warning mb-6">
+  <strong>{% trans "SSLCommerz recurring not configured" %}</strong>
+  <p class="text-sm mt-1">{{ recurring_config_reason }}</p>
+</div>
+{% else %}
+<div class="mb-6 rounded-lg border border-border/60 bg-canvas px-4 py-3 text-sm text-ink-light">
+  {% trans "SSLCommerz recurring: configured (SALT + plan refer present)." %}
+</div>
+{% endif %}
+
+<form method="get" class="mb-6 flex flex-wrap gap-3">
+  <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Search donor…' %}" class="form-input max-w-xs">
+  <select name="status" class="form-input max-w-xs">
+    <option value="">{% trans "All statuses" %}</option>
+    {% for value, label in status_choices %}
+    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="provider" class="form-input max-w-xs">
+    <option value="">{% trans "All providers" %}</option>
+    <option value="SSLCOMMERZ" {% if provider_filter == "SSLCOMMERZ" %}selected{% endif %}>SSLCommerz</option>
+  </select>
+  <button type="submit" class="btn-secondary btn-sm">{% trans "Filter" %}</button>
+</form>
+
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>{% trans "Donor" %}</th>
+        <th>{% trans "Amount" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Provider" %}</th>
+        <th>{% trans "Next billing" %}</th>
+        <th>{% trans "Failures" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in subscriptions %}
+      <tr>
+        <td>{{ s.donor_name }}{% if s.donor_email %}<br><span class="text-xs text-ink-light">{{ s.donor_email }}</span>{% endif %}</td>
+        <td>৳{{ s.amount|floatformat:0 }}</td>
+        <td>{{ s.get_status_display }}</td>
+        <td>{{ s.get_payment_gateway_display }}</td>
+        <td>{% if s.next_billing %}{{ s.next_billing|date:"j M Y" }}{% else %}—{% endif %}</td>
+        <td>{{ s.consecutive_failures }}</td>
+        <td><a href="{% url 'dashboard-recurring-detail' s.pk %}" class="text-primary hover:underline">{% trans "Open" %}</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-ink-light">{% trans "No subscriptions found." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

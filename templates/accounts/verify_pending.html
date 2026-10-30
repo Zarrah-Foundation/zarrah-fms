@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Verify Email" %} - {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-md px-4 py-16 text-center">
+  <div class="card space-y-4">
+    <h1 class="text-2xl font-bold text-primary-dark">{% trans "Check your email" %}</h1>
+    <p class="text-ink-light">
+      {% trans "We sent a verification link to your email address. Please click the link to verify your account before logging in." %}
+    </p>
+    {% if pending_email %}
+    <p class="text-sm font-medium text-ink">{{ pending_email }}</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'verify-resend' %}" class="space-y-3 text-left">
+      {% csrf_token %}
+      <label class="form-label" for="id_email">{% trans "Email" %}</label>
+      <input type="email" name="email" id="id_email" value="{{ pending_email }}" class="form-input" required>
+      <button type="submit" class="btn-secondary w-full">{% trans "Resend verification email" %}</button>
+    </form>
+
+    <a href="{% url 'login' %}" class="btn-primary mt-2 inline-block w-full">{% trans "Go to Login" %}</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% load i18n i18n_extras %}
+<div class="zf-home-heading {% if align == 'left' %}text-left{% else %}mx-auto max-w-2xl text-center{% endif %}">
+  {% if eyebrow %}
+  <p class="zf-home-eyebrow">{{ eyebrow }}</p>
+  {% endif %}
+  <h2 class="zf-home-title">
+    {{ section|bl:"title"|default:fallback_title }}
+  </h2>
+  {% if section.content_en or section.content_bn %}
+    {% if show_content != False %}
+    <p class="zf-home-lead mt-3">
+      {{ section|bl:"content" }}
+    </p>
+    {% endif %}
+  {% elif lead %}
+  <p class="zf-home-lead mt-3">{{ lead }}</p>
+  {% endif %}
+</div>

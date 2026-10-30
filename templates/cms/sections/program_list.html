@@ -1,0 +1,40 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section zf-home-section--muted" aria-labelledby="home-focus-title">
+  <div class="container-app">
+    <div class="zf-home-heading mx-auto mb-10 max-w-2xl text-center">
+      <p class="zf-home-eyebrow">{% zf_label "Areas of Work" %}</p>
+      <h2 id="home-focus-title" class="zf-home-title">
+        {{ section|bl:"title" }}
+      </h2>
+      {% if section.content_en or section.content_bn %}
+      <p class="zf-home-lead mt-3">{{ section|bl:"content" }}</p>
+      {% endif %}
+    </div>
+
+    {% if home_focus_areas %}
+    <ul class="zf-focus-grid">
+      {% for area in home_focus_areas %}
+      <li class="zf-focus-card">
+        <div class="zf-focus-card__icon" aria-hidden="true">
+          <i class="bi {{ area.icon|default:'bi-heart' }}"></i>
+        </div>
+        <h3 class="zf-focus-card__title">{{ area|bl:"title" }}</h3>
+        <p class="zf-focus-card__text">{{ area|bl:"text" }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if section.button_link %}
+    <div class="mt-10 text-center">
+      <a href="{{ section.button_link }}" class="btn-secondary">
+        {% if section.button_text_en or section.button_text_bn %}
+          {{ section|bl:"button_text" }}
+        {% else %}
+          {% trans "Learn more" %}
+        {% endif %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>

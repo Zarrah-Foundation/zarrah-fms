@@ -1,0 +1,57 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section zf-home-section--muted" aria-labelledby="home-news-title">
+  <div class="container-app">
+    <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+      <div class="zf-home-heading max-w-xl text-left">
+        <p class="zf-home-eyebrow">{% trans "News" %}</p>
+        <h2 id="home-news-title" class="zf-home-title text-left">
+          {{ section|bl:"title" }}
+        </h2>
+        {% if section.content_en or section.content_bn %}
+        <p class="zf-home-lead mt-3 text-left">{{ section|bl:"content" }}</p>
+        {% endif %}
+      </div>
+      <a href="{% url 'news' %}" class="btn-secondary btn-sm shrink-0">
+        {% if section.button_text_en or section.button_text_bn %}
+          {{ section|bl:"button_text" }}
+        {% else %}
+          {% trans "View All News" %}
+        {% endif %}
+      </a>
+    </div>
+
+    {% if home_news %}
+    <div class="zf-news-grid">
+      {% for article in home_news %}
+      <article class="zf-news-card">
+        {% if article.featured_image %}
+        <a href="{% url 'news-detail' article.slug %}" class="zf-news-card__media" tabindex="-1" aria-hidden="true">
+          <img src="{{ article.featured_image.url }}" alt="" loading="lazy" width="640" height="400">
+        </a>
+        {% endif %}
+        <div class="zf-news-card__body">
+          <p class="zf-news-card__meta">
+            {% if article.published_at %}{{ article.published_at|date:"j M Y" }}{% endif %}
+            {% if article.category %}
+              {% if article.published_at %}<span aria-hidden="true"> · </span>{% endif %}
+              {{ article.category|bl:"name" }}
+            {% endif %}
+          </p>
+          <h3 class="zf-news-card__title">
+            <a href="{% url 'news-detail' article.slug %}">{{ article|bl:"title" }}</a>
+          </h3>
+          {% with excerpt=article|bl:"excerpt" %}
+          {% if excerpt %}
+          <p class="zf-news-card__excerpt">{{ excerpt|truncatewords:28 }}</p>
+          {% endif %}
+          {% endwith %}
+          <a href="{% url 'news-detail' article.slug %}" class="zf-news-card__more">
+            {% trans "Read More" %} <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>

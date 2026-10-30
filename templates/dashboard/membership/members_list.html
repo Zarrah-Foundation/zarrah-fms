@@ -1,0 +1,69 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{% trans "Members" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Members" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-people mr-2 text-primary"></i>{% trans "Members" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{{ page_obj.paginator.count }} {% trans "members" %}</p>
+  </div>
+  {% if can_create %}
+  <a href="{% url 'dashboard-member-create' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Add Member" %}</a>
+  {% endif %}
+</div>
+
+<form method="get" class="dash-toolbar">
+  <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Search by name, ID, phone, email…' %}" class="dash-search">
+  <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "All statuses" %}</option>
+    {% for code, label in status_choices %}
+    <option value="{{ code }}" {% if status == code %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-search"></i>{% trans "Search" %}</button>
+  {% if q or status %}<a href="?" class="btn-ghost btn-sm">{% trans "Clear" %}</a>{% endif %}
+</form>
+
+{% if members %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Member ID" %}</th>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Phone" %}</th>
+        <th>{% trans "Type" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Joined" %}</th>
+        <th class="text-right">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td><a href="{% url 'dashboard-member-detail' m.pk %}" class="font-semibold text-primary hover:underline" lang="en">{{ m.member_id }}</a></td>
+        <td>{{ m.first_name }} {{ m.last_name }}</td>
+        <td lang="en">{{ m.phone }}</td>
+        <td>{{ m.membership_type.name_en|default:"—" }}</td>
+        <td>{% status_badge m.status m.get_status_display %}</td>
+        <td>{{ m.joined_at|date:"M d, Y"|default:"—" }}</td>
+        <td class="text-right">
+          <div class="inline-flex items-center gap-1">
+            <a href="{% url 'dashboard-member-detail' m.pk %}" class="dash-icon-btn" title="{% trans 'View' %}"><i class="bi bi-eye"></i></a>
+            {% if can_edit %}<a href="{% url 'dashboard-member-edit' m.pk %}" class="dash-icon-btn" title="{% trans 'Edit' %}"><i class="bi bi-pencil"></i></a>{% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No members found" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-people" title=empty_title %}
+{% endif %}
+{% endblock %}

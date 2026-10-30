@@ -1,0 +1,20 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Transactions" %}{% endblock %}
+{% block topbar_title %}{% trans "Transactions" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><h1 class="dash-page-title">{% trans "Transactions" %}</h1></div>
+<form method="get" class="mb-4 flex flex-wrap gap-2">
+  <input class="form-input max-w-xs" name="q" value="{{ q }}" placeholder="{% trans 'Search…' %}">
+  <select name="status" class="form-input max-w-xs"><option value="">{% trans "All statuses" %}</option>{% for v,l in status_choices %}<option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+  <select name="purpose" class="form-input max-w-xs"><option value="">{% trans "All purposes" %}</option><option value="DONATION" {% if purpose == "DONATION" %}selected{% endif %}>Donation</option><option value="MEMBERSHIP_FEE" {% if purpose == "MEMBERSHIP_FEE" %}selected{% endif %}>Membership fee</option><option value="MEMBERSHIP_REG" {% if purpose == "MEMBERSHIP_REG" %}selected{% endif %}>Registration</option></select>
+  <button class="btn-secondary btn-sm">{% trans "Filter" %}</button>
+</form>
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+<table class="dash-table"><thead><tr><th>{% trans "Date" %}</th><th>{% trans "Tran ID" %}</th><th>{% trans "Purpose" %}</th><th>{% trans "Gateway" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th><th></th></tr></thead>
+<tbody>{% for t in transactions %}<tr>
+<td>{{ t.created_at|date:"j M Y H:i" }}</td><td class="text-xs">{{ t.tran_id }}</td><td>{{ t.get_purpose_display }}</td><td>{{ t.gateway }}</td><td>৳{{ t.amount|floatformat:0 }}</td><td>{{ t.get_status_display }}</td>
+<td><a class="text-primary hover:underline" href="{% url 'dashboard-payments-transaction-detail' t.pk %}">{% trans "Open" %}</a></td>
+</tr>{% empty %}<tr><td colspan="7">{% trans "No transactions." %}</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}

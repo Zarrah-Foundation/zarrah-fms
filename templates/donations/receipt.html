@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Donation Receipt" %} {{ receipt_number }} - {{ foundation_name }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  @media print {
+    header, footer, .no-print, .messages, nav, #main-content > .container-app:first-child { display: none !important; }
+    body { background: white !important; }
+    .receipt-sheet { box-shadow: none !important; border: none !important; margin: 0 !important; max-width: none !important; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section container-app">
+  <div class="no-print mb-6 flex flex-wrap items-center gap-3">
+    <a href="{% url 'donation-receipt-pdf' donation.pk %}" class="btn-primary">
+        <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>{% zf_label "Download PDF" %}
+    </a>
+    <button type="button" onclick="window.print()" class="btn-secondary">
+        <i class="bi bi-printer" aria-hidden="true"></i>{% zf_label "Print" %}
+    </button>
+    {% if donation.donor_email %}
+    <form method="post" action="{% url 'donation-receipt-email' donation.pk %}" class="inline">
+      {% csrf_token %}
+      <button type="submit" class="btn-secondary">
+        <i class="bi bi-envelope" aria-hidden="true"></i>{% zf_label "Email Receipt" %}
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+  <article class="receipt-sheet card mx-auto max-w-2xl">
+    <header class="mb-6 flex flex-wrap items-center gap-4 border-b border-border pb-5">
+      {% if site_settings.site_logo %}
+      <img src="{{ site_settings.site_logo.url }}" alt="" class="h-14 w-auto object-contain">
+      {% endif %}
+      <div>
+        <h1 class="text-h3 text-primary-dark">{{ foundation_name }}</h1>
+        {% if foundation_name_bn and foundation_name_bn != foundation_name %}
+        <p class="text-sm text-ink-light">{{ foundation_name_bn }}</p>
+        {% endif %}
+        <p class="mt-1 text-sm font-semibold text-primary">{% zf_label "Donation Receipt" %}</p>
+      </div>
+    </header>
+
+    <dl class="grid gap-3 text-sm sm:grid-cols-2">
+      <div>
+        <dt class="text-ink-light">{% zf_label "Receipt Number" %}</dt>
+        <dd class="font-semibold text-ink">{{ receipt_number }}</dd>
+      </div>
+      <div>
+        <dt class="text-ink-light">{% zf_label "Transaction ID" %}</dt>
+        <dd class="font-semibold text-ink">{{ transaction_id }}</dd>
+      </div>
+      <div>
+        <dt class="text-ink-light">{% zf_label "Date" %}</dt>
+        <dd class="font-semibold text-ink">{{ donation_date|date:"d M Y, H:i" }}</dd>
+      </div>
+      <div>
+        <dt class="text-ink-light">{% zf_label "Payment Method" %}</dt>
+        <dd class="font-semibold text-ink">{{ payment_method }}</dd>
+      </div>
+      <div>
+        <dt class="text-ink-light">{% zf_label "Donor Name" %}</dt>
+        <dd class="font-semibold text-ink">{{ donor_name }}</dd>
+      </div>
+      {% if on_behalf_of %}
+      <div>
+        <dt class="text-ink-light">{% zf_label "On Behalf Of" %}</dt>
+        <dd class="font-semibold text-ink">{{ on_behalf_of }}</dd>
+      </div>
+      {% endif %}
+      <div>
+        <dt class="text-ink-light">{% zf_label "Donation Category" %}</dt>
+        <dd class="font-semibold text-ink">{{ category_name }}</dd>
+      </div>
+      <div>
+        <dt class="text-ink-light">{% zf_label "Donation Amount" %}</dt>
+        <dd class="text-lg font-bold text-primary-dark">{{ amount|floatformat:0 }} {{ currency }}</dd>
+      </div>
+    </dl>
+
+    {% if address or primary_email or primary_phone %}
+    <footer class="mt-8 border-t border-border pt-4 text-xs text-ink-light">
+      {% if address %}<p>{{ address|linebreaksbr }}</p>{% endif %}
+      <p class="mt-1">
+        {% if primary_email %}{{ primary_email }}{% endif %}
+        {% if primary_email and primary_phone %} · {% endif %}
+        {% if primary_phone %}{{ primary_phone }}{% endif %}
+      </p>
+    </footer>
+    {% endif %}
+  </article>
+</section>
+{% endblock %}

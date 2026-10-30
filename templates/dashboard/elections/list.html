@@ -1,0 +1,53 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Elections" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Elections" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-ui-checks-grid"></i> {% trans "Elections" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Manage elections, turnout and published results." %}</p>
+  </div>
+  {% if can_create %}
+  <a href="{% url 'dashboard-election-create' %}" class="btn-primary"><i class="bi bi-plus-lg"></i>{% trans "New election" %}</a>
+  {% endif %}
+</div>
+
+<div class="card-flat overflow-x-auto">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>{% trans "Title" %}</th>
+        <th>{% trans "Type" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Window" %}</th>
+        <th>{% trans "Seats" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in elections %}
+      <tr>
+        <td class="font-medium">{{ e.title_en }}</td>
+        <td>{{ e.get_election_type_display }}</td>
+        <td>{{ e.get_status_display }}</td>
+        <td class="text-sm text-ink-light">
+          {% if e.start_at %}{{ e.start_at|date:"Y-m-d H:i" }}{% else %}—{% endif %}
+          →
+          {% if e.end_at %}{{ e.end_at|date:"Y-m-d H:i" }}{% else %}—{% endif %}
+        </td>
+        <td>{{ e.total_seats }}</td>
+        <td class="text-right">
+          <a href="{% url 'dashboard-election-detail' e.pk %}" class="btn-ghost btn-sm">{% trans "Open" %}</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-ink-light">{% trans "No elections yet." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" with page_obj=page_obj %}
+{% endblock %}

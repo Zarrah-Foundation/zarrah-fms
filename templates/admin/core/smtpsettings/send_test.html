@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Send Test Email" %}</h1>
+<p>
+  {% if smtp.is_active %}
+  {% blocktrans with host=smtp.host %}Using active SMTP settings ({{ host }}).{% endblocktrans %}
+  {% else %}
+  {% trans "SMTP settings are inactive — Django will fall back to SMTP_* values from .env." %}
+  {% endif %}
+</p>
+<form method="post">
+  {% csrf_token %}
+  <div>
+    <label for="id_to_email">{% trans "Recipient email" %}</label>
+    <input type="email" name="to_email" id="id_to_email" value="{{ default_to }}" required>
+  </div>
+  <div style="margin-top: 1rem;">
+    <input type="submit" class="default" value="{% trans 'Send Test Email' %}">
+    <a href="{% url 'admin:core_smtpsettings_change' smtp.pk %}" class="button cancel-link">{% trans "Cancel" %}</a>
+  </div>
+</form>
+{% endblock %}

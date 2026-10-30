@@ -1,0 +1,18 @@
+{% comment %}
+Bilingual section heading for major Constitution sections.
+Params: title_bn, title_en, eyebrow (optional), id (for aria)
+{% endcomment %}
+<header class="constitution-section-header">
+  {% if eyebrow %}<p class="constitution-part-label">{{ eyebrow }}</p>{% endif %}
+  <h2 {% if heading_id %}id="{{ heading_id }}"{% endif %} class="constitution-section-title">
+    <span lang="bn" class="block">{{ title_bn }}</span>
+    <span lang="en" class="constitution-section-title-en">{{ title_en }}</span>
+  </h2>
+  {% if note_bn or note_en %}
+  <p class="constitution-section-note">
+    {% if note_bn %}<span lang="bn">{{ note_bn }}</span>{% endif %}
+    {% if note_bn and note_en %}<span class="constitution-dot" aria-hidden="true">·</span>{% endif %}
+    {% if note_en %}<span lang="en">{{ note_en }}</span>{% endif %}
+  </p>
+  {% endif %}
+</header>

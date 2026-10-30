@@ -1,0 +1,56 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{{ resolution.resolution_id }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Resolution" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{{ resolution.title_en|default:resolution.title_bn }}</h1>
+    <p class="text-sm text-ink-light">
+      {{ resolution.resolution_id }} · {{ resolution.get_status_display }}
+      {% if version %}· {% trans "Version" %} {{ version.version_number }}{% endif %}
+    </p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    {% if can_download and version %}
+    <a href="{% url 'my-resolution-pdf' resolution.pk %}" class="btn-secondary">{% trans "PDF" %}</a>
+    <a href="{% url 'my-resolution-docx' resolution.pk %}" class="btn-secondary">{% trans "Word" %}</a>
+    {% endif %}
+    {% if can_sign %}
+    <a href="{% url 'my-resolution-sign' resolution.pk %}" class="btn-primary">{% trans "Approve &amp; Sign" %}</a>
+    {% elif not has_signature and signer and not signer.signed_at %}
+    <a href="{% url 'my-signature' %}" class="btn-secondary">{% trans "Upload signature to sign" %}</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if version %}
+<div class="card-flat prose max-w-none">
+  {{ version.content_bn|safe }}
+  {% if version.content_en %}
+  <h2 class="mt-6 text-h4">{% trans "English" %}</h2>
+  {{ version.content_en|safe }}
+  {% endif %}
+  {% if version.decision_bn or version.decision_en %}
+  <h2 class="mt-6 text-h4">{% trans "Decision" %}</h2>
+  {{ version.decision_bn|default:version.decision_en|safe }}
+  {% endif %}
+</div>
+{% endif %}
+
+{% if signer %}
+<div class="card-flat mt-6 text-sm">
+  <p>
+    {% if signer.signed_at %}
+    {% trans "You signed on" %} {{ signer.signed_at|date:"d M Y, H:i" }}
+    {% else %}
+    {% trans "Your signature is pending on this version." %}
+    {% endif %}
+  </p>
+</div>
+{% endif %}
+
+<p class="mt-4"><a href="{% url 'my-resolutions' %}" class="btn-ghost">{% trans "Back to list" %}</a></p>
+{% endblock %}

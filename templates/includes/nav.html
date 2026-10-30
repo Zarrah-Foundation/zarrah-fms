@@ -1,0 +1,96 @@
+{% load i18n i18n_extras %}
+<header class="site-header">
+  <div class="site-header-inner">
+    {% include "includes/_brand_mark.html" %}
+
+    <nav aria-label="{% zf_label 'Primary navigation' %}" class="hidden items-center gap-7 lg:flex">
+      <a href="{% url 'about' %}" class="nav-link{% if request.resolver_match.url_name == 'about' or request.resolver_match.url_name == 'leadership' or request.resolver_match.url_name == 'mission-vision' %} nav-link-active{% endif %}">{% zf_label "About" %}</a>
+      <a href="{% url 'objectives' %}" class="nav-link{% if request.resolver_match.url_name == 'objectives' %} nav-link-active{% endif %}">{% zf_label "Objectives" %}</a>
+      <a href="{% url 'transparency' %}" class="nav-link{% if request.resolver_match.url_name == 'transparency' %} nav-link-active{% endif %}">{% zf_label "Transparency" %}</a>
+      <a href="{% url 'membership' %}" class="nav-link{% if request.resolver_match.url_name == 'membership' or request.resolver_match.url_name == 'membership-apply' %} nav-link-active{% endif %}">{% zf_label "Membership" %}</a>
+      <a href="https://skills.zarrah.org/" class="nav-link" target="_blank" rel="noopener noreferrer">{% zf_label "Zarrah Skills" %}<span class="sr-only">{% zf_label "(opens in a new tab)" %}</span></a>
+      <a href="{% url 'news' %}" class="nav-link{% if request.resolver_match.url_name == 'news' or request.resolver_match.url_name == 'news-detail' %} nav-link-active{% endif %}">{% zf_label "News" %}</a>
+      <a href="{% url 'reports' %}" class="nav-link{% if request.resolver_match.url_name == 'reports' %} nav-link-active{% endif %}">{% zf_label "Reports" %}</a>
+      <a href="{% url 'contact' %}" class="nav-link{% if request.resolver_match.url_name == 'contact' %} nav-link-active{% endif %}">{% zf_label "Contact" %}</a>
+    </nav>
+
+    <div class="hidden items-center gap-3 lg:flex">
+      {% include "includes/_language_switch.html" with size="sm" %}
+
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="nav-link">
+          <i class="bi bi-speedometer2 mr-1" aria-hidden="true"></i>{% zf_label "My Account" %}
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-link">{% zf_label "Login" %}</a>
+      {% endif %}
+      <a href="{% url 'donation' %}" class="btn-primary btn-sm">
+        <i class="bi bi-heart-fill" aria-hidden="true"></i>{% zf_label "Donate" %}
+      </a>
+    </div>
+
+    <button type="button" id="drawer-open-btn" class="btn-ghost btn-sm lg:hidden" aria-label="{% zf_label 'Open menu' %}" aria-haspopup="dialog" aria-controls="mobile-drawer" aria-expanded="false">
+      <i class="bi bi-list text-2xl" aria-hidden="true"></i>
+    </button>
+  </div>
+</header>
+
+<div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+
+<aside id="mobile-drawer" class="drawer-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="{% zf_label 'Main menu' %}" tabindex="-1">
+  <div class="drawer-header">
+    {% include "includes/_brand_mark.html" with wrapper_class="flex items-center gap-2.5" img_class="h-8 w-auto" icon_wrap_class="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-soft-sm" icon_class="text-base" text_class="text-base font-extrabold leading-tight text-primary-dark" %}
+    <button type="button" id="drawer-close-btn" class="drawer-close-btn" aria-label="{% zf_label 'Close menu' %}">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <nav aria-label="{% zf_label 'Mobile navigation' %}" class="drawer-nav">
+    <a href="{% url 'home' %}" class="drawer-link{% if request.resolver_match.url_name == 'home' %} drawer-link-active{% endif %}">
+      <i class="bi bi-house-door" aria-hidden="true"></i>{% zf_label "Home" %}
+    </a>
+    <a href="{% url 'about' %}" class="drawer-link{% if request.resolver_match.url_name == 'about' %} drawer-link-active{% endif %}">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>{% zf_label "About" %}
+    </a>
+    <a href="{% url 'objectives' %}" class="drawer-link{% if request.resolver_match.url_name == 'objectives' %} drawer-link-active{% endif %}">
+      <i class="bi bi-list-check" aria-hidden="true"></i>{% zf_label "Objectives" %}
+    </a>
+    <a href="{% url 'transparency' %}" class="drawer-link{% if request.resolver_match.url_name == 'transparency' %} drawer-link-active{% endif %}">
+      <i class="bi bi-eye" aria-hidden="true"></i>{% zf_label "Transparency" %}
+    </a>
+    <a href="{% url 'membership' %}" class="drawer-link{% if request.resolver_match.url_name == 'membership' or request.resolver_match.url_name == 'membership-apply' %} drawer-link-active{% endif %}">
+      <i class="bi bi-people" aria-hidden="true"></i>{% zf_label "Membership" %}
+    </a>
+    <a href="https://skills.zarrah.org/" class="drawer-link" target="_blank" rel="noopener noreferrer">
+      <i class="bi bi-mortarboard" aria-hidden="true"></i>{% zf_label "Zarrah Skills" %}
+      <span class="sr-only">{% zf_label "(opens in a new tab)" %}</span>
+    </a>
+    <a href="{% url 'donation' %}" class="drawer-link{% if request.resolver_match.url_name == 'donation' %} drawer-link-active{% endif %}">
+      <i class="bi bi-heart" aria-hidden="true"></i>{% zf_label "Donate" %}
+    </a>
+    <a href="{% url 'news' %}" class="drawer-link{% if request.resolver_match.url_name == 'news' or request.resolver_match.url_name == 'news-detail' %} drawer-link-active{% endif %}">
+      <i class="bi bi-newspaper" aria-hidden="true"></i>{% zf_label "News" %}
+    </a>
+    <a href="{% url 'reports' %}" class="drawer-link{% if request.resolver_match.url_name == 'reports' %} drawer-link-active{% endif %}">
+      <i class="bi bi-file-earmark-text" aria-hidden="true"></i>{% zf_label "Reports" %}
+    </a>
+    <a href="{% url 'contact' %}" class="drawer-link{% if request.resolver_match.url_name == 'contact' %} drawer-link-active{% endif %}">
+      <i class="bi bi-envelope" aria-hidden="true"></i>{% zf_label "Contact" %}
+    </a>
+  </nav>
+
+  <div class="drawer-footer">
+    {% include "includes/_language_switch.html" %}
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="btn-primary w-full">
+        <i class="bi bi-speedometer2" aria-hidden="true"></i>{% zf_label "My Account" %}
+      </a>
+    {% else %}
+      <a href="{% url 'donation' %}" class="btn-primary w-full">
+        <i class="bi bi-heart-fill" aria-hidden="true"></i>{% zf_label "Donate" %}
+      </a>
+      <a href="{% url 'login' %}" class="btn-secondary w-full">{% zf_label "Login" %}</a>
+    {% endif %}
+  </div>
+</aside>

@@ -1,0 +1,22 @@
+{% comment %}
+Reusable button/link.
+Usage:
+  {% include "includes/ui/buttons/_btn.html" with href=url_value text="Donate Now" icon="bi-heart-fill" variant="accent" size="lg" %}
+Params:
+  href      - if set, renders <a>; otherwise renders <button type="submit">
+  text      - visible label (required)
+  icon      - Bootstrap Icons class, e.g. "bi-heart-fill" (optional)
+  variant   - primary | secondary | accent | white | outline-white | ghost (default: primary)
+  size      - sm | base | lg (default: base)
+  new_tab   - True to open link in a new tab
+  extra_class - additional utility classes
+  aria_label  - overrides the accessible name (defaults to text)
+{% endcomment %}
+{% with btn_variant=variant|default:"primary" btn_size=size|default:"base" %}
+<{% if href %}a href="{{ href }}"{% if new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}{% else %}button type="{{ type|default:'submit' }}"{% endif %}
+  class="btn-{{ btn_variant }}{% if btn_size == 'sm' %} btn-sm{% elif btn_size == 'lg' %} btn-lg{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}>
+  {% if icon %}<i class="bi {{ icon }}" aria-hidden="true"></i>{% endif %}
+  <span>{{ text }}</span>
+</{% if href %}a{% else %}button{% endif %}>
+{% endwith %}

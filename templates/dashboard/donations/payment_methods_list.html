@@ -1,0 +1,101 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment Methods" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Payment Methods" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-credit-card mr-2 text-primary"></i>{% trans "Payment Methods" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Enable channels, set purpose availability, and configure SSLCommerz without exposing secrets. Passwords are never shown after save." %}</p>
+  </div>
+  {% if can_create %}
+  <a href="{% url 'dashboard-payment-method-create' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Add" %}</a>
+  {% endif %}
+</div>
+
+{% if hosted_cards %}
+<div class="alert-info mb-4">
+  <i class="bi bi-info-circle"></i>
+  <span>
+    {% for ch in hosted_cards %}
+      {{ ch.label }} — {% trans "not a direct adapter" %}; {% trans "available via SSLCommerz hosted checkout when the merchant store enables cards." %}
+    {% endfor %}
+  </span>
+</div>
+{% endif %}
+
+{% if method_rows %}
+<div class="space-y-4">
+  {% for row in method_rows %}
+  <article class="rounded-card border border-border/60 bg-surface p-5">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold text-ink">{{ row.config.display_name|default:row.config.get_method_display }}</h2>
+        <p class="text-xs text-ink-light" lang="en">{{ row.config.method }}</p>
+        {% if not row.cap.implemented %}
+        <p class="mt-2 text-sm font-medium text-warning">{% trans "Status: Not implemented" %}</p>
+        {% endif %}
+      </div>
+      <div class="relative z-10 flex flex-wrap gap-2">
+        {% if can_edit %}
+          {% if row.config.method == "SSLCOMMERZ" or row.config.method == "BKASH" or row.config.method == "NAGAD" %}
+        <a href="{% url 'dashboard-payment-method-configure' row.config.pk %}"
+           class="btn-primary btn-sm relative z-10">
+          <i class="bi bi-key" aria-hidden="true"></i>{% trans "Configure" %}
+        </a>
+          {% endif %}
+        {% endif %}
+        {% if can_edit %}
+        <a href="{% url 'dashboard-payment-method-edit' row.config.pk %}" class="btn-secondary btn-sm">
+          <i class="bi bi-pencil" aria-hidden="true"></i>{% trans "Edit" %}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <dl class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-ink-light">{% trans "Gateway" %}</dt>
+        <dd class="font-medium">{% if row.config.is_enabled %}{% trans "Enabled" %}{% else %}{% trans "Disabled" %}{% endif %}</dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-ink-light">{% trans "Donations" %}</dt>
+        <dd class="font-medium">{% if row.config.enabled_for_donation %}{% trans "ON" %}{% else %}{% trans "OFF" %}{% endif %}</dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-ink-light">{% trans "Membership fees" %}</dt>
+        <dd class="font-medium">{% if row.config.enabled_for_membership_fee %}{% trans "ON" %}{% else %}{% trans "OFF" %}{% endif %}</dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wide text-ink-light">{% trans "Credentials" %}</dt>
+        <dd class="font-medium" lang="en">
+          {% if row.config.method == "SSLCOMMERZ" %}
+            {% if row.cap.credentials.configured %}{% trans "Configured" %}{% else %}{% trans "Missing" %}{% endif %}
+            · {% if row.cap.credentials.is_sandbox %}{% trans "Sandbox" %}{% else %}{% trans "Production" %}{% endif %}
+          {% elif not row.cap.implemented %}
+            {% trans "Not implemented" %}
+          {% else %}
+            {{ row.cap.credentials.status }}
+          {% endif %}
+        </dd>
+      </div>
+    </dl>
+    {% if row.cap.label_note %}
+    <p class="mt-3 text-xs text-ink-light">{{ row.cap.label_note }}</p>
+    {% endif %}
+    {% if row.config.method == "SSLCOMMERZ" and row.cap.credentials.last_test_status %}
+    <p class="mt-2 text-xs text-ink-light">
+      {% trans "Last test" %}: <span lang="en">{{ row.cap.credentials.last_test_status }}</span>
+      {% if row.cap.credentials.last_tested_at %} · {{ row.cap.credentials.last_tested_at }}{% endif %}
+    </p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+{% trans "No payment methods configured" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-credit-card" title=empty_title %}
+{% endif %}
+{% endblock %}

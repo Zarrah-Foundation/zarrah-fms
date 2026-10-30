@@ -1,0 +1,72 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Membership Fee Settings" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Membership Fee Settings" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <p class="text-sm text-ink-light">
+      <a href="{% url 'dashboard-membership-fees' %}" class="text-primary hover:underline">{% trans "Membership Fees" %}</a>
+      <span class="mx-1">/</span>{% trans "Settings" %}
+    </p>
+    <h1 class="dash-page-title mt-1">{% trans "Membership Fee Settings" %}</h1>
+    <p class="mt-1 max-w-2xl text-sm text-ink-light">
+      {% trans "Existing members become liable for monthly fees from the configured starting month. New members become liable from the month their membership is approved." %}
+    </p>
+  </div>
+</div>
+
+<form method="post" class="card-flat max-w-2xl space-y-5 p-6">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div>
+    <label class="form-label" for="{{ form.monthly_fee_amount.id_for_label }}">{% trans "Monthly Fee" %}</label>
+    <div class="relative">
+      <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-light">৳</span>
+      <input type="number" name="{{ form.monthly_fee_amount.name }}" id="{{ form.monthly_fee_amount.id_for_label }}"
+             value="{{ form.monthly_fee_amount.value }}" step="0.01" min="0"
+             class="form-input pl-8" {% if not can_edit %}disabled{% endif %}>
+    </div>
+    {% if form.monthly_fee_amount.help_text %}<p class="form-help">{{ form.monthly_fee_amount.help_text }}</p>{% endif %}
+    {{ form.monthly_fee_amount.errors }}
+  </div>
+
+  <div>
+    <label class="form-label" for="{{ form.fee_starting_month.id_for_label }}">{% trans "Fee Starting Month" %}</label>
+    {{ form.fee_starting_month }}
+    {% if form.fee_starting_month.help_text %}<p class="form-help">{{ form.fee_starting_month.help_text }}</p>{% endif %}
+    {{ form.fee_starting_month.errors }}
+  </div>
+
+  <div>
+    <label class="form-label" for="{{ form.registration_fee_amount.id_for_label }}">{% trans "Registration Fee" %}</label>
+    <div class="relative">
+      <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-light">৳</span>
+      <input type="number" name="{{ form.registration_fee_amount.name }}" id="{{ form.registration_fee_amount.id_for_label }}"
+             value="{{ form.registration_fee_amount.value }}" step="0.01" min="0"
+             class="form-input pl-8" {% if not can_edit %}disabled{% endif %}>
+    </div>
+    {% if form.registration_fee_amount.help_text %}<p class="form-help">{{ form.registration_fee_amount.help_text }}</p>{% endif %}
+    {{ form.registration_fee_amount.errors }}
+  </div>
+
+  <div class="flex items-center gap-2">
+    {{ form.is_active }}
+    <label for="{{ form.is_active.id_for_label }}" class="text-sm">{% trans "Active configuration" %}</label>
+  </div>
+
+  <div>
+    <label class="form-label" for="{{ form.admin_note.id_for_label }}">{% trans "Admin note" %}</label>
+    {{ form.admin_note }}
+  </div>
+
+  {% if can_edit %}
+  <button type="submit" class="btn-primary"><i class="bi bi-check2"></i>{% trans "Save Settings" %}</button>
+  {% endif %}
+</form>
+{% endblock %}

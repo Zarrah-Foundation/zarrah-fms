@@ -1,0 +1,24 @@
+{% load i18n %}
+{% comment %}Renders a single bound form field with label, control, errors and
+help text, styled with the design system. Params: field (required),
+wrap_class (optional extra classes for the wrapper).{% endcomment %}
+{% if field.field.widget.input_type == "checkbox" %}
+<div class="form-group form-group-checkbox {{ wrap_class }}">
+  <label class="form-checkbox-label">
+    {{ field }}
+    <span>{{ field.label }}</span>
+  </label>
+  {% if field.help_text %}<p class="form-hint">{{ field.help_text|safe }}</p>{% endif %}
+  {% for error in field.errors %}<p class="form-error"><i class="bi bi-exclamation-circle"></i>{{ error }}</p>{% endfor %}
+</div>
+{% else %}
+<div class="form-group {{ wrap_class }}">
+  <label class="form-label" for="{{ field.id_for_label }}">
+    <span class="form-label-text">{{ field.label }}</span>
+    {% if field.field.required %}<span class="form-required">*</span>{% endif %}
+  </label>
+  {{ field }}
+  {% if field.help_text %}<p class="form-hint">{{ field.help_text|safe }}</p>{% endif %}
+  {% for error in field.errors %}<p class="form-error"><i class="bi bi-exclamation-circle"></i>{{ error }}</p>{% endfor %}
+</div>
+{% endif %}

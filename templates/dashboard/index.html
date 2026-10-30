@@ -1,0 +1,171 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n static fee_extras %}
+
+{% block title %}{% trans "Dashboard" %} - {% trans "Zarrah Foundation" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 class="text-h3">{% trans "Dashboard" %}</h1>
+    <p class="text-ink-light">{% trans "Welcome back" %}, {{ user.name|default:user.email }}</p>
+  </div>
+  {% if notifications_unread_count %}
+  <span class="badge-warning">
+    <i class="bi bi-bell-fill" aria-hidden="true"></i>{{ notifications_unread_count }} {% trans "new notifications" %}
+  </span>
+  {% endif %}
+</div>
+
+{% if is_admin or is_finance %}
+<div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+  <div class="card">
+    <p class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% trans "Total Members" %}</p>
+    <p class="mt-2 text-2xl font-bold text-primary-dark">{{ total_members }}</p>
+  </div>
+  <div class="card">
+    <p class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% trans "Pending Applications" %}</p>
+    <p class="mt-2 text-2xl font-bold text-warning">{{ pending_applications }}</p>
+    <a href="{% url 'dashboard-applications' %}" class="mt-1 inline-block text-sm font-medium text-primary hover:underline">{% trans "Review" %} &rarr;</a>
+  </div>
+  <div class="card">
+    <p class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% trans "Donations" %}</p>
+    <p class="mt-2 text-2xl font-bold text-accent">{{ total_donations }}</p>
+  </div>
+  <div class="card">
+    <p class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% trans "Total Income" %}</p>
+    <p class="mt-2 text-2xl font-bold text-success">{{ total_income|floatformat:0 }} <span class="text-sm font-medium">BDT</span></p>
+  </div>
+  <div class="card">
+    <p class="text-xs font-semibold uppercase tracking-wide text-ink-light">{% trans "Total Expenses" %}</p>
+    <p class="mt-2 text-2xl font-bold text-danger">{{ total_expense|floatformat:0 }} <span class="text-sm font-medium">BDT</span></p>
+  </div>
+</div>
+
+<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card">
+    <h2 class="mb-4 text-h4">{% trans "Income vs Expense" %}</h2>
+    <div class="h-64">
+      <canvas id="finance-chart"
+        data-labels="{{ finance_chart_labels }}"
+        data-income="{{ finance_chart_income }}"
+        data-expense="{{ finance_chart_expense }}"
+        data-income-label="{% trans 'Income' %}"
+        data-expense-label="{% trans 'Expense' %}"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <h2 class="mb-4 text-h4">{% trans "Donation Trends" %}</h2>
+    <div class="h-64">
+      <canvas id="donation-trend-chart"
+        data-labels="{{ donation_trend_labels }}"
+        data-values="{{ donation_trend_values }}"
+        data-label="{% trans 'Donations (BDT)' %}"></canvas>
+    </div>
+  </div>
+  <div class="card lg:col-span-2">
+    <h2 class="mb-4 text-h4">{% trans "Monthly Membership Growth" %}</h2>
+    <div class="h-64">
+      <canvas id="membership-growth-chart"
+        data-labels="{{ membership_growth_labels }}"
+        data-values="{{ membership_growth_values }}"
+        data-label="{% trans 'New Members' %}"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+  {% if latest_applications %}
+  <div class="card">
+    <h2 class="mb-4 text-h4">{% trans "Latest Applications" %}</h2>
+    <div class="space-y-3">
+      {% for app in latest_applications %}
+      <div class="flex items-center justify-between gap-3 rounded-field border border-border/60 p-3">
+        <div>
+          <p class="font-semibold text-ink">{{ app.full_name }}</p>
+          <p class="text-xs text-ink-light">{{ app.present_district|default:app.country }} · {{ app.created_at|date:"M d, Y" }}</p>
+        </div>
+        <span class="badge-warning">{% trans "Pending" %}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{% url 'dashboard-applications' %}" class="btn-secondary btn-sm mt-4 inline-block">{% trans "View All" %}</a>
+  </div>
+  {% endif %}
+
+  {% if recent_donations %}
+  <div class="card">
+    <h2 class="mb-4 text-h4">{% trans "Recent Donations" %}</h2>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>{% trans "Donor" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th></tr></thead>
+        <tbody>
+          {% for d in recent_donations %}
+          <tr>
+            <td>{{ d.donor_name }}</td>
+            <td>{{ d.amount|floatformat:0 }} {{ d.currency }}</td>
+            <td>
+              <span class="badge-{% if d.status == 'COMPLETED' %}success{% elif d.status == 'PENDING' %}warning{% else %}danger{% endif %}">
+                {{ d.get_status_display }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if is_member and member_profile %}
+<div class="card mb-8">
+  <h2 class="mb-4 text-h4">{% trans "My Profile" %}</h2>
+  <p><strong>{% trans "Member ID:" %}</strong> <span lang="en">{{ member_profile.member_id }}</span></p>
+  <p><strong>{% trans "Name:" %}</strong> {{ member_profile.first_name }} {{ member_profile.last_name }}</p>
+  <p><strong>{% trans "Status:" %}</strong> {{ member_profile.get_status_display }}</p>
+  <div class="mt-4 flex flex-wrap gap-3">
+    <a href="{% url 'my-signature' %}" class="btn-secondary inline-block">{% trans "Digital Signature" %}</a>
+    <a href="{% url 'my-elections' %}" class="btn-primary inline-block">{% trans "My Elections" %}</a>
+  </div>
+</div>
+{% if membership_fees %}
+<div class="card mb-8">
+  <h2 class="mb-4 text-h4">{% trans "Membership Fees" %}</h2>
+  {% for fee in membership_fees %}
+  <p class="text-sm text-ink">{{ fee|fee_period }}: ৳{{ fee.amount|floatformat:0 }} — {{ fee.get_status_display }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endif %}
+
+{% if is_donor or user_donations %}
+<div class="card mb-8">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <h2 class="text-h4">{% trans "My Donations" %}</h2>
+    <a href="{% url 'dashboard-my-donations' %}" class="text-sm font-medium text-primary hover:underline">{% trans "View all" %}</a>
+  </div>
+  {% for d in user_donations %}
+  <p class="text-sm text-ink">{{ d.created_at|date:"M d, Y" }}: {{ d.amount|floatformat:0 }} {{ d.currency }} — {{ d.get_status_display }}</p>
+  {% empty %}
+  <p class="text-ink-light">{% trans "No donations yet." %}</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if recent_activity %}
+<div class="card">
+  <h2 class="mb-4 text-h4">{% trans "Recent Activity" %}</h2>
+  <div class="space-y-2">
+    {% for log in recent_activity %}
+    <p class="text-sm text-ink-light">{{ log.created_at|date:"M d, H:i" }} — {{ log.description }}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/dashboard-charts.js' %}"></script>
+{% endblock %}

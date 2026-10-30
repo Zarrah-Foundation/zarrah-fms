@@ -1,0 +1,36 @@
+{% load i18n %}
+<div class="relative">
+  <button type="button" class="dash-icon-btn" data-dropdown-toggle="notif-menu" aria-haspopup="true" aria-expanded="false" aria-label="{% trans 'Notifications' %}">
+    <i class="bi bi-bell text-xl" aria-hidden="true"></i>
+    {% if dash_unread_count %}
+    <span class="dash-badge-count">{{ dash_unread_count }}</span>
+    {% endif %}
+  </button>
+
+  <div id="notif-menu" data-dropdown-menu class="dash-menu dash-menu-wide" hidden>
+    <div class="dash-menu-header">
+      <span>{% trans "Notifications" %}{% if dash_unread_count %} ({{ dash_unread_count }}){% endif %}</span>
+      {% if dash_unread_count %}
+      <button type="button" id="notif-mark-all" data-url="{% url 'dashboard-notifications-read-all' %}" class="text-xs font-semibold text-primary hover:underline">{% trans "Mark all read" %}</button>
+      {% endif %}
+    </div>
+
+    <div class="max-h-96 overflow-y-auto">
+      {% for n in dash_recent_notifications %}
+      <a href="{% url 'dashboard-notifications' %}" class="dash-menu-item {% if n.viewer_is_unread %}notif-unread{% endif %}">
+        <span class="notif-dot {% if n.priority == 'CRITICAL' %}bg-danger{% elif n.priority == 'HIGH' %}bg-warning{% elif n.priority == 'LOW' %}bg-ink-light{% else %}bg-info{% endif %}"></span>
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"><i class="bi {{ n.icon|default:'bi-bell' }}"></i></span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate font-semibold text-ink">{{ n.title }}</span>
+          <span class="block truncate text-xs text-ink-light">{{ n.message|truncatechars:70 }}</span>
+          <span class="block text-[11px] text-ink-light/70">{{ n.created_at|date:"M d, H:i" }}</span>
+        </span>
+      </a>
+      {% empty %}
+      <p class="px-4 py-8 text-center text-sm text-ink-light">{% trans "No notifications yet." %}</p>
+      {% endfor %}
+    </div>
+
+    <a href="{% url 'dashboard-notifications' %}" class="block border-t border-border/60 px-4 py-3 text-center text-sm font-semibold text-primary hover:bg-canvas">{% trans "View all" %}</a>
+  </div>
+</div>

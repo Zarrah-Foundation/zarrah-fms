@@ -1,0 +1,88 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My Elections" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "My Elections" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-ballot mr-2 text-primary"></i>{% trans "My Elections" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Vote in open elections and view published results. Your ballot choices remain secret." %}</p>
+  </div>
+</div>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-lg font-semibold text-ink">{% trans "Open — Vote Now" %}</h2>
+  <div class="space-y-3">
+    {% for election in open_elections %}
+    <article class="flex flex-col gap-3 rounded-card border border-border/60 bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h3 class="font-semibold text-ink">{{ election.localized_title }}</h3>
+        <p class="text-sm text-ink-light">
+          {{ election.get_election_type_display }}
+          {% if election.end_at %} · {% trans "Ends" %} {{ election.end_at }}{% endif %}
+        </p>
+        {% if election.pk in voted_ids %}
+        <p class="mt-1 text-sm font-medium text-primary">{% trans "Already Voted" %}</p>
+        {% endif %}
+      </div>
+      {% if election.pk in voted_ids %}
+      <span class="badge-success">{% trans "Vote recorded" %}</span>
+      {% else %}
+      <a href="{% url 'my-election-cast' election.pk %}" class="btn-primary shrink-0">
+        <i class="bi bi-pencil-square"></i>{% trans "Vote Now" %}
+      </a>
+      {% endif %}
+    </article>
+    {% empty %}
+    <p class="rounded-card border border-dashed border-border px-6 py-8 text-center text-ink-light">
+      {% trans "No open elections for you right now." %}
+    </p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-lg font-semibold text-ink">{% trans "Results Available" %}</h2>
+  <div class="space-y-3">
+    {% for election in published %}
+    <article class="flex flex-col gap-3 rounded-card border border-border/60 bg-surface p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h3 class="font-semibold">{{ election.localized_title }}</h3>
+        <p class="text-sm text-ink-light">{{ election.get_status_display }}</p>
+      </div>
+      <a href="{% url 'my-election-results' election.pk %}" class="btn-secondary shrink-0">{% trans "View results" %}</a>
+    </article>
+    {% empty %}
+    <p class="text-sm text-ink-light">{% trans "No published results yet." %}</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2 class="mb-4 text-lg font-semibold text-ink">{% trans "Your election history" %}</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "Election" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Your vote" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for election in history %}
+        <tr>
+          <td>{{ election.localized_title }}</td>
+          <td>{{ election.get_status_display }}</td>
+          <td>{% if election.pk in voted_ids %}{% trans "Already Voted" %}{% else %}—{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="text-ink-light">{% trans "No history yet." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Meeting types" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Meeting types" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-tags"></i> {% trans "Meeting types" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Quorum ratios and eligibility rules per constitution." %}</p>
+  </div>
+  {% if can_create %}
+  <a href="{% url 'dashboard-meeting-type-create' %}" class="btn-primary"><i class="bi bi-plus-lg"></i>{% trans "New type" %}</a>
+  {% endif %}
+</div>
+
+<div class="card-flat overflow-x-auto">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Quorum" %}</th>
+        <th>{% trans "Eligibility" %}</th>
+        <th>{% trans "Reminder (h)" %}</th>
+        <th>{% trans "Active" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in meeting_types %}
+      <tr>
+        <td class="font-medium">{{ t.name_en }}{% if t.name_bn %}<span class="mt-0.5 block text-xs font-normal text-ink-light">{{ t.name_bn }}</span>{% endif %}</td>
+        <td>
+          <span class="font-mono text-sm font-semibold">{{ t.quorum_numerator }}/{{ t.quorum_denominator }}</span>
+          <span class="mt-0.5 block text-xs text-ink-light">{% trans "Quorum fraction" %}</span>
+        </td>
+        <td>{{ t.get_eligibility_mode_display }}</td>
+        <td>{% if t.reminder_enabled %}{{ t.reminder_hours_before }}{% else %}—{% endif %}</td>
+        <td>{% if t.is_active %}{% trans "Yes" %}{% else %}—{% endif %}</td>
+        <td class="text-right">
+          {% if can_edit %}
+          <a href="{% url 'dashboard-meeting-type-edit' t.pk %}" class="btn-ghost btn-sm">{% trans "Edit" %}</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-ink-light">{% trans "No meeting types. Run seed_meeting_types." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

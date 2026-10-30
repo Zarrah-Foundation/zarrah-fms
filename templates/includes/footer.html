@@ -1,0 +1,172 @@
+{% load i18n i18n_extras %}
+<footer class="relative mt-auto overflow-hidden bg-primary-dark text-white">
+  <svg class="block w-full text-canvas" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="currentColor" d="M0,32 C240,72 480,0 720,24 C960,48 1200,8 1440,32 L1440,0 L0,0 Z"></path>
+  </svg>
+
+  <svg class="pointer-events-none absolute -right-10 bottom-0 h-64 w-64 text-white/[0.06] sm:h-80 sm:w-80" viewBox="0 0 200 200" fill="currentColor" aria-hidden="true">
+    <path d="M100 10c-18 22-40 30-40 58 0 18 12 32 28 36-2 10-8 20-18 28h60c-10-8-16-18-18-28 16-4 28-18 28-36 0-28-22-36-40-58z"/>
+    <rect x="94" y="120" width="12" height="60" rx="4"/>
+  </svg>
+
+  <div class="container-app relative py-14">
+<div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        {% include "includes/_brand_mark.html" with variant="footer" wrapper_class="mb-4 flex items-center gap-2.5" text_class="text-lg font-extrabold" %}
+        <p class="text-sm leading-relaxed text-white/70">
+          {{ site_settings.localized_tagline }}
+        </p>
+        {% if site_settings.registration_number or site_settings.registration_date %}
+        <ul class="mt-4 space-y-1.5 text-sm text-white/75">
+          {% if site_settings.registration_number %}
+          <li>
+            <span class="text-white/90">{% zf_label "Registration No." %}:</span>
+            {{ site_settings.registration_number }}
+          </li>
+          {% endif %}
+          {% if site_settings.registration_date %}
+          <li>
+            <span class="text-white/90">{% zf_label "Registration Date" %}:</span>
+            {{ site_settings.registration_date|date:"j F Y" }}
+          </li>
+          {% endif %}
+        </ul>
+        {% endif %}
+        <div class="mt-5 flex items-center gap-3">
+          {% if site_settings.facebook_url %}
+          <a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-250 hover:bg-accent hover:text-primary-dark">
+            <i class="bi bi-facebook" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+          {% if site_settings.twitter_url %}
+          <a href="{{ site_settings.twitter_url }}" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-250 hover:bg-accent hover:text-primary-dark">
+            <i class="bi bi-twitter-x" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+          {% if site_settings.instagram_url %}
+          <a href="{{ site_settings.instagram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-250 hover:bg-accent hover:text-primary-dark">
+            <i class="bi bi-instagram" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+          {% if site_settings.youtube_url %}
+          <a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-250 hover:bg-accent hover:text-primary-dark">
+            <i class="bi bi-youtube" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+          {% if site_settings.linkedin_url %}
+          <a href="{{ site_settings.linkedin_url }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-250 hover:bg-accent hover:text-primary-dark">
+            <i class="bi bi-linkedin" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+          {% if site_settings.telegram_url %}
+          <a href="{{ site_settings.telegram_url }}" target="_blank" rel="noopener noreferrer" aria-label="Telegram" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-250 hover:bg-accent hover:text-primary-dark">
+            <i class="bi bi-telegram" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+          {% if site_settings.github_url %}
+          <a href="{{ site_settings.github_url }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors duration-250 hover:bg-accent hover:text-primary-dark">
+            <i class="bi bi-github" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+<!-- Mobile: Menu + Legal -->
+<div class="col-span-1 sm:col-span-2 lg:col-span-2">
+    <div class="grid grid-cols-2 gap-8 lg:grid-cols-2">
+
+        <!-- Menu -->
+        <div>
+            <h4 class="mb-4 text-sm font-bold uppercase tracking-wide text-accent-light">
+                {% zf_label "Menu" %}
+            </h4>
+
+            <ul class="space-y-2.5 text-sm text-white/75">
+                <li><a href="{% url 'about' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "About" %}</a></li>
+                <li><a href="{% url 'objectives' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Objectives" %}</a></li>
+                <li><a href="{% url 'membership' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Membership" %}</a></li>
+                <li><a href="{% url 'donation' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Donate" %}</a></li>
+                <li><a href="{% url 'transparency' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Transparency" %}</a></li>
+                <li><a href="{% url 'reports' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Reports" %}</a></li>
+                <li><a href="{% url 'news' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "News" %}</a></li>
+                <li><a href="{% url 'contact' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Contact" %}</a></li>
+            </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+            <h4 class="mb-4 text-sm font-bold uppercase tracking-wide text-accent-light">
+                {% zf_label "Legal" %}
+            </h4>
+
+            <ul class="space-y-2.5 text-sm text-white/75">
+                <li><a href="{% url 'constitution' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Constitution" %}</a></li>
+                <li><a href="{% url 'privacy' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Privacy" %}</a></li>
+                <li><a href="{% url 'terms' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "Terms" %}</a></li>
+                <li><a href="{% url 'faq' %}" class="transition-colors duration-250 hover:text-white">{% zf_label "FAQ" %}</a></li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+      <div>
+        <h4 class="mb-4 text-sm font-bold uppercase tracking-wide text-accent-light">{% zf_label "Contact" %}</h4>
+        <ul class="space-y-2.5 text-sm text-white/75">
+          {% if site_settings.localized_address %}
+          <li class="flex items-start gap-2">
+            <i class="bi bi-geo-alt-fill mt-0.5 text-accent-light" aria-hidden="true"></i>
+            <span>{{ site_settings.localized_address|linebreaksbr }}</span>
+          </li>
+          {% endif %}
+          {% if site_settings.primary_phone %}
+          <li>
+            <a href="tel:{{ site_settings.primary_phone }}" class="flex items-center gap-2 transition-colors duration-250 hover:text-white">
+              <i class="bi bi-telephone-fill text-accent-light" aria-hidden="true"></i>{{ site_settings.primary_phone }}
+            </a>
+          </li>
+          {% endif %}
+          {% if site_settings.whatsapp %}
+          <li>
+            <a href="https://wa.me/{{ site_settings.whatsapp|cut:'+'|cut:' '|cut:'-' }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 transition-colors duration-250 hover:text-white">
+              <i class="bi bi-whatsapp text-accent-light" aria-hidden="true"></i>{{ site_settings.whatsapp }}
+            </a>
+          </li>
+          {% endif %}
+          {% if site_settings.primary_email %}
+          <li>
+            <a href="mailto:{{ site_settings.primary_email }}" class="flex items-center gap-2 transition-colors duration-250 hover:text-white">
+              <i class="bi bi-envelope-fill text-accent-light" aria-hidden="true"></i>{{ site_settings.primary_email }}
+            </a>
+          </li>
+          {% else %}
+          <li>
+            <a href="{% url 'contact' %}" class="flex items-center gap-2 transition-colors duration-250 hover:text-white">
+              <i class="bi bi-envelope-fill text-accent-light" aria-hidden="true"></i>{% zf_label "Get in touch" %}
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+
+        <h4 class="mb-3 mt-6 text-sm font-bold uppercase tracking-wide text-accent-light">{% zf_label "Newsletter" %}</h4>
+        {% include "includes/ui/forms/_newsletter_form.html" %}
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/60 sm:flex-row">
+      <p>
+        {% if site_settings.copyright_text %}
+        {{ site_settings.copyright_text }}
+        {% else %}
+        &copy; {% now "Y" %} <span>{{ site_settings.localized_name }}</span>. {% zf_label "All rights reserved." %}
+        {% endif %}
+      </p>
+      <p>
+        {% if site_settings.localized_footer_text %}
+        {{ site_settings.localized_footer_text }}
+        {% else %}
+        {% zf_label "Registered under the Societies Registration Act 1860." %}
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</footer>

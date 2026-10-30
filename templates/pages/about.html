@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras static %}
+
+{% block title %}{% zf_label "About" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{% blocktrans %}Zarrah Foundation is a voluntary, non-profit, non-political humanitarian organisation in Bangladesh. Purpose, objectives, governance and contact.{% endblocktrans %}">
+{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  "name": "{{ site_settings.localized_name|default:'Zarrah Foundation'|escapejs }}",
+  "alternateName": "জার্‌রাহ ফাউন্ডেশন",
+  "description": "{{ site_settings.meta_description|default:'Zarrah Foundation is a voluntary, non-profit, non-political humanitarian organisation in Bangladesh.'|escapejs }}",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'about' %}",
+  "areaServed": "Bangladesh",
+  "slogan": "{{ about_slogan_en|escapejs }}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<section class="relative overflow-hidden bg-primary-dark text-white" aria-labelledby="about-hero-heading">
+  <div class="container-app relative py-16 lg:py-24">
+    <nav aria-label="{% zf_label 'Breadcrumb' %}" class="mb-8 flex items-center gap-2 text-sm text-white/70">
+      <ol class="flex items-center gap-2">
+        <li><a href="{% url 'home' %}" class="transition-colors hover:text-white">{% zf_label "Home" %}</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="font-semibold text-white" aria-current="page">{% zf_label "About" %}</li>
+      </ol>
+    </nav>
+    <div class="max-w-3xl">
+      <p class="text-sm font-semibold uppercase tracking-wide text-accent-light">{{ about_hero|bl:"eyebrow" }}</p>
+      <h1 id="about-hero-heading" class="mt-4 text-h1 text-white">{{ about_hero|bl:"title" }}</h1>
+      <p class="mt-4 text-xl font-semibold text-accent-light">{{ about_hero|bl:"slogan" }}</p>
+      <p class="mt-6 max-w-2xl text-body leading-8 text-white/85">{{ about_hero|bl:"subtitle" }}</p>
+      <div class="mt-10 flex flex-wrap gap-4">
+        {% url 'objectives' as objectives_url %}
+        {% url 'membership' as membership_url %}
+        {% zf_label "Objectives" as objectives_text %}
+        {% zf_label "Membership" as membership_text %}
+        {% include "includes/ui/buttons/_btn.html" with href=objectives_url text=objectives_text variant="accent" size="lg" %}
+        {% include "includes/ui/buttons/_btn.html" with href=membership_url text=membership_text variant="outline-white" size="lg" %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="who-we-are" class="section bg-surface scroll-mt-24" aria-labelledby="who-we-are-heading">
+  <div class="container-app grid items-start gap-12 lg:grid-cols-2">
+    <div>
+      {% include "includes/ui/badges/_badge.html" with text=about_who_we_are|bl:"eyebrow" %}
+      <h2 id="who-we-are-heading" class="mt-6 text-h2 text-ink">{{ about_who_we_are|bl:"title" }}</h2>
+      <p class="mt-6 text-body leading-8 text-ink-light">{{ about_who_we_are|bl:"paragraph_1" }}</p>
+      <p class="mt-4 text-body leading-8 text-ink-light">{{ about_who_we_are|bl:"paragraph_2" }}</p>
+    </div>
+    <div class="space-y-6">
+      {% include "includes/ui/cards/_info_card.html" with icon="bi-patch-check" title=about_registration|bl:"title" subtitle=about_registration|bl:"subtitle" rows=about_registration.rows %}
+    </div>
+  </div>
+</section>
+
+<section id="nature" class="section bg-canvas scroll-mt-24" aria-labelledby="nature-heading">
+  <div class="container-app">
+    <h2 id="nature-heading" class="text-h2 text-ink">{% zf_label "Organizational Nature" %}</h2>
+    <p class="mt-4 max-w-3xl text-body leading-8 text-ink-light">{{ about_copy|bl:"nature_intro" }}</p>
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {% for value in about_core_values %}
+      <div class="rounded-card border border-border/60 bg-surface p-6">
+        <h3 class="text-lg font-semibold leading-7 text-ink">{{ value|bl:"title" }}</h3>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section id="mission-vision" class="section bg-surface scroll-mt-24" aria-labelledby="mission-vision-heading">
+  <div class="container-app">
+    <div class="mx-auto mb-12 max-w-3xl text-center">
+      {% include "includes/ui/badges/_badge.html" with text=about_mission_vision|bl:"eyebrow" %}
+      <h2 id="mission-vision-heading" class="mt-5 text-h2 text-ink">{{ about_mission_vision|bl:"title" }}</h2>
+      <p class="mt-5 text-body leading-8 text-ink-light">{{ about_mission_vision|bl:"subtitle" }}</p>
+    </div>
+    <div class="grid gap-8 lg:grid-cols-2">
+      <div class="rounded-card border border-border/60 bg-canvas p-8 md:p-10">
+        <h3 class="text-h3 text-ink">{{ about_mission_vision.mission|bl:"title" }}</h3>
+        <p class="mt-5 leading-8 text-ink-light">{{ about_mission_vision.mission|bl:"text" }}</p>
+      </div>
+      <div class="rounded-card border border-border/60 bg-canvas p-8 md:p-10">
+        <h3 class="text-h3 text-ink">{{ about_mission_vision.vision|bl:"title" }}</h3>
+        <p class="mt-5 leading-8 text-ink-light">{{ about_mission_vision.vision|bl:"text" }}</p>
+      </div>
+    </div>
+    <p class="mt-8 text-center">
+      <a href="{% url 'objectives' %}" class="font-semibold text-primary hover:underline">{% zf_label "Read the documented objectives" %}</a>
+    </p>
+  </div>
+</section>
+
+<section id="objectives" class="section bg-canvas scroll-mt-24" aria-labelledby="impact-areas-heading">
+  <div class="container-app">
+    <div class="mx-auto mb-12 max-w-3xl text-center">
+      <h2 id="impact-areas-heading" class="text-h2 text-ink">{% zf_label "Areas of Work" %}</h2>
+      <p class="mt-5 text-body leading-8 text-ink-light">{{ about_copy|bl:"areas_intro" }}</p>
+    </div>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {% for area in about_impact_areas %}
+      <article class="rounded-card border border-border/60 bg-surface p-6">
+        <h3 class="text-lg font-semibold leading-7 text-ink">{{ area|bl:"title" }}</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-light">{{ area|bl:"text" }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section id="zarrah-skills" class="section bg-surface scroll-mt-24" aria-labelledby="skills-heading">
+  <div class="container-app">
+    <h2 id="skills-heading" class="text-h2 text-ink">{{ about_skills|bl:"title" }}</h2>
+    <p class="mt-4 max-w-3xl text-body leading-8 text-ink-light">{{ about_skills|bl:"text" }}</p>
+    <p class="mt-6">
+      <a href="{{ about_skills.url }}" class="btn-primary" target="_blank" rel="noopener noreferrer">
+        {% zf_label "Visit Zarrah Skills" %}
+        <span class="sr-only">{% zf_label "(opens in a new tab)" %}</span>
+        <i class="bi bi-box-arrow-up-right ml-1" aria-hidden="true"></i>
+      </a>
+    </p>
+  </div>
+</section>
+
+<section id="structure" class="section bg-canvas scroll-mt-24" aria-labelledby="structure-heading">
+  <div class="container-app">
+    <h2 id="structure-heading" class="text-h2 text-ink">{% zf_label "Organizational Structure" %}</h2>
+    <p class="mt-4 max-w-3xl text-body leading-8 text-ink-light">{{ about_copy|bl:"structure_intro" }}</p>
+    <div class="mt-10 grid gap-6 lg:grid-cols-3">
+      {% for body in about_structure %}
+      <article class="rounded-card border border-border/60 bg-surface p-6 md:p-8">
+        <h3 class="text-xl font-semibold leading-7 text-ink">{{ body|bl:"title" }}</h3>
+        <p class="mt-3 text-sm font-medium leading-6 text-primary">{{ body|bl:"summary" }}</p>
+        <p class="mt-4 text-sm leading-7 text-ink-light">{{ body|bl:"details" }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% include "includes/ui/sections/_quorum.html" %}
+
+<section id="leadership" class="section bg-surface scroll-mt-24" aria-labelledby="leadership-heading">
+  <div class="container-app">
+    <div class="mx-auto mb-12 max-w-3xl text-center">
+      {% include "includes/ui/badges/_badge.html" with text=about_leadership|bl:"eyebrow" %}
+      <h2 id="leadership-heading" class="mt-5 text-h2 text-ink">{{ about_leadership|bl:"title" }}</h2>
+      <p class="mt-5 text-body leading-8 text-ink-light">{{ about_leadership|bl:"subtitle" }}</p>
+    </div>
+
+    {% if about_leadership.chairman or about_leadership.secretary %}
+    <div class="mb-12 grid gap-8 lg:grid-cols-2">
+      {% if about_leadership.chairman %}
+        {% include "includes/ui/cards/_leadership_card.html" with person=about_leadership.chairman highlighted=True %}
+      {% endif %}
+      {% if about_leadership.secretary %}
+        {% include "includes/ui/cards/_leadership_card.html" with person=about_leadership.secretary %}
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if about_leadership.committee %}
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {% for member in about_leadership.committee %}
+        {% include "includes/ui/cards/_leadership_card.html" with person=member %}
+      {% endfor %}
+    </div>
+    {% elif not about_leadership.chairman and not about_leadership.secretary %}
+    <p class="text-center leading-8 text-ink-light">{{ about_copy|bl:"leadership_empty" }}</p>
+    {% endif %}
+
+    {% if about_founders %}
+    <div class="mt-16">
+      <h3 class="text-h3 text-ink">{% zf_label "Founding members" %}</h3>
+      <p class="mt-3 max-w-3xl text-sm leading-7 text-ink-light">{{ about_copy|bl:"founders_intro" }}</p>
+      <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {% for person in about_founders %}
+        <li class="rounded-card border border-border/50 bg-canvas px-4 py-3">
+          <p class="font-semibold text-ink" lang="en">{{ person.name }}</p>
+          <p class="text-sm leading-6 text-ink-light">{{ person|bl:"role" }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section id="membership-about" class="section bg-canvas scroll-mt-24" aria-labelledby="membership-about-heading">
+  <div class="container-app">
+    <h2 id="membership-about-heading" class="text-h2 text-ink">{% zf_label "Membership" %}</h2>
+    <p class="mt-4 max-w-3xl text-body leading-8 text-ink-light">{{ about_membership_eligibility|bl:"intro" }}</p>
+    <ul class="mt-6 max-w-3xl list-disc space-y-2 pl-5 leading-7 text-ink-light">
+      {% for item in about_membership_eligibility.items %}
+      <li>{{ item|bl }}</li>
+      {% endfor %}
+    </ul>
+    <p class="mt-4 max-w-3xl text-body leading-8 text-ink-light">{{ about_membership_eligibility|bl:"outro" }}</p>
+    <p class="mt-6">
+      <a href="{% url 'membership' %}" class="btn-primary">{% zf_label "Membership information" %}</a>
+    </p>
+  </div>
+</section>
+
+<section id="governance" class="section bg-surface scroll-mt-24" aria-labelledby="governance-heading">
+  <div class="container-app">
+    <h2 id="governance-heading" class="text-h2 text-ink">{% zf_label "Governance & Accountability" %}</h2>
+    <p class="mt-4 max-w-3xl text-body leading-8 text-ink-light">{{ about_legal|bl:"subtitle" }}</p>
+    <ul class="mt-6 max-w-3xl list-disc space-y-2 pl-5 leading-7 text-ink-light">
+      {% for item in about_meetings.items %}
+      <li>{{ item|bl }}</li>
+      {% endfor %}
+    </ul>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="{% url 'constitution' %}" class="btn-secondary">{% zf_label "Constitution" %}</a>
+      <a href="{% url 'reports' %}" class="btn-secondary">{% zf_label "Reports" %}</a>
+      <a href="{% url 'transparency' %}" class="btn-secondary">{% zf_label "Transparency" %}</a>
+    </div>
+    <p class="mt-6">
+      <a href="{% url 'transparency' %}#governance-legal" class="font-semibold text-primary hover:underline">
+        {% zf_label "View Governance Documents" %} →
+      </a>
+    </p>
+  </div>
+</section>
+
+{% url 'transparency' as transparency_url %}
+{% zf_label "View Transparency" as transparency_cta %}
+{% include "includes/ui/sections/_financial_principles.html" with principles=about_financial_principles heading_id="financial-principles-about" extra_note=about_copy|bl:"summaries_note" cta_href=transparency_url cta_label=transparency_cta %}
+
+<section id="legal-identity" class="section bg-surface scroll-mt-24" aria-labelledby="legal-heading">
+  <div class="container-app">
+    {% include "includes/ui/typography/_section_header.html" with eyebrow_text=about_legal|bl:"eyebrow" title=about_legal|bl:"title" subtitle=about_legal|bl:"subtitle" %}
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for doc in about_legal.documents %}
+      {% url doc.url_name as doc_url %}
+      <a href="{{ doc_url }}" class="feature-card group">
+        <h3 class="text-xl font-bold leading-7 text-ink">{{ doc|bl:"title" }}</h3>
+        <p class="mt-3 text-[15px] leading-7 text-ink-light">{{ doc|bl:"text" }}</p>
+        <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+          {{ doc|bl:"cta" }}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-border/60 pt-8">
+      {% for indicator in about_legal.trust_indicators %}
+      <span class="badge-primary">{{ indicator|bl:"label" }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% include "includes/ui/sections/_cta_banner.html" with title=about_cta|bl:"title" subtitle=about_cta|bl:"subtitle" buttons=about_cta.buttons %}
+
+<section id="contact-about" class="section bg-canvas scroll-mt-24" aria-labelledby="contact-about-heading">
+  <div class="container-app max-w-3xl">
+    <h2 id="contact-about-heading" class="text-h2 text-ink">{% zf_label "Contact" %}</h2>
+    <p class="mt-4 whitespace-pre-line text-body leading-8 text-ink-light">{% if LANGUAGE_CODE == 'bn' %}{{ about_office_bn }}{% else %}{{ about_office_en }}{% endif %}</p>
+    <p class="mt-6">
+      <a href="{% url 'contact' %}" class="btn-secondary">{% zf_label "Contact Us" %}</a>
+    </p>
+  </div>
+</section>
+
+{% endblock %}

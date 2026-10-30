@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ subject }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f6f5;font-family:Georgia,'Times New Roman',serif;color:#1a1f1c;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6f5;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #d7e0db;border-radius:8px;overflow:hidden;">
+          <tr>
+            <td style="background:{{ brand_primary|default:'#0B6B3A' }};padding:20px 24px;">
+              <p style="margin:0;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.85);">{{ foundation_name }}</p>
+              <h1 style="margin:8px 0 0;font-size:22px;line-height:1.3;color:#ffffff;font-weight:700;">Meeting invitation</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px;">
+              <p style="margin:0 0 16px;font-size:16px;line-height:1.5;">You are invited to a meeting.</p>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 20px;font-size:14px;line-height:1.5;">
+                <tr><td style="padding:6px 0;color:#5b6660;width:120px;">Title</td><td style="padding:6px 0;font-weight:600;">{{ meeting_title }}</td></tr>
+                <tr><td style="padding:6px 0;color:#5b6660;">Reference</td><td style="padding:6px 0;font-family:Consolas,monospace;">{{ reference }}</td></tr>
+                <tr><td style="padding:6px 0;color:#5b6660;">Type</td><td style="padding:6px 0;">{{ meeting_type }}</td></tr>
+                <tr><td style="padding:6px 0;color:#5b6660;">Date &amp; time</td><td style="padding:6px 0;">{{ datetime_display }} ({{ timezone_name }})</td></tr>
+                <tr><td style="padding:6px 0;color:#5b6660;">Mode</td><td style="padding:6px 0;">{{ mode }}</td></tr>
+                {% if venue %}<tr><td style="padding:6px 0;color:#5b6660;">Venue</td><td style="padding:6px 0;">{{ venue }}</td></tr>{% endif %}
+                {% if online_url %}<tr><td style="padding:6px 0;color:#5b6660;">Online</td><td style="padding:6px 0;"><a href="{{ online_url }}" style="color:{{ brand_primary|default:'#0B6B3A' }};">{{ online_url }}</a></td></tr>{% endif %}
+              </table>
+              {% if agenda_titles %}
+              <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:{{ brand_primary|default:'#0B6B3A' }};">Agenda</p>
+              <ol style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.5;color:#1a1f1c;">
+                {% for title in agenda_titles %}<li style="margin-bottom:4px;">{{ title }}</li>{% endfor %}
+              </ol>
+              {% endif %}
+              {% if rsvp_url %}
+              <p style="margin:0 0 8px;">
+                <a href="{{ rsvp_url }}" style="display:inline-block;background:{{ brand_primary|default:'#0B6B3A' }};color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:6px;font-size:14px;font-weight:700;">View meeting &amp; RSVP</a>
+              </p>
+              <p style="margin:0;font-size:12px;color:#5b6660;word-break:break-all;">{{ rsvp_url }}</p>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:14px 24px;background:#f0f4f2;font-size:12px;color:#5b6660;">
+              {{ foundation_name }} · Official meeting notice
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

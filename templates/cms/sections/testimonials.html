@@ -1,0 +1,60 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section zf-home-section--muted" aria-labelledby="home-testimonials-title">
+  <div class="container-app">
+    <div class="zf-home-heading mx-auto mb-10 max-w-2xl text-center">
+      <p class="zf-home-eyebrow">{% trans "Community" %}</p>
+      <h2 id="home-testimonials-title" class="zf-home-title">
+        {{ section|bl:"title" }}
+      </h2>
+      {% if section.content_en or section.content_bn %}
+      <p class="zf-home-lead mt-3">{{ section|bl:"content" }}</p>
+      {% endif %}
+    </div>
+
+    {% if home_testimonials %}
+      {% if home_testimonials|length == 1 %}
+        {% with item=home_testimonials.0 %}
+        {% with quote=item|bl:"content" %}
+        {% if quote %}
+        <figure class="zf-quote-feature">
+          <blockquote class="zf-quote-feature__text">“{{ quote }}”</blockquote>
+          <figcaption class="zf-quote-feature__meta">
+            {% if item.photo %}
+            <img src="{{ item.photo.url }}" alt="" class="zf-quote-feature__photo" loading="lazy" width="56" height="56">
+            {% endif %}
+            <div>
+              <cite class="zf-quote-feature__name">{{ item.author_name }}</cite>
+              {% if item.designation %}<p class="zf-quote-feature__role">{{ item.designation }}</p>{% endif %}
+            </div>
+          </figcaption>
+        </figure>
+        {% endif %}
+        {% endwith %}
+        {% endwith %}
+      {% else %}
+      <div class="zf-quote-grid">
+        {% for item in home_testimonials %}
+        {% with quote=item|bl:"content" %}
+        {% if quote %}
+        <figure class="zf-quote-card">
+          <blockquote class="zf-quote-card__text">“{{ quote }}”</blockquote>
+          <figcaption class="zf-quote-card__meta">
+            {% if item.photo %}
+            <img src="{{ item.photo.url }}" alt="" class="zf-quote-card__photo" loading="lazy" width="48" height="48">
+            {% else %}
+            <div class="zf-quote-card__avatar" aria-hidden="true"><i class="bi bi-person-fill"></i></div>
+            {% endif %}
+            <div>
+              <cite class="zf-quote-card__name">{{ item.author_name }}</cite>
+              {% if item.designation %}<p class="zf-quote-card__role">{{ item.designation }}</p>{% endif %}
+            </div>
+          </figcaption>
+        </figure>
+        {% endif %}
+        {% endwith %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>

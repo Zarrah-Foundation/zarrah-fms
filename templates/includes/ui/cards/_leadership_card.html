@@ -1,0 +1,33 @@
+{% load i18n i18n_extras static %}
+{% comment %}
+Reusable leadership profile card (About: Leadership section).
+Falls back to static_photo, then an avatar icon when no uploaded photo is set.
+Usage:
+  {% include "includes/ui/cards/_leadership_card.html" with person=about_leadership.chairman highlighted=True %}
+Params:
+  person      - {name, role_en/role_bn, bio_en/bio_bn, photo, static_photo}
+  highlighted - True for the Chairman card (larger, accent border)
+{% endcomment %}
+<article class="group overflow-hidden rounded-card border {% if highlighted %}border-accent/30 shadow-soft-lg{% else %}border-border/60 shadow-soft-sm{% endif %} bg-surface transition-all duration-300 hover:-translate-y-1.5 hover:shadow-soft-lg">
+  <div class="relative h-72 w-full overflow-hidden bg-primary/5">
+    {% if person.photo %}
+    <img src="{{ person.photo.url }}" alt="{{ person.name }}" loading="lazy"
+         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+    {% elif person.static_photo %}
+    <img src="{% static person.static_photo %}" alt="{{ person.name }}" loading="lazy"
+         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+    {% else %}
+    <div class="avatar-fallback" aria-hidden="true">
+      <i class="bi bi-person-fill"></i>
+    </div>
+    {% endif %}
+  </div>
+  <div class="p-6">
+    {% trans "Leadership" as coming_soon_text %}
+    <h3 class="text-xl font-bold text-ink"{% if person.name %} lang="en"{% endif %}>{{ person.name }}</h3>
+    <p class="mt-1 font-semibold text-primary">{{ person|bl:"role" }}</p>
+    {% if person|bl:"bio" %}
+    <p class="mt-3 text-[15px] leading-6 text-ink-light">{{ person|bl:"bio" }}</p>
+    {% endif %}
+  </div>
+</article>

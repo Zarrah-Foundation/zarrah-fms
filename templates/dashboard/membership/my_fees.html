@@ -1,0 +1,143 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras fee_extras %}
+
+{% block title %}{% trans "My Fees" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "My Fees" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "Membership Fees" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Select unpaid months below to pay with SSLCommerz." %}</p>
+  </div>
+</div>
+
+<div class="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Monthly fee" %}</p>
+    <p class="mt-1 text-lg font-semibold">৳{{ fee_summary.monthly_fee|floatformat:0 }}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Paid through" %}</p>
+    <p class="mt-1 text-lg font-semibold">{% if fee_summary.paid_through %}{{ fee_summary.paid_through_label }}{% else %}—{% endif %}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Pending" %}</p>
+    <p class="mt-1 text-lg font-semibold">{{ fee_summary.pending_months }} {% trans "months" %}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Pending amount" %}</p>
+    <p class="mt-1 text-lg font-semibold">৳{{ fee_summary.pending_amount|floatformat:0 }}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Autopay" %}</p>
+    <p class="mt-1 text-lg font-semibold">{% if fee_summary.autopay_enabled %}{% trans "ON" %}{% else %}{% trans "OFF" %}{% endif %}</p>
+  </div>
+</div>
+
+{% if registration_fee %}
+<div class="card-flat mb-6 p-5">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h2 class="text-h4">{% trans "Registration fee" %}</h2>
+      <p class="mt-1 text-sm text-ink-light">
+        {% trans "One-time fee" %}: ৳{{ registration_fee.amount|floatformat:0 }}
+        ·
+        {% if registration_fee.status == "COMPLETED" %}{% trans "Paid" %}{% else %}{% trans "Pending" %}{% endif %}
+      </p>
+    </div>
+    {% if registration_fee.status != "COMPLETED" %}
+    <form method="post" action="{% url 'dashboard-my-fees-pay-registration' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary btn-sm"><i class="bi bi-credit-card"></i>{% trans "Pay registration fee" %}</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+  <div class="card-flat">
+    <h2 class="mb-3 text-h4">{% trans "Auto-payment" %}</h2>
+    <p class="mb-3 text-sm text-ink-light">
+      {% if autopay.is_enabled %}
+        {% trans "Enabled" %} ({{ autopay.get_mode_display }})
+      {% else %}
+        {% trans "Off — activate only when the current month is unpaid. Prepaid future months keep auto-payment off." %}
+      {% endif %}
+    </p>
+    <div class="flex flex-wrap gap-2">
+      {% if is_due and not autopay.is_enabled %}
+      <form method="post" action="{% url 'dashboard-my-fees-autopay-activate' %}">{% csrf_token %}
+        <button class="btn-primary btn-sm" type="submit">{% trans "Activate auto-payment" %}</button>
+      </form>
+      {% endif %}
+      {% if autopay.is_enabled %}
+      <form method="post" action="{% url 'dashboard-my-fees-autopay-deactivate' %}">{% csrf_token %}
+        <button class="btn-secondary btn-sm" type="submit">{% trans "Deactivate auto-payment" %}</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card-flat">
+    <h2 class="mb-3 text-h4">{% trans "Pay selected months" %}</h2>
+    <p class="mb-3 text-sm text-ink-light">{% blocktrans with fee=monthly_fee|floatformat:0 %}Total uses each selected month’s amount (current monthly fee ৳{{ fee }}). Checkout uses SSLCommerz one-time hosted payment.{% endblocktrans %}</p>
+    <form method="post" action="{% url 'dashboard-my-fees-pay' %}" id="fee-pay-form">
+      {% csrf_token %}
+      <p class="mb-2 text-sm font-semibold" id="fee-total">{% trans "Total" %}: ৳0</p>
+      <button type="submit" class="btn-primary btn-sm"><i class="bi bi-credit-card"></i>{% trans "Pay with SSLCommerz" %}</button>
+    </form>
+  </div>
+</div>
+
+{% if fees %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>{% trans "Period" %}</th>
+        <th>{% trans "Amount" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Paid" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fee in fees %}
+      <tr>
+        <td>
+          {% if fee.status != "COMPLETED" %}
+          <input type="checkbox" form="fee-pay-form" name="months" value="{{ fee.year }}-{{ fee.month }}" class="fee-month-check" data-amount="{{ fee.amount }}">
+          {% endif %}
+        </td>
+        <td>{{ fee|fee_period }}</td>
+        <td>৳{{ fee.amount|floatformat:0 }}</td>
+        <td>{% status_badge fee.status fee.get_status_display %}</td>
+        <td>{{ fee.paid_at|date:"M d, Y"|default:"—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+{% trans "No fee records" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-cash-coin" title=empty_title %}
+{% endif %}
+
+<script>
+(function () {
+  function updateTotal() {
+    var total = 0;
+    document.querySelectorAll(".fee-month-check:checked").forEach(function (el) {
+      total += Number(el.getAttribute("data-amount") || 50);
+    });
+    var node = document.getElementById("fee-total");
+    if (node) node.textContent = "{% trans 'Total' %}: ৳" + total;
+  }
+  document.querySelectorAll(".fee-month-check").forEach(function (el) {
+    el.addEventListener("change", updateTotal);
+  });
+  updateTotal();
+})();
+</script>
+{% endblock %}

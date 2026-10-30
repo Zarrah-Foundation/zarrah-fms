@@ -1,0 +1,23 @@
+{% load i18n_extras %}
+{% comment %}
+Reusable alternating vertical-timeline entry (About: Our Journey).
+Usage:
+  {% include "includes/ui/timeline/_timeline_item.html" with item=milestone side="left" is_last=forloop.last %}
+Params:
+  item    - {year, icon, title_en/title_bn, text_en/text_bn, highlight}
+  side    - "left" | "right" — which column the card sits in on desktop
+  is_last - True to omit the bottom margin on the final entry
+{% endcomment %}
+<div class="relative {% if not is_last %}mb-12{% endif %} lg:flex lg:items-center{% if side == 'right' %} lg:flex-row-reverse{% endif %}">
+  <div class="lg:w-1/2 {% if side == 'right' %}lg:pl-16{% else %}lg:pr-16{% endif %} pl-14 lg:pl-0">
+    <div class="timeline-card {% if item.highlight %}!border-0 bg-gradient-to-br from-primary to-primary-dark text-white{% endif %}">
+      <span class="inline-flex items-center gap-2 text-sm font-bold {% if item.highlight %}text-accent-light{% else %}text-primary{% endif %}">
+        <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+        {{ item.year }}
+      </span>
+      <h3 class="mt-2 text-xl font-bold {% if item.highlight %}text-white{% else %}text-ink{% endif %}">{{ item|bl:"title" }}</h3>
+      <p class="mt-3 text-[15px] leading-6 {% if item.highlight %}text-white/85{% else %}text-ink-light{% endif %}">{{ item|bl:"text" }}</p>
+    </div>
+  </div>
+  <div class="timeline-dot {% if item.highlight %}timeline-dot-accent{% endif %}" aria-hidden="true"></div>
+</div>

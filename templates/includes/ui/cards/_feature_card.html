@@ -1,0 +1,12 @@
+{% comment %}
+Reusable icon + title + text card (About: Core Values, Impact Areas).
+Usage:
+  {% include "includes/ui/cards/_feature_card.html" with icon=value.icon title=value|bl:"title" text=value|bl:"text" %}
+{% endcomment %}
+<article class="feature-card group">
+  <div class="feature-card-icon">
+    <i class="bi {{ icon }}" aria-hidden="true"></i>
+  </div>
+  <h3 class="mt-6 text-xl font-bold text-ink">{{ title }}</h3>
+  <p class="mt-3 text-[15px] leading-7 text-ink-light">{{ text }}</p>
+</article>

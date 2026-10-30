@@ -1,0 +1,22 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Refunds" %}{% endblock %}
+{% block topbar_title %}{% trans "Refunds" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><h1 class="dash-page-title">{% trans "Refunds" %}</h1>
+<p class="text-sm text-ink-light">{% trans "Only Super Admin can approve. REFUNDED requires provider confirmation." %}</p></div>
+<form method="get" class="mb-4"><select name="status" class="form-input max-w-xs" onchange="this.form.submit()"><option value="">{% trans "All" %}</option>{% for v,l in status_choices|default_if_none:"" %}{% endfor %}
+<option value="REQUESTED" {% if status == "REQUESTED" %}selected{% endif %}>Requested</option>
+<option value="APPROVED" {% if status == "APPROVED" %}selected{% endif %}>Approved</option>
+<option value="REFUNDED" {% if status == "REFUNDED" %}selected{% endif %}>Refunded</option>
+<option value="REJECTED" {% if status == "REJECTED" %}selected{% endif %}>Rejected</option>
+<option value="FAILED" {% if status == "FAILED" %}selected{% endif %}>Failed</option>
+</select></form>
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+<table class="dash-table"><thead><tr><th>{% trans "Date" %}</th><th>{% trans "Amount" %}</th><th>{% trans "Provider" %}</th><th>{% trans "Status" %}</th><th>{% trans "Requested by" %}</th><th></th></tr></thead>
+<tbody>{% for r in refunds %}<tr>
+<td>{{ r.created_at|date:"j M Y H:i" }}</td><td>৳{{ r.amount|floatformat:0 }}</td><td>{{ r.provider }}</td><td>{{ r.get_status_display }}</td><td>{{ r.requested_by }}</td>
+<td><a href="{% url 'dashboard-payments-refund-detail' r.pk %}" class="text-primary">{% trans "Open" %}</a></td>
+</tr>{% empty %}<tr><td colspan="6">{% trans "No refunds." %}</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}

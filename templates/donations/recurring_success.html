@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Monthly donation active" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="section container-app">
+  <div class="mx-auto max-w-xl text-center">
+    <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-success/15 text-2xl text-success">
+      <i class="bi bi-check-lg" aria-hidden="true"></i>
+    </div>
+    <h1 class="text-h3 text-primary-dark">{% zf_label "Thank you — your monthly gift is active" %}</h1>
+    <p class="mt-3 text-ink-light">
+      {% zf_label "Monthly Donation" %} — ৳{{ subscription.amount }}
+    </p>
+    {% if management_token %}
+    <p class="mt-6 text-sm text-ink-light">
+      {% zf_label "Save this private link to manage or cancel your subscription:" %}
+    </p>
+    <p class="mt-2 break-all rounded-lg border border-border bg-canvas px-3 py-2 text-sm">
+      <a class="text-primary hover:underline" href="{% url 'donation-recurring-manage' management_token %}">
+        {% url 'donation-recurring-manage' management_token as manage_url %}{{ request.scheme }}://{{ request.get_host }}{{ manage_url }}
+      </a>
+    </p>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <p class="mt-6">
+      <a href="{% url 'dashboard-my-recurring' %}" class="btn-primary">{% zf_label "View in dashboard" %}</a>
+    </p>
+    {% endif %}
+    <p class="mt-4">
+      <a href="{% url 'donation' %}" class="text-primary hover:underline">{% zf_label "Back to donations" %}</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

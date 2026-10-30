@@ -1,0 +1,27 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Edit position" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Edit position" %}{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'dashboard-member-detail' member.pk %}" class="mb-4 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Back to profile" %}</a>
+
+<div class="mb-6">
+  <h1 class="dash-page-title">{% trans "Edit position assignment" %}</h1>
+  <p class="mt-1 text-sm text-ink-light">{{ assignment.position.name_en }} — {{ member.member_id }}</p>
+</div>
+
+<form method="post" class="card-flat max-w-2xl space-y-4" novalidate>
+  {% csrf_token %}
+  <div class="dash-form-grid">
+    {% for field in form %}
+    {% include "dashboard/includes/_form_field.html" with field=field %}
+    {% endfor %}
+  </div>
+  <div class="flex gap-2">
+    <button type="submit" class="btn-primary">{% trans "Save" %}</button>
+    <a href="{% url 'dashboard-member-detail' member.pk %}" class="btn-secondary">{% trans "Cancel" %}</a>
+  </div>
+</form>
+{% endblock %}

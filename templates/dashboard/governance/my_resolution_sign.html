@@ -1,0 +1,64 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Approve & Sign" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Approve & Sign" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mx-auto max-w-3xl">
+  <div class="dash-page-header">
+    <div>
+      <h1 class="dash-page-title">{% trans "Approve &amp; Sign" %}</h1>
+      <p class="text-sm text-ink-light">
+        {{ resolution.resolution_id }}
+        {% if version %}· {% trans "Version" %} {{ version.version_number }}{% endif %}
+      </p>
+    </div>
+  </div>
+
+  {% if version %}
+  <div class="card-flat prose mb-6 max-w-none">
+    {{ version.content_bn|safe }}
+    {% if version.content_en %}
+    <h2 class="mt-4 text-h5">{% trans "English" %}</h2>
+    {{ version.content_en|safe }}
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if has_signature and member.signature_image %}
+  <div class="card-flat mb-6">
+    <p class="mb-2 text-sm font-medium">{% trans "Signature that will be applied" %}</p>
+    <img
+      src="{{ member.signature_image.url }}"
+      alt="{% trans 'Your digital signature' %}"
+      class="max-h-20 max-w-xs object-contain"
+    >
+    <p class="mt-2 text-xs text-ink-light">
+      {{ member.first_name }} {{ member.last_name }} · {{ member.member_id }}
+    </p>
+  </div>
+  {% else %}
+  <div class="card-flat mb-6 border-warning/40 bg-warning/5 text-sm">
+    <p>{% trans "You must upload a digital signature before you can approve and sign." %}</p>
+    <a href="{% url 'my-signature' %}" class="btn-secondary btn-sm mt-3 inline-block">{% trans "Manage signature" %}</a>
+  </div>
+  {% endif %}
+
+  <form method="post" class="card-flat space-y-5">
+    {% csrf_token %}
+    <div class="rounded-lg border border-border/60 bg-surface/50 p-4 text-sm">
+      <p>{% trans "By signing, you confirm agreement with the decisions recorded in this resolution for authorized Foundation administration." %}</p>
+    </div>
+    {% for field in form %}
+    {% include "dashboard/includes/_form_field.html" with field=field %}
+    {% endfor %}
+    <div class="flex justify-end gap-3 border-t border-border/60 pt-5">
+      <a href="{% url 'my-resolution-detail' resolution.pk %}" class="btn-ghost">{% trans "Cancel" %}</a>
+      <button type="submit" class="btn-primary" {% if not has_signature %}disabled{% endif %}>
+        {% trans "Approve &amp; Sign" %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

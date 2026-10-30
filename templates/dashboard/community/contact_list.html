@@ -1,0 +1,53 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{% trans "Contact Messages" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Contact Messages" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-envelope mr-2 text-primary"></i>{% trans "Contact Messages" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{{ page_obj.paginator.count }} {% trans "messages" %} · {{ unread_count }} {% trans "unread" %}</p>
+  </div>
+</div>
+
+<form method="get" class="dash-toolbar">
+  <input type="search" name="q" value="{{ search_query }}" placeholder="{% trans 'Name, email, subject…' %}" class="dash-search">
+  <label class="inline-flex items-center gap-2 text-sm text-ink-light">
+    <input type="checkbox" name="unread" value="1" class="form-checkbox" onchange="this.form.submit()" {% if unread %}checked{% endif %}>
+    {% trans "Unread only" %}
+  </label>
+  <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-search"></i>{% trans "Filter" %}</button>
+  {% if search_query or unread %}<a href="?" class="btn-ghost btn-sm">{% trans "Clear" %}</a>{% endif %}
+</form>
+
+{% if contact_messages %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Subject" %}</th>
+        <th>{% trans "From" %}</th>
+        <th>{% trans "Received" %}</th>
+        <th class="text-right">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in contact_messages %}
+      <tr class="{% if not m.is_read %}font-semibold{% endif %}">
+        <td>{% if not m.is_read %}<span class="mr-1 inline-block h-2 w-2 rounded-full bg-info align-middle"></span>{% endif %}{{ m.subject }}</td>
+        <td>{{ m.name }} <span class="text-ink-light">&lt;{{ m.email }}&gt;</span></td>
+        <td>{{ m.created_at|date:"M d, Y" }}</td>
+        <td class="text-right"><a href="{% url 'dashboard-contact-message-detail' m.pk %}" class="dash-icon-btn" title="{% trans 'View' %}"><i class="bi bi-eye"></i></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No messages found" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-envelope" title=empty_title %}
+{% endif %}
+{% endblock %}

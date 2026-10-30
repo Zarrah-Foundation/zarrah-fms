@@ -1,0 +1,190 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{{ application.full_name }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Application" %}{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'dashboard-applications' %}" class="mb-4 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Back to applications" %}</a>
+
+<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <h1 class="dash-page-title">{{ application.full_name }}</h1>
+    <p class="text-sm text-ink-light">
+      {% status_badge application.status application.get_status_display %}
+      · {{ application.created_at|date:"M d, Y" }}
+      {% if application.reference_code %}· <span lang="en">{{ application.reference_code }}</span>{% endif %}
+    </p>
+  </div>
+  <div class="flex flex-wrap items-center gap-2">
+    {% if can_download %}
+    <a href="{% url 'dashboard-application-pdf' application.pk %}" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-pdf"></i>{% trans "PDF" %}</a>
+    {% endif %}
+    {% if can_edit %}
+    <a href="{% url 'dashboard-application-edit' application.pk %}" class="btn-secondary btn-sm"><i class="bi bi-pencil"></i>{% trans "Edit" %}</a>
+    {% endif %}
+    {% if application.status != "APPROVED" %}
+      {% if can_review and application.status != "UNDER_REVIEW" %}
+      <form method="post" action="{% url 'dashboard-application-action' application.pk %}"><input type="hidden" name="action" value="review">{% csrf_token %}<button class="btn-secondary btn-sm"><i class="bi bi-hourglass-split"></i>{% trans "Under review" %}</button></form>
+      {% endif %}
+      {% if can_approve %}
+      <form method="post" action="{% url 'dashboard-application-action' application.pk %}" onsubmit="return confirm('{% trans "Approve this application?" %}');"><input type="hidden" name="action" value="approve">{% csrf_token %}<button class="btn-success btn-sm"><i class="bi bi-check-lg"></i>{% trans "Approve" %}</button></form>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Applicant" %}</h2>
+      <dl class="dash-dl">
+        <div><dt class="dash-dl-term">{% trans "English Name" %}</dt><dd class="dash-dl-desc" lang="en">{{ application.english_name }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Bangla Name" %}</dt><dd class="dash-dl-desc">{{ application.bangla_name }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Father" %}</dt><dd class="dash-dl-desc">{{ application.father_name }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Mother" %}</dt><dd class="dash-dl-desc">{{ application.mother_name }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Email" %}</dt><dd class="dash-dl-desc" lang="en">{{ application.email|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Phone" %}</dt><dd class="dash-dl-desc" lang="en">{{ application.phone }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Gender" %}</dt><dd class="dash-dl-desc">{{ application.get_gender_display }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Date of Birth" %}</dt><dd class="dash-dl-desc">{{ application.date_of_birth|date:"M d, Y" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Identity" %}</dt><dd class="dash-dl-desc">{{ application.get_identity_type_display }} — <span lang="en">{{ application.identity_number }}</span></dd></div>
+        <div><dt class="dash-dl-term">{% trans "Occupation" %}</dt><dd class="dash-dl-desc">{{ application.occupation|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Education" %}</dt><dd class="dash-dl-desc">{{ application.education|default:"—" }}</dd></div>
+      </dl>
+    </div>
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Address" %}</h2>
+      <dl class="dash-dl">
+        <div><dt class="dash-dl-term">{% trans "Present District" %}</dt><dd class="dash-dl-desc">{{ application.present_district|default:"—" }}</dd></div>
+        <div><dt class="dash-dl-term">{% trans "Present Upazila" %}</dt><dd class="dash-dl-desc">{{ application.present_upazila|default:"—" }}</dd></div>
+        <div class="sm:col-span-2"><dt class="dash-dl-term">{% trans "Present Address" %}</dt><dd class="dash-dl-desc">{{ application.present_address|default:"—" }}</dd></div>
+      </dl>
+    </div>
+
+    {% if application.status != "APPROVED" and can_review %}
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Request missing document" %}</h2>
+      <form method="post" action="{% url 'dashboard-application-action' application.pk %}" class="space-y-3">
+        <input type="hidden" name="action" value="request_documents">
+        {% csrf_token %}
+        <div>
+          <label class="form-label" for="document_label">{% trans "Document label" %}</label>
+          <input type="text" name="document_label" id="document_label" class="form-input" required placeholder="{% trans 'e.g. Updated NID scan' %}">
+        </div>
+        <div>
+          <label class="form-label" for="instruction">{% trans "Instruction" %}</label>
+          <textarea name="instruction" id="instruction" class="form-textarea" rows="2" placeholder="{% trans 'Optional guidance for the applicant.' %}"></textarea>
+        </div>
+        <div>
+          <label class="form-label" for="admin_message">{% trans "Message shown to applicant" %}</label>
+          <textarea name="admin_message" id="admin_message" class="form-textarea" rows="2" placeholder="{% trans 'Optional status message.' %}"></textarea>
+        </div>
+        <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-file-earmark-plus"></i>{% trans "Request document" %}</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if application.status != "APPROVED" and can_reject %}
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Reject Application" %}</h2>
+      <form method="post" action="{% url 'dashboard-application-action' application.pk %}">
+        <input type="hidden" name="action" value="reject">
+        {% csrf_token %}
+        <label class="form-label" for="reason">{% trans "Reason" %}</label>
+        <textarea name="reason" id="reason" class="form-textarea" rows="3" placeholder="{% trans 'Optional reason shown to the applicant.' %}"></textarea>
+        <button type="submit" class="btn-danger btn-sm mt-3" onclick="return confirm('{% trans "Reject this application?" %}');"><i class="bi bi-x-lg"></i>{% trans "Reject" %}</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Audit history" %}</h2>
+      {% if events %}
+      <ul class="space-y-3">
+        {% for event in events %}
+        <li class="border-b border-border/40 pb-3 text-sm last:border-0">
+          <p class="font-semibold text-ink">{{ event.get_action_display }}</p>
+          <p class="text-ink-light">{{ event.message|default:"—" }}</p>
+          <p class="mt-1 text-xs text-ink-light/70">{{ event.created_at|date:"M d, Y H:i" }}{% if event.actor %} · {{ event.actor }}{% endif %}</p>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-sm text-ink-light">{% trans "No events yet." %}</p>
+      {% endif %}
+    </div>
+
+    <div class="card-flat" id="edit-history">
+      <h2 class="mb-4 text-h4">{% trans "Edit History" %}</h2>
+      {% if edit_history %}
+      <ol class="space-y-3 border-l border-border/70 pl-4">
+        {% for item in edit_history %}
+        <li class="relative text-sm">
+          <span class="absolute -left-[1.3rem] top-1 h-2 w-2 rounded-full bg-primary"></span>
+          <p class="font-medium text-ink">{{ item.log.action }} · {{ item.log.created_at|date:"M d, Y H:i" }}</p>
+          <p class="text-xs text-ink-light">{% if item.log.user %}{{ item.log.user.email }}{% else %}—{% endif %}</p>
+          {% if item.log.reason %}<p class="mt-1 text-xs"><span class="font-medium">{% trans "Reason" %}:</span> {{ item.log.reason }}</p>{% endif %}
+          {% if item.changes %}
+          <ul class="mt-1 space-y-0.5 text-xs text-ink-light">
+            {% for change in item.changes %}
+            <li>
+              <span class="font-medium text-ink">{{ change.field }}</span>:
+              <span class="line-through opacity-60">{{ change.old|default:"—" }}</span>
+              → {{ change.new|default:"—" }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+      {% if edit_history_page.has_other_pages %}
+      <div class="mt-3 flex gap-2 text-sm">
+        {% if edit_history_page.has_previous %}
+        <a href="?history_page={{ edit_history_page.previous_page_number }}#edit-history" class="btn-ghost btn-sm">{% trans "Newer" %}</a>
+        {% endif %}
+        {% if edit_history_page.has_next %}
+        <a href="?history_page={{ edit_history_page.next_page_number }}#edit-history" class="btn-ghost btn-sm">{% trans "Older" %}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% else %}
+      <p class="text-sm text-ink-light">{% trans "No field edits recorded." %}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    {% if application.photo %}
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Photo" %}</h2>
+      <img src="{{ application.photo.url }}" alt="" class="w-full rounded-field">
+    </div>
+    {% endif %}
+    <div class="card-flat">
+      <h2 class="mb-4 text-h4">{% trans "Documents" %}</h2>
+      {% if application.identity_document %}
+      <a href="{{ application.identity_document.url }}" target="_blank" rel="noopener" class="btn-secondary btn-sm w-full"><i class="bi bi-file-earmark"></i>{% trans "Identity document" %}</a>
+      {% else %}<p class="text-sm text-ink-light">{% trans "No documents." %}</p>{% endif %}
+      {% if document_requests %}
+      <ul class="mt-4 space-y-2 text-sm">
+        {% for req in document_requests %}
+        <li class="rounded-field border border-border/50 p-3">
+          <p class="font-medium">{{ req.document_label }}</p>
+          <p class="text-xs text-ink-light">{% if req.is_satisfied %}{% trans "Uploaded" %}{% else %}{% trans "Awaiting upload" %}{% endif %}</p>
+          {% if req.uploaded_file %}<a href="{{ req.uploaded_file.url }}" class="text-primary hover:underline" target="_blank" rel="noopener">{% trans "Open file" %}</a>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% if application.admin_message %}
+    <div class="alert-info"><i class="bi bi-chat-left-text"></i><span>{{ application.admin_message }}</span></div>
+    {% endif %}
+    {% if application.rejection_reason %}
+    <div class="alert-danger"><i class="bi bi-x-circle"></i><span>{{ application.rejection_reason }}</span></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% load i18n i18n_extras %}
+<section class="zf-hero" aria-labelledby="home-hero-title">
+  {% if section.image %}
+  <img src="{{ section.image.url }}" alt="" class="zf-hero__media" fetchpriority="high" width="1920" height="1080">
+  <div class="zf-hero__scrim" aria-hidden="true"></div>
+  {% else %}
+  <div class="zf-hero__glow" aria-hidden="true"></div>
+  {% endif %}
+
+  <div class="container-app relative z-[1] flex flex-col items-center gap-5 py-16 text-center md:gap-6 md:py-24 lg:py-28">
+    <p class="zf-hero__eyebrow">
+      {% with cfg=section.get_config %}
+        {% if LANGUAGE_CODE == 'bn' %}
+          {% if cfg.eyebrow_bn %}{{ cfg.eyebrow_bn }}{% elif cfg.eyebrow_en %}{{ cfg.eyebrow_en }}{% else %}{% trans "Zarrah Foundation" %}{% endif %}
+        {% else %}
+          {% if cfg.eyebrow_en %}{{ cfg.eyebrow_en }}{% elif cfg.eyebrow_bn %}{{ cfg.eyebrow_bn }}{% else %}{% trans "Zarrah Foundation" %}{% endif %}
+        {% endif %}
+      {% endwith %}
+    </p>
+
+    <h1 id="home-hero-title" class="zf-hero__title">
+      {{ section|bl:"title"|default:site_settings.localized_name }}
+    </h1>
+
+    {% if section.content_en or section.content_bn %}
+    <p class="zf-hero__lead">
+      {{ section|bl:"content" }}
+    </p>
+    {% elif site_settings.localized_tagline %}
+    <p class="zf-hero__lead">{{ site_settings.localized_tagline }}</p>
+    {% endif %}
+
+    <div class="zf-hero__actions">
+      <a href="{{ section.button_link|default:'/donation/' }}" class="btn-accent">
+        <i class="bi bi-heart-fill" aria-hidden="true"></i>
+        {% if section.button_text_en or section.button_text_bn %}
+          {{ section|bl:"button_text" }}
+        {% else %}
+          {% trans "Donate Now" %}
+        {% endif %}
+      </a>
+      {% with cfg=section.get_config %}
+      <a href="{% if cfg.secondary_button_link %}{{ cfg.secondary_button_link }}{% else %}{% url 'membership' %}{% endif %}" class="btn zf-hero__btn-secondary">
+        <i class="bi bi-people-fill" aria-hidden="true"></i>
+        {% if LANGUAGE_CODE == 'bn' %}
+          {% if cfg.secondary_button_text_bn %}{{ cfg.secondary_button_text_bn }}{% elif cfg.secondary_button_text_en %}{{ cfg.secondary_button_text_en }}{% else %}{% trans "Become a Member" %}{% endif %}
+        {% else %}
+          {% if cfg.secondary_button_text_en %}{{ cfg.secondary_button_text_en }}{% elif cfg.secondary_button_text_bn %}{{ cfg.secondary_button_text_bn }}{% else %}{% trans "Become a Member" %}{% endif %}
+        {% endif %}
+      </a>
+      {% endwith %}
+      <a href="{% url 'about' %}" class="btn zf-hero__btn-tertiary">
+        {% zf_label "Learn About Us" %}
+      </a>
+    </div>
+  </div>
+</section>

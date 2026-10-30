@@ -1,0 +1,32 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Applications" %} - {% trans "Dashboard" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-6 flex items-center justify-between gap-4">
+  <h1 class="text-h3">{% trans "Pending Applications" %}</h1>
+  <span class="badge-warning">{{ applications|length }} {% trans "pending" %}</span>
+</div>
+<div class="alert-info mb-6">
+  <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+  <span>{% trans "Use Django Admin to approve or reject applications — approving automatically generates a Member ID, creates a login account and emails the applicant." %}</span>
+</div>
+
+<div class="space-y-4">
+  {% for app in applications %}
+  <div class="card flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="font-semibold text-ink">{{ app.full_name }}</h2>
+      <p class="text-sm text-ink-light">{{ app.email }} · {{ app.phone }} · {{ app.present_district|default:app.country }}</p>
+      <p class="text-xs text-ink-light">{{ app.created_at|date:"M d, Y" }}</p>
+    </div>
+    <a href="/admin/members/memberapplication/{{ app.id }}/change/" class="btn-secondary btn-sm">
+      <i class="bi bi-pencil-square" aria-hidden="true"></i>{% trans "Review" %}
+    </a>
+  </div>
+  {% empty %}
+  <div class="card text-center text-ink-light">{% trans "No pending applications." %}</div>
+  {% endfor %}
+</div>
+{% endblock %}

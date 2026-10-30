@@ -1,0 +1,51 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section" aria-labelledby="home-leadership-title">
+  <div class="container-app">
+    <div class="zf-home-heading mx-auto mb-10 max-w-2xl text-center">
+      <p class="zf-home-eyebrow">{% trans "Leadership" %}</p>
+      <h2 id="home-leadership-title" class="zf-home-title">
+        {{ section|bl:"title" }}
+      </h2>
+      {% if section.content_en or section.content_bn %}
+      <p class="zf-home-lead mt-3">{{ section|bl:"content" }}</p>
+      {% endif %}
+    </div>
+
+    {% if home_leadership %}
+    <div class="zf-leadership-grid">
+      {% for person in home_leadership %}
+      <article class="zf-leader-card">
+        <div class="zf-leader-card__photo">
+          {% if person.photo %}
+          <img src="{{ person.photo.url }}" alt="{{ person.name }}" loading="lazy" width="320" height="320">
+          {% else %}
+          <div class="zf-leader-card__fallback" aria-hidden="true">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          {% endif %}
+        </div>
+        <div class="zf-leader-card__body">
+          <h3 class="zf-leader-card__name" lang="en">{{ person.name }}</h3>
+          <p class="zf-leader-card__role">{{ person|bl:"role" }}</p>
+          {% if person|bl:"bio" %}
+          <p class="zf-leader-card__bio">{{ person|bl:"bio"|truncatewords:28 }}</p>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if section.button_link %}
+    <div class="mt-10 text-center">
+      <a href="{{ section.button_link }}" class="btn-secondary">
+        {% if section.button_text_en or section.button_text_bn %}
+          {{ section|bl:"button_text" }}
+        {% else %}
+          {% trans "Full leadership" %}
+        {% endif %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>

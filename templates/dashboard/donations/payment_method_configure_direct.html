@@ -1,0 +1,36 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{{ page_title }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{{ page_title }}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Secrets are write-only and never shown after save. Recurring is not offered to donors until live-verified." %}</p>
+  </div>
+  <a href="{% url 'dashboard-payment-methods' %}" class="btn-secondary btn-sm">{% trans "Back" %}</a>
+</div>
+<div class="mb-4 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm"><strong>LIVE VALIDATION PENDING</strong></div>
+{% if provider_health %}
+<dl class="mb-6 grid gap-3 sm:grid-cols-3 text-sm">
+  <div><dt class="text-xs text-ink-light">{% trans "One-time" %}</dt><dd>{{ provider_health.one_time.status }}</dd></div>
+  <div><dt class="text-xs text-ink-light">{% trans "Recurring" %}</dt><dd>{{ provider_health.recurring.status }}</dd></div>
+  <div><dt class="text-xs text-ink-light">{% trans "Refund" %}</dt><dd>{{ provider_health.refund.status }}</dd></div>
+</dl>
+{% endif %}
+<form method="post" class="card max-w-2xl space-y-4" autocomplete="off">
+  {% csrf_token %}
+  {% for field in form %}
+  <div>
+    {% if field.field.widget.input_type == "checkbox" %}
+    <label class="flex items-start gap-2 text-sm">{{ field }}<span><span class="font-medium">{{ field.label }}</span>{% if field.help_text %}<span class="block text-xs text-ink-light">{{ field.help_text }}</span>{% endif %}</span></label>
+    {% else %}
+    <label class="mb-1 block text-sm font-medium">{{ field.label }}</label>{{ field }}
+    {% if field.help_text %}<p class="text-xs text-ink-light">{{ field.help_text }}</p>{% endif %}
+    {% endif %}
+    {% if field.errors %}<p class="text-sm text-danger">{{ field.errors|striptags }}</p>{% endif %}
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn-primary">{% trans "Save configuration" %}</button>
+</form>
+{% endblock %}

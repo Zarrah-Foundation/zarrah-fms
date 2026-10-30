@@ -1,0 +1,68 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My Donations" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "My Donations" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "My Donations" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Donations linked to your account or verified email address." %}</p>
+  </div>
+  <a href="{% url 'donation' %}" class="btn-primary btn-sm">
+    <i class="bi bi-heart-fill"></i>{% trans "Donate again" %}
+  </a>
+</div>
+
+{% if donations %}
+<div class="overflow-x-auto rounded-card border border-border/60 bg-surface">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>{% trans "Date" %}</th>
+        <th>{% trans "Amount" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Payment method" %}</th>
+        <th>{% trans "Reference" %}</th>
+        <th>{% trans "Receipt" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in donations %}
+      <tr>
+        <td>{{ d.created_at|date:"j M Y H:i" }}</td>
+        <td class="font-semibold">{{ d.amount }} {{ d.currency }}</td>
+        <td>{{ d.get_status_display }}</td>
+        <td>{{ d.get_payment_method_display }}</td>
+        <td class="text-sm text-ink-light">
+          {% if d.receipt_number %}{{ d.receipt_number }}{% elif d.transaction_id %}{{ d.transaction_id }}{% else %}—{% endif %}
+        </td>
+        <td>
+          {% if d.status == "COMPLETED" %}
+          <a href="{% url 'donation-receipt' d.pk %}" class="text-primary hover:underline">{% trans "View" %}</a>
+          ·
+          <a href="{% url 'donation-receipt-pdf' d.pk %}" class="text-primary hover:underline">{% trans "PDF" %}</a>
+          {% else %}
+          —
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if page_obj.has_other_pages %}
+<div class="mt-4 flex justify-center gap-2">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn-secondary btn-sm">{% trans "Previous" %}</a>{% endif %}
+  <span class="text-sm text-ink-light">{% blocktrans with n=page_obj.number t=page_obj.paginator.num_pages %}Page {{ n }} of {{ t }}{% endblocktrans %}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn-secondary btn-sm">{% trans "Next" %}</a>{% endif %}
+</div>
+{% endif %}
+{% else %}
+<div class="rounded-card border border-dashed border-border px-6 py-12 text-center text-ink-light">
+  <p>{% trans "No donations found for your account yet." %}</p>
+  <a href="{% url 'donation' %}" class="btn-primary mt-4 inline-flex">{% trans "Make a donation" %}</a>
+</div>
+{% endif %}
+{% endblock %}

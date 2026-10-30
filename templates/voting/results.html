@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Results" %} - {{ vote.title }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-lg px-4 py-12">
+  <div class="card">
+    <h1 class="mb-6 text-2xl font-bold text-emerald-800">{{ vote.title }} — {% trans "Results" %}</h1>
+    <div class="space-y-3">
+      {% for option_id, count in tallies.items %}
+      <div class="flex justify-between border-b py-2">
+        <span>
+          {% for oid, opt in options.items %}
+            {% if oid == option_id %}{{ opt.label }}{% endif %}
+          {% endfor %}
+        </span>
+        <span class="font-semibold">{{ count }} {% trans "votes" %}</span>
+      </div>
+      {% empty %}
+      <p class="text-gray-500">{% trans "No votes recorded." %}</p>
+      {% endfor %}
+    </div>
+    <a href="{% url 'voting-list' %}" class="btn-secondary mt-6 inline-block">{% trans "Back" %}</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi {{ page_icon }} mr-2 text-primary"></i>{{ page_title }}</h1>
+    {% if page_subtitle %}<p class="mt-2 max-w-3xl text-sm text-ink-light">{{ page_subtitle }}</p>{% endif %}
+    <p class="mt-1 text-sm text-ink-light">{{ page_obj.paginator.count }} {% trans "total" %}</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a href="{% url 'home' %}" class="btn-secondary btn-sm" target="_blank" rel="noopener">
+      <i class="bi bi-eye"></i>{% trans "View Homepage" %}
+    </a>
+    {% if can_create and create_url_name %}
+    <a href="{% url create_url_name %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Add section" %}</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if section_rows %}
+<div class="space-y-3">
+  {% for row in section_rows %}
+  {% with section=row.section meta=row.meta %}
+  <article class="card-flat flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
+    <div class="min-w-0 flex-1 space-y-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <h2 class="text-base font-semibold text-ink">
+          {{ section.get_section_type_display }}
+        </h2>
+        <span class="rounded bg-ink/5 px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-ink-light">
+          {{ meta.kind }} · {{ meta.source_label }}
+        </span>
+        {% if row.status == "published" %}
+        <span class="rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900">{% trans "Published" %}</span>
+        {% elif row.status == "draft" %}
+        <span class="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">{% trans "Draft" %}</span>
+        {% else %}
+        <span class="rounded bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-800">{% trans "Disabled" %}</span>
+        {% endif %}
+      </div>
+      {% if section.title_en or section.title_bn %}
+      <p class="truncate text-sm text-ink-light">
+        {{ section.title_en|default:section.title_bn }}
+      </p>
+      {% endif %}
+      <p class="text-xs text-ink-light">
+        {% trans "Order" %} {{ section.order }}
+        · {% trans "EN" %} {% if row.langs.en %}✓{% else %}—{% endif %}
+        · {% trans "BN" %} {% if row.langs.bn %}✓{% else %}—{% endif %}
+        · {% trans "Updated" %} {{ section.updated_at|date:"j M Y H:i" }}
+      </p>
+      {% if meta.source_help %}
+      <p class="text-xs text-ink-light/90">{{ meta.source_help }}</p>
+      {% endif %}
+    </div>
+    <div class="flex flex-wrap items-center gap-2 shrink-0">
+      {% if row.manage_url_name %}
+      <a href="{% url row.manage_url_name %}" class="btn-ghost btn-sm">{% trans "Manage source" %}</a>
+      {% endif %}
+      <a href="{% url 'home' %}" class="btn-ghost btn-sm" target="_blank" rel="noopener">{% trans "Preview" %}</a>
+      {% if can_edit and edit_url_name %}
+      <a href="{% url edit_url_name section.pk %}" class="btn-secondary btn-sm">
+        {% if meta.kind == "DATA_DRIVEN" %}{% trans "Edit presentation" %}{% else %}{% trans "Edit" %}{% endif %}
+      </a>
+      {% endif %}
+      {% if can_delete and delete_url_name %}
+      <a href="{% url delete_url_name section.pk %}" class="btn-ghost btn-sm text-danger">{% trans "Delete" %}</a>
+      {% endif %}
+    </div>
+  </article>
+  {% endwith %}
+  {% endfor %}
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "Nothing here yet" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon=page_icon title=empty_title %}
+{% endif %}
+{% endblock %}

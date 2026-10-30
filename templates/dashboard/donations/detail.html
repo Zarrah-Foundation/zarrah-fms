@@ -1,0 +1,35 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{% trans "Donation" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Donation" %}{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'dashboard-donations' %}" class="mb-4 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Back to donations" %}</a>
+
+<div class="mx-auto max-w-2xl">
+  <div class="card-flat">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <p class="text-3xl font-bold text-primary-dark">{{ donation.amount|floatformat:0 }} {{ donation.currency }}</p>
+        <p class="text-sm text-ink-light">{{ donation.category.name_en }}</p>
+      </div>
+      {% status_badge donation.status donation.get_status_display %}
+    </div>
+    <dl class="dash-dl">
+      <div><dt class="dash-dl-term">{% trans "Donor" %}</dt><dd class="dash-dl-desc">{{ donation.display_name }}</dd></div>
+      <div><dt class="dash-dl-term">{% trans "Anonymous" %}</dt><dd class="dash-dl-desc">{% if donation.is_anonymous %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</dd></div>
+      {% if not donation.is_anonymous %}
+      <div><dt class="dash-dl-term">{% trans "Email" %}</dt><dd class="dash-dl-desc" lang="en">{{ donation.donor_email|default:"—" }}</dd></div>
+      <div><dt class="dash-dl-term">{% trans "Phone" %}</dt><dd class="dash-dl-desc" lang="en">{{ donation.donor_phone|default:"—" }}</dd></div>
+      {% endif %}
+      <div><dt class="dash-dl-term">{% trans "Payment Method" %}</dt><dd class="dash-dl-desc">{{ donation.get_payment_method_display }}</dd></div>
+      <div><dt class="dash-dl-term">{% trans "Transaction ID" %}</dt><dd class="dash-dl-desc" lang="en">{{ donation.transaction_id|default:"—" }}</dd></div>
+      <div><dt class="dash-dl-term">{% trans "Receipt" %}</dt><dd class="dash-dl-desc" lang="en">{{ donation.receipt_number|default:"—" }}</dd></div>
+      <div><dt class="dash-dl-term">{% trans "Date" %}</dt><dd class="dash-dl-desc">{{ donation.created_at|date:"M d, Y H:i" }}</dd></div>
+      {% if donation.on_behalf_of %}<div class="sm:col-span-2"><dt class="dash-dl-term">{% trans "On behalf of" %}</dt><dd class="dash-dl-desc">{{ donation.on_behalf_of }}</dd></div>{% endif %}
+      {% if donation.message %}<div class="sm:col-span-2"><dt class="dash-dl-term">{% trans "Message" %}</dt><dd class="dash-dl-desc">{{ donation.message }}</dd></div>{% endif %}
+    </dl>
+  </div>
+</div>
+{% endblock %}

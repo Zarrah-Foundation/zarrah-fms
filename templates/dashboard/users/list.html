@@ -1,0 +1,65 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{% trans "Users" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Users" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title"><i class="bi bi-person-badge mr-2 text-primary"></i>{% trans "Users" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{{ page_obj.paginator.count }} {% trans "accounts" %}</p>
+  </div>
+  {% if can_create %}<a href="{% url 'dashboard-user-create' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i>{% trans "Add user" %}</a>{% endif %}
+</div>
+
+<form method="get" class="dash-toolbar">
+  <input type="search" name="q" value="{{ search_query }}" placeholder="{% trans 'Name or email…' %}" class="dash-search">
+  <select name="role" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "All roles" %}</option>
+    {% for code, label in roles %}<option value="{{ code }}" {% if role == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <select name="active" class="form-select w-auto" onchange="this.form.submit()">
+    <option value="">{% trans "All" %}</option>
+    <option value="1" {% if active == '1' %}selected{% endif %}>{% trans "Active" %}</option>
+    <option value="0" {% if active == '0' %}selected{% endif %}>{% trans "Inactive" %}</option>
+  </select>
+  <button type="submit" class="btn-secondary btn-sm"><i class="bi bi-search"></i>{% trans "Filter" %}</button>
+  {% if search_query or role or active %}<a href="?" class="btn-ghost btn-sm">{% trans "Clear" %}</a>{% endif %}
+</form>
+
+{% if users %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Email" %}</th>
+        <th>{% trans "Role" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th>{% trans "Last login" %}</th>
+        <th class="text-right">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td class="font-medium">{{ u.name|default:"—" }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.get_role_display }}</td>
+        <td>{% if u.is_active_member %}<span class="badge-success">{% trans "Active" %}</span>{% else %}<span class="badge-muted">{% trans "Inactive" %}</span>{% endif %}</td>
+        <td>{{ u.last_login|date:"M d, Y"|default:"—" }}</td>
+        <td class="text-right">
+          {% if can_edit %}<a href="{% url 'dashboard-user-edit' u.pk %}" class="dash-icon-btn" title="{% trans 'Edit' %}"><i class="bi bi-pencil"></i></a>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No users found" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-person-badge" title=empty_title %}
+{% endif %}
+{% endblock %}

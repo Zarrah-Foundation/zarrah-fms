@@ -1,0 +1,50 @@
+{% load i18n i18n_extras %}
+<section class="zf-home-section" aria-labelledby="home-partners-title">
+  <div class="container-app">
+    <div class="zf-home-heading mx-auto mb-8 max-w-2xl text-center">
+      <p class="zf-home-eyebrow">{% trans "Organizations & platforms supporting our work" %}</p>
+      <h2 id="home-partners-title" class="zf-home-title">
+        {{ section|bl:"title" }}
+      </h2>
+      {% if section.content_en or section.content_bn %}
+      <p class="zf-home-lead mt-3">{{ section|bl:"content" }}</p>
+      {% endif %}
+    </div>
+
+    {% if home_partners %}
+    <ul class="zf-supporter-grid">
+      {% for partner in home_partners %}
+      <li class="zf-supporter-card">
+        {% if partner.public_url %}
+        <a href="{{ partner.public_url }}" target="_blank" rel="noopener noreferrer" class="zf-supporter-card__identity">
+        {% else %}
+        <div class="zf-supporter-card__identity">
+        {% endif %}
+          {% if partner.logo_is_usable %}
+          <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="zf-supporter-card__logo" loading="lazy" width="160" height="48" onerror="this.hidden=true; var m=this.nextElementSibling; if(m){m.hidden=false;}">
+          <span class="zf-supporter-card__mark" hidden aria-hidden="true">{{ partner.initials }}</span>
+          {% else %}
+          <span class="zf-supporter-card__mark" aria-hidden="true">{{ partner.initials }}</span>
+          {% endif %}
+          <span class="zf-supporter-card__name">{{ partner.name }}</span>
+          {% if partner.public_url %}
+          <span class="sr-only">{% zf_label "(opens in a new tab)" %}</span>
+          <i class="bi bi-box-arrow-up-right zf-supporter-card__ext" aria-hidden="true"></i>
+          {% endif %}
+        {% if partner.public_url %}
+        </a>
+        {% else %}
+        </div>
+        {% endif %}
+        {% if partner.localized_relationship_type %}
+        <p class="zf-supporter-card__type">{{ partner.localized_relationship_type }}</p>
+        {% endif %}
+        {% if partner.localized_description %}
+        <p class="zf-supporter-card__desc">{{ partner.localized_description }}</p>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,64 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras %}
+
+{% block title %}{% trans "Applications" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Membership Applications" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <h1 class="dash-page-title"><i class="bi bi-file-earmark-person mr-2 text-primary"></i>{% trans "Applications" %}</h1>
+</div>
+
+<div class="dash-toolbar">
+  {% for code, label in status_choices %}
+  <a href="?status={{ code }}" class="rounded-badge px-3 py-1.5 text-sm font-semibold {% if status == code %}bg-primary text-white{% else %}bg-canvas text-ink-light hover:text-primary{% endif %}">
+    {{ label }} <span class="ml-1 opacity-70">{{ counts|get_attr:code }}</span>
+  </a>
+  {% endfor %}
+</div>
+
+{% if applications %}
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Phone" %}</th>
+        <th>{% trans "District" %}</th>
+        <th>{% trans "Submitted" %}</th>
+        <th>{% trans "Status" %}</th>
+        <th class="text-right">{% trans "Actions" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td><a href="{% url 'dashboard-application-detail' app.pk %}" class="font-semibold text-primary hover:underline">{{ app.full_name }}</a></td>
+        <td lang="en">{{ app.phone }}</td>
+        <td>{{ app.present_district|default:app.country|default:"—" }}</td>
+        <td>{{ app.created_at|date:"M d, Y" }}</td>
+        <td>{% status_badge app.status app.get_status_display %}</td>
+        <td class="text-right">
+          <div class="inline-flex flex-wrap items-center justify-end gap-1">
+            <a href="{% url 'dashboard-application-detail' app.pk %}" class="dash-icon-btn" title="{% trans 'View' %}"><i class="bi bi-eye"></i></a>
+            {% if app.status != "APPROVED" %}
+              {% if can_review and app.status != "UNDER_REVIEW" %}
+              <form method="post" action="{% url 'dashboard-application-action' app.pk %}"><input type="hidden" name="action" value="review">{% csrf_token %}<button class="dash-icon-btn" title="{% trans 'Mark under review' %}"><i class="bi bi-hourglass-split"></i></button></form>
+              {% endif %}
+              {% if can_approve %}
+              <form method="post" action="{% url 'dashboard-application-action' app.pk %}" onsubmit="return confirm('{% trans "Approve this application?" %}');"><input type="hidden" name="action" value="approve">{% csrf_token %}<button class="dash-icon-btn hover:text-success" title="{% trans 'Approve' %}"><i class="bi bi-check-lg"></i></button></form>
+              {% endif %}
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "dashboard/includes/_pagination.html" %}
+{% else %}
+{% trans "No applications in this view" as empty_title %}
+{% include "dashboard/includes/_empty_state.html" with icon="bi-file-earmark-person" title=empty_title %}
+{% endif %}
+{% endblock %}

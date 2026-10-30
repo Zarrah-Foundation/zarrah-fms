@@ -1,0 +1,46 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "SMS Settings" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "SMS Settings" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "SMS Settings" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Provider-agnostic SMS configuration. API keys are never exposed publicly." %}</p>
+  </div>
+</div>
+
+<form method="post" class="mx-auto max-w-3xl space-y-6">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+  <div class="card-flat">
+    <h2 class="mb-5 text-h4">{% trans "Provider" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.enabled %}
+      {% include "dashboard/includes/_form_field.html" with field=form.provider %}
+      {% include "dashboard/includes/_form_field.html" with field=form.api_url %}
+      {% include "dashboard/includes/_form_field.html" with field=form.api_key %}
+      {% include "dashboard/includes/_form_field.html" with field=form.sender_id %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-5 text-h4">{% trans "Verification limits" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.verification_timeout_seconds %}
+      {% include "dashboard/includes/_form_field.html" with field=form.resend_cooldown_seconds %}
+      {% include "dashboard/includes/_form_field.html" with field=form.max_attempts %}
+      {% include "dashboard/includes/_form_field.html" with field=form.max_sends_per_hour %}
+    </div>
+  </div>
+
+  {% if can_edit %}
+  <div class="flex justify-end">
+    <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save changes" %}</button>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}

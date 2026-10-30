@@ -1,0 +1,24 @@
+{% comment %}
+Reusable section heading: eyebrow badge + title + optional subtitle.
+Usage:
+  {% include "includes/ui/typography/_section_header.html" with eyebrow_icon="bi-bullseye" eyebrow_text=x|bl:"eyebrow" title=x|bl:"title" subtitle=x|bl:"subtitle" %}
+Params:
+  eyebrow_text - small pill label above the heading (optional)
+  eyebrow_icon  - Bootstrap Icons class for the pill (optional)
+  title         - heading text (required)
+  subtitle      - supporting paragraph (optional)
+  align         - center | left (default: center)
+  on_dark       - True when section background is dark/gradient
+  max_width     - Tailwind max-width class for the wrapper (default: max-w-3xl)
+{% endcomment %}
+<div class="mx-auto mb-14 {{ max_width|default:"max-w-3xl" }} {% if align == 'left' %}text-left{% else %}text-center{% endif %}">
+  {% if eyebrow_text %}
+  {% include "includes/ui/badges/_badge.html" with icon=eyebrow_icon text=eyebrow_text on_dark=on_dark %}
+  {% endif %}
+  <h2 class="mt-5 text-h2 {% if on_dark %}text-white{% else %}text-ink{% endif %}">{{ title }}</h2>
+  {% if subtitle %}
+  <p class="mt-5 text-body {% if on_dark %}text-white/80{% else %}text-ink-light{% endif %}{% if align == 'left' %}{% else %} mx-auto{% endif %}">
+    {{ subtitle }}
+  </p>
+  {% endif %}
+</div>

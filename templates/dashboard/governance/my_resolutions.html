@@ -1,0 +1,51 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My resolutions" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "My resolutions" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <h1 class="dash-page-title"><i class="bi bi-file-earmark-text"></i> {% trans "My resolutions" %}</h1>
+</div>
+
+<div class="space-y-6">
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Awaiting your signature" %}</h2>
+    <table class="dash-table">
+      <thead><tr><th>{% trans "Resolution" %}</th><th>{% trans "Meeting" %}</th><th></th></tr></thead>
+      <tbody>
+        {% for s in pending %}
+        <tr>
+          <td>{{ s.resolution.resolution_id }} — {{ s.resolution.title_en|default:s.resolution.title_bn }}</td>
+          <td>{{ s.resolution.meeting.reference_id }}</td>
+          <td class="text-right">
+            <a href="{% url 'my-resolution-sign' s.resolution.pk %}" class="btn-primary btn-sm">{% trans "Sign" %}</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="text-ink-light">{% trans "Nothing pending." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Signed" %}</h2>
+    <table class="dash-table">
+      <thead><tr><th>{% trans "Resolution" %}</th><th>{% trans "Signed at" %}</th><th></th></tr></thead>
+      <tbody>
+        {% for s in signed %}
+        <tr>
+          <td>{{ s.resolution.resolution_id }}</td>
+          <td>{{ s.signed_at|date:"Y-m-d H:i" }}</td>
+          <td class="text-right"><a href="{% url 'my-resolution-detail' s.resolution.pk %}" class="btn-ghost btn-sm">{% trans "View" %}</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3" class="text-ink-light">{% trans "No signed resolutions yet." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

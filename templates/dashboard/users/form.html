@@ -1,0 +1,65 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% if is_create %}{% trans "Add User" %}{% else %}{% trans "Edit User" %}{% endif %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% if is_create %}{% trans "Add User" %}{% else %}{% trans "Edit User" %}{% endif %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <a href="{% url 'dashboard-users' %}" class="mb-1 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Users" %}</a>
+    <h1 class="dash-page-title">{% if is_create %}{% trans "Add User" %}{% else %}{{ target_user.email }}{% endif %}</h1>
+  </div>
+  {% if not is_create %}
+  <div class="flex items-center gap-2">
+    {% if can_reset %}<a href="{% url 'dashboard-user-reset-password' target_user.pk %}" class="btn-secondary btn-sm"><i class="bi bi-key"></i>{% trans "Reset password" %}</a>{% endif %}
+    {% if can_deactivate %}
+    <form method="post" action="{% url 'dashboard-user-toggle-active' target_user.pk %}">
+      {% csrf_token %}
+      {% if target_user.is_active_member %}
+      <button type="submit" class="btn-danger btn-sm"><i class="bi bi-person-x"></i>{% trans "Deactivate" %}</button>
+      {% else %}
+      <button type="submit" class="btn-primary btn-sm"><i class="bi bi-person-check"></i>{% trans "Activate" %}</button>
+      {% endif %}
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2">
+    <form method="post" class="card-flat space-y-5">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="dash-form-grid">
+        {% for field in form %}
+        {% include "dashboard/includes/_form_field.html" with field=field %}
+        {% endfor %}
+      </div>
+      <div class="flex justify-end gap-3 border-t border-border/60 pt-5">
+        <a href="{% url 'dashboard-users' %}" class="btn-ghost">{% trans "Cancel" %}</a>
+        <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save" %}</button>
+      </div>
+    </form>
+  </div>
+
+  {% if not is_create %}
+  <div class="card-flat">
+    <h2 class="mb-3 text-h4">{% trans "Login history" %}</h2>
+    {% if login_history %}
+    <ul class="space-y-3 text-sm">
+      {% for entry in login_history %}
+      <li class="border-b border-border/40 pb-2">
+        <p class="font-medium text-ink">{{ entry.logged_in_at|date:"M d, Y H:i" }}</p>
+        <p class="text-ink-light">{{ entry.ip_address|default:"—" }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-sm text-ink-light">{% trans "No login records." %}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

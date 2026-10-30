@@ -1,0 +1,17 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Webhook event" %}{% endblock %}
+{% block topbar_title %}{% trans "Webhook event" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><h1 class="dash-page-title">{{ event.external_event_id }}</h1>
+<a href="{% url 'dashboard-payments-webhooks' %}" class="btn-secondary btn-sm">{% trans "Back" %}</a></div>
+<div class="rounded-card border border-border/60 bg-surface p-5 space-y-2 text-sm">
+<p><span class="text-ink-light">{% trans "Provider" %}:</span> {{ event.provider }}</p>
+<p><span class="text-ink-light">{% trans "Type" %}:</span> {{ event.event_type }}</p>
+<p><span class="text-ink-light">{% trans "Status" %}:</span> {{ event.get_processing_status_display }}</p>
+<p><span class="text-ink-light">{% trans "Received" %}:</span> {{ event.received_at }}</p>
+<p><span class="text-ink-light">{% trans "Processed" %}:</span> {{ event.processed_at|default:"—" }}</p>
+<p><span class="text-ink-light">{% trans "Error" %}:</span> {{ event.error_message|default:"—" }}</p>
+{% if event.safe_payload %}<pre class="mt-4 overflow-x-auto rounded bg-canvas p-3 text-xs">{{ event.safe_payload }}</pre>{% endif %}
+</div>
+{% endblock %}

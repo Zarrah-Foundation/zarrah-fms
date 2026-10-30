@@ -1,0 +1,33 @@
+{% load i18n %}
+<div class="space-y-3">
+  <form method="get" class="flex flex-wrap gap-2" data-media-search>
+    {% if section_id %}<input type="hidden" name="section" value="{{ section_id }}">{% endif %}
+    <input type="search" name="q" value="{{ search_query }}" placeholder="{% trans 'Search images…' %}" class="form-input flex-1 min-w-[12rem]">
+    <button type="submit" class="btn-secondary btn-sm">{% trans "Search" %}</button>
+  </form>
+  <p class="text-sm text-ink-light">
+    <span data-selected-count>0</span> {% trans "selected" %}
+  </p>
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4" data-media-grid>
+    {% for item in media_items %}
+    <label class="relative block cursor-pointer rounded-lg border border-border/70 p-2 {% if item.in_gallery %}opacity-60{% endif %}">
+      <input
+        type="checkbox"
+        class="absolute left-3 top-3"
+        value="{{ item.id }}"
+        data-media-id="{{ item.id }}"
+        {% if item.in_gallery %}disabled checked{% endif %}
+      >
+      {% if item.url %}
+      <img src="{{ item.url }}" alt="" class="mb-2 h-28 w-full rounded object-cover" loading="lazy" width="240" height="112">
+      {% else %}
+      <div class="mb-2 flex h-28 items-center justify-center rounded bg-ink/5 text-xs text-ink-light">{% trans "No preview" %}</div>
+      {% endif %}
+      <p class="truncate text-xs font-medium text-ink" title="{{ item.name }}">{{ item.name }}</p>
+      <p class="text-[11px] text-ink-light">{{ item.created }}{% if item.in_gallery %} · {% trans "Already in gallery" %}{% endif %}</p>
+    </label>
+    {% empty %}
+    <p class="col-span-full text-sm text-ink-light">{% trans "No images in the library yet. Upload new images first." %}</p>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,79 @@
+{% load i18n i18n_extras %}
+<button
+  type="button"
+  id="back-to-top"
+  class="back-to-top"
+  aria-label="{% zf_label 'Back to top' %}"
+  aria-hidden="true"
+  tabindex="-1"
+>
+  <i class="bi bi-arrow-up" aria-hidden="true"></i>
+</button>
+
+<style>
+  .back-to-top {
+    position: fixed;
+    right: 1.15rem;
+    bottom: 1.35rem;
+    z-index: 45;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.15rem;
+    height: 3.15rem;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: #0B6B3A;
+    color: #fff;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(8, 79, 44, 0.28);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(0.5rem) scale(0.92);
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease,
+      visibility 0.22s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease;
+  }
+  .back-to-top.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+  .back-to-top:hover {
+    background: #084F2C;
+    box-shadow: 0 12px 28px rgba(8, 79, 44, 0.36);
+    transform: translateY(-2px) scale(1);
+  }
+  .back-to-top.is-visible:hover {
+    transform: translateY(-2px) scale(1);
+  }
+  .back-to-top:focus-visible {
+    outline: 2px solid #0B6B3A;
+    outline-offset: 3px;
+  }
+  @media (min-width: 640px) {
+    .back-to-top {
+      right: 1.5rem;
+      bottom: 1.75rem;
+      width: 3.35rem;
+      height: 3.35rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .back-to-top {
+      transition: none;
+    }
+    .back-to-top.is-visible:hover {
+      transform: none;
+    }
+  }
+</style>

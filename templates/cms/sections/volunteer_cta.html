@@ -1,0 +1,6 @@
+{% load i18n %}
+<section class="my-12 rounded-2xl bg-emerald-800 py-12 text-center text-white">
+  <h2 class="text-2xl font-bold">{% if LANGUAGE_CODE == 'bn' and section.title_bn %}{{ section.title_bn }}{% else %}{{ section.title_en|default:"Become a Volunteer" }}{% endif %}</h2>
+  <p class="mx-auto mt-4 max-w-xl opacity-90">{% if LANGUAGE_CODE == 'bn' and section.content_bn %}{{ section.content_bn }}{% else %}{{ section.content_en|default:section.content_bn }}{% endif %}</p>
+  <a href="{% url 'volunteer' %}" class="mt-6 inline-block rounded-lg bg-white px-6 py-3 font-medium text-emerald-800 hover:bg-gray-100">{% trans "Join Us" %}</a>
+</section>

@@ -1,0 +1,39 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% if is_create %}{% trans "New resolution" %}{% else %}{% trans "Edit resolution" %}{% endif %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Resolution" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mx-auto max-w-4xl">
+  <div class="dash-page-header">
+    <h1 class="dash-page-title">{% if is_create %}{% trans "New resolution" %}{% else %}{% trans "Edit resolution" %}{% endif %}</h1>
+    <p class="text-sm text-ink-light">{{ meeting.reference_id }} — {{ meeting.title_en|default:meeting.title_bn }}</p>
+  </div>
+
+  <form method="post" class="card-flat space-y-5 js-dash-form" novalidate>
+    {% csrf_token %}
+    <div class="dash-form-grid">
+      {% for field in form %}
+      {% include "dashboard/includes/_form_field.html" with field=field %}
+      {% endfor %}
+    </div>
+    <div class="flex justify-end gap-3 border-t border-border/60 pt-5">
+      <a href="{% if resolution %}{% url 'dashboard-resolution-detail' resolution.pk %}{% else %}{% url 'dashboard-meeting-detail' meeting.pk %}{% endif %}" class="btn-ghost">{% trans "Cancel" %}</a>
+      <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/tinymce@7.6.0/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+(function () {
+  var form = document.querySelector("form.js-dash-form");
+  if (form) form.addEventListener("submit", function () { if (window.tinymce) try { tinymce.triggerSave(); } catch (e) {} });
+  if (!window.tinymce) return;
+  tinymce.init({ selector: "textarea.js-richtext", menubar: false, plugins: "lists link table", toolbar: "blocks | bold italic | bullist numlist | link removeformat", height: 360, branding: false });
+})();
+</script>
+{% endblock %}

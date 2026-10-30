@@ -1,0 +1,231 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n dashboard_extras fee_extras %}
+
+{% block title %}{% trans "Fee Details" %} · {{ member.member_id }}{% endblock %}
+{% block topbar_title %}{% trans "Membership Fee Details" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header flex flex-wrap items-start justify-between gap-4">
+  <div>
+    <p class="text-sm text-ink-light">
+      <a href="{% url 'dashboard-membership-fees' %}" class="text-primary hover:underline">{% trans "Membership Fees" %}</a>
+      <span class="mx-1">/</span>
+      {{ member.first_name }} {{ member.last_name }}
+    </p>
+    <h1 class="dash-page-title mt-1">{{ member.first_name }} {{ member.last_name }}</h1>
+    <p class="mt-1 text-sm text-ink-light" lang="en">{{ member.member_id }} · {{ member.user.email|default:"" }}</p>
+  </div>
+  {% if can_view_member %}
+  <a href="{% url 'dashboard-member-detail' member.pk %}" class="btn-ghost btn-sm">{% trans "Member profile" %}</a>
+  {% endif %}
+</div>
+
+<section class="card-flat mb-6 p-5">
+  <h2 class="mb-4 text-h4">{% trans "Member summary" %}</h2>
+  <dl class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-sm">
+    <div>
+      <dt class="text-ink-light">{% trans "Name" %}</dt>
+      <dd class="font-medium">{{ member.first_name }} {{ member.last_name }}</dd>
+    </div>
+    <div>
+      <dt class="text-ink-light">{% trans "Membership ID" %}</dt>
+      <dd class="font-medium" lang="en">{{ member.member_id }}</dd>
+    </div>
+    <div>
+      <dt class="text-ink-light">{% trans "Membership Type" %}</dt>
+      <dd class="font-medium">{{ member.membership_type.name_en|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt class="text-ink-light">{% trans "Approval Date" %}</dt>
+      <dd class="font-medium">
+        {% if member.approved_at %}{{ member.approved_at|date:"M d, Y" }}
+        {% elif member.joined_at %}{{ member.joined_at|date:"M d, Y" }}
+        {% else %}—{% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt class="text-ink-light">{% trans "Fee Start Month" %}</dt>
+      <dd class="font-medium">{% if fee_summary.fee_start %}{{ fee_summary.fee_start_label }}{% else %}—{% endif %}</dd>
+    </div>
+    <div>
+      <dt class="text-ink-light">{% trans "Registration Fee" %}</dt>
+      <dd class="font-medium">৳{{ fee_summary.registration_fee_amount|floatformat:0 }}</dd>
+    </div>
+    <div>
+      <dt class="text-ink-light">{% trans "Registration Fee Status" %}</dt>
+      <dd class="font-medium">
+        {% if fee_summary.registration_fee_status == "COMPLETED" %}{% trans "Paid" %}
+        {% elif fee_summary.registration_fee_status %}{% trans "Pending" %}
+        {% else %}—{% endif %}
+      </dd>
+    </div>
+  </dl>
+</section>
+
+<div class="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Monthly fee" %}</p>
+    <p class="mt-1 text-lg font-semibold text-ink">৳{{ fee_summary.monthly_fee|floatformat:0 }}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Paid through" %}</p>
+    <p class="mt-1 text-lg font-semibold text-ink">{% if fee_summary.paid_through %}{{ fee_summary.paid_through_label }}{% else %}—{% endif %}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Pending" %}</p>
+    <p class="mt-1 text-lg font-semibold text-ink">{{ fee_summary.pending_months }} {% trans "months" %}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Pending amount" %}</p>
+    <p class="mt-1 text-lg font-semibold text-ink">৳{{ fee_summary.pending_amount|floatformat:0 }}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Autopay" %}</p>
+    <p class="mt-1 text-lg font-semibold text-ink">{% if fee_summary.autopay_enabled %}{% trans "ON" %}{% else %}{% trans "OFF" %}{% endif %}</p>
+  </div>
+  <div class="card-flat p-4">
+    <p class="text-xs uppercase tracking-wide text-ink-light">{% trans "Next due" %}</p>
+    <p class="mt-1 text-lg font-semibold text-ink">{% if fee_summary.next_due %}{{ fee_summary.next_due_label }}{% else %}—{% endif %}</p>
+  </div>
+</div>
+
+<section class="card-flat mb-6 p-5">
+  <h2 class="mb-3 text-h4">{% trans "Autopay" %}</h2>
+  <p class="mb-3 text-sm text-ink-light">
+    {% trans "Status" %}:
+    {% if autopay.is_enabled %}{% trans "ON" %} ({{ autopay.get_mode_display }}){% else %}{% trans "OFF" %}{% endif %}
+    {% if autopay.next_charge_on %} · {% trans "Next due period" %}: {{ autopay.next_charge_on|date:"M Y" }}{% endif %}
+  </p>
+  {% if can_manage_autopay and autopay.is_enabled %}
+  <form method="post" action="{% url 'dashboard-member-fee-autopay-deactivate' member.pk %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url 'dashboard-membership-fee-detail' member.pk %}">
+    <button type="submit" class="btn-secondary btn-sm">{% trans "Deactivate" %}</button>
+  </form>
+  {% endif %}
+</section>
+
+{% if can_record_fee and registration_fee and registration_fee.status != "COMPLETED" %}
+<section class="card-flat mb-6 p-5">
+  <h2 class="mb-3 text-h4">{% trans "Record registration fee" %}</h2>
+  <form method="post" action="{% url 'dashboard-membership-fee-registration' member.pk %}" class="space-y-3">
+    {% csrf_token %}
+    <div class="dash-form-grid">
+      <div>
+        <label class="form-label">{% trans "Payment method" %}</label>
+        <select name="payment_method" class="form-input">
+          {% for code, label in offline_methods %}
+          <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="form-label">{% trans "Reference / transaction ID" %}</label>
+        <input type="text" name="transaction_id" class="form-input">
+      </div>
+      <div class="sm:col-span-2">
+        <label class="form-label">{% trans "Notes" %}</label>
+        <textarea name="notes" class="form-textarea" rows="2"></textarea>
+      </div>
+    </div>
+    <button type="submit" class="btn-primary btn-sm">{% trans "Record registration fee" %}</button>
+  </form>
+</section>
+{% endif %}
+
+<div class="card-flat mb-6">
+  <h2 class="mb-4 text-h4">{% trans "Monthly fees" %}</h2>
+  {% if fees %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% if can_record_fee %}{% endif %}</th>
+          <th>{% trans "Period" %}</th>
+          <th>{% trans "Amount" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Payment Source" %}</th>
+          <th>{% trans "Payment Date" %}</th>
+          <th>{% trans "Reference" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fee in fees %}
+        <tr>
+          <td>
+            {% if can_record_fee and fee.status != "COMPLETED" %}
+            <input type="checkbox" form="admin-fee-record" name="months" value="{{ fee.year }}-{{ fee.month }}">
+            {% endif %}
+          </td>
+          <td>{{ fee|fee_period }}</td>
+          <td>৳{{ fee.amount|floatformat:0 }}</td>
+          <td>{% status_badge fee.status fee.get_status_display %}</td>
+          <td>{{ fee.get_source_display|default:"—" }}</td>
+          <td>{{ fee.paid_at|date:"M d, Y"|default:"—" }}</td>
+          <td class="text-sm" lang="en">{{ fee.transaction_id|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-sm text-ink-light">{% trans "No fee records." %}</p>
+  {% endif %}
+
+  {% if can_record_fee %}
+  <form id="admin-fee-record" method="post" action="{% url 'dashboard-member-fee-record' member.pk %}" class="mt-4 space-y-3 border-t border-border/50 pt-4">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url 'dashboard-membership-fee-detail' member.pk %}">
+    <div class="dash-form-grid">
+      <div>
+        <label class="form-label">{% trans "Payment method" %}</label>
+        <select name="payment_method" class="form-input">
+          {% for code, label in offline_methods %}
+          <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="form-label">{% trans "Reference / transaction ID" %}</label>
+        <input type="text" name="transaction_id" class="form-input">
+      </div>
+      <div class="sm:col-span-2">
+        <label class="form-label">{% trans "Notes" %}</label>
+        <textarea name="notes" class="form-textarea" rows="2"></textarea>
+      </div>
+    </div>
+    <button type="submit" class="btn-primary btn-sm"><i class="bi bi-cash"></i>{% trans "Record offline payment" %}</button>
+  </form>
+  {% endif %}
+</div>
+
+{% if payments %}
+<div class="card-flat mb-6">
+  <h2 class="mb-4 text-h4">{% trans "Payment history" %}</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Amount" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Source" %}</th>
+          <th>{% trans "Periods" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+        <tr>
+          <td>{{ p.created_at|date:"M d, Y H:i" }}</td>
+          <td>৳{{ p.amount|floatformat:0 }}</td>
+          <td>{% status_badge p.status p.get_status_display %}</td>
+          <td>{{ p.get_source_display|default:"—" }}</td>
+          <td class="text-sm">{{ p.months|fee_months }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

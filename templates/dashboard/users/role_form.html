@@ -1,0 +1,54 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% if is_create %}{% trans "Add Role" %}{% else %}{% trans "Edit Role" %}{% endif %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% if is_create %}{% trans "Add Role" %}{% else %}{% trans "Edit Role" %}{% endif %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <a href="{% url 'dashboard-roles' %}" class="mb-1 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% trans "Roles" %}</a>
+    <h1 class="dash-page-title">{% if is_create %}{% trans "Add Role" %}{% else %}{{ role.name }}{% endif %}</h1>
+  </div>
+</div>
+
+<form method="post" class="space-y-6">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Role details" %}</h2>
+    <div class="dash-form-grid">
+      {% include "dashboard/includes/_form_field.html" with field=form.name %}
+      {% include "dashboard/includes/_form_field.html" with field=form.legacy_role %}
+      {% include "dashboard/includes/_form_field.html" with field=form.description wrap_class="sm:col-span-2" %}
+      {% include "dashboard/includes/_form_field.html" with field=form.is_active %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-1 text-h4">{% trans "Permissions" %}</h2>
+    <p class="mb-4 text-sm text-ink-light">{% trans "Select the actions this role may perform." %}</p>
+    <div class="space-y-5">
+      {% for module_label, items in permission_groups.items %}
+      <div>
+        <p class="mb-2 text-sm font-semibold text-ink">{{ module_label }}</p>
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {% for it in items %}
+          <label class="flex items-center gap-2 rounded-lg border border-border/60 px-3 py-2 text-sm">
+            <input type="checkbox" name="permissions" value="{{ it.perm.id }}" class="form-checkbox" {% if it.checked %}checked{% endif %}>
+            <span>{{ it.perm.action|title }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <a href="{% url 'dashboard-roles' %}" class="btn-ghost">{% trans "Cancel" %}</a>
+    <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save role" %}</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Payment Successful" %} | {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-lg px-4 py-16 text-center">
+  <div class="card">
+    <h1 class="mb-4 text-2xl font-bold text-emerald-800">{% zf_label "Payment Successful" %}</h1>
+    <p class="text-gray-600">{% zf_label "Your donation of" %} {{ donation.amount|floatformat:0 }} {{ donation.currency }} {% zf_label "has been received." %}</p>
+    {% if donation.receipt_number %}
+    <p class="mt-2 text-sm text-gray-500">{% zf_label "Receipt Number:" %} <span lang="en">{{ donation.receipt_number }}</span></p>
+    {% endif %}
+    <p class="mt-1 text-sm text-gray-500">{% zf_label "Transaction ID:" %} <span lang="en">{{ donation.transaction.tran_id }}</span></p>
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <a href="{% url 'donation-receipt' donation.pk %}" class="btn-primary inline-block">
+        {% zf_label "View Receipt" %}
+      </a>
+      <a href="{% url 'donation-receipt-pdf' donation.pk %}" class="btn-secondary inline-block">
+        {% zf_label "Download PDF" %}
+      </a>
+      <a href="{% url 'home' %}" class="btn-secondary inline-block">{% zf_label "Return Home" %}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

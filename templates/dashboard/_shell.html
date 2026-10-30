@@ -1,0 +1,118 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B6B3A">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}{% trans "Dashboard" %} · {{ site_settings.localized_name }}{% endblock %}</title>
+
+  {% if site_settings.site_favicon %}
+  <link rel="icon" href="{{ site_settings.site_favicon.url }}">
+  {% endif %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.maateen.me/kalpurush/font.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}?v=20260809-p6">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="dash-layout">
+  <a href="#dash-main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-btn focus:bg-primary focus:px-4 focus:py-2 focus:text-white">
+    {% trans "Skip to main content" %}
+  </a>
+
+  {# ===== Desktop sidebar ===== #}
+  <aside class="dash-sidebar" aria-label="{% trans 'Dashboard navigation' %}">
+    <div class="dash-brand">
+      <a href="{% url 'dashboard' %}" class="flex items-center gap-2.5">
+        {% if site_settings.site_logo %}
+        <img src="{{ site_settings.site_logo.url }}" alt="" class="h-9 w-auto">
+        {% else %}
+        <span class="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-soft-sm"><i class="bi bi-heart-fill"></i></span>
+        {% endif %}
+        <span class="text-base font-extrabold leading-tight text-primary-dark">{{ site_settings.short_name|default:site_settings.localized_name }}</span>
+      </a>
+    </div>
+    <div class="dash-sidebar-scroll" data-dash-nav-scroll>
+      {% include "dashboard/includes/_sidebar_nav.html" %}
+    </div>
+  </aside>
+
+  {# ===== Mobile drawer ===== #}
+  <div id="dash-drawer-backdrop" class="drawer-backdrop" hidden></div>
+  <aside id="dash-drawer" class="drawer-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="{% trans 'Dashboard menu' %}" tabindex="-1">
+    <div class="drawer-header">
+      <a href="{% url 'dashboard' %}" class="flex items-center gap-2.5">
+        <span class="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white"><i class="bi bi-heart-fill"></i></span>
+        <span class="text-base font-extrabold text-primary-dark">{{ site_settings.short_name|default:site_settings.localized_name }}</span>
+      </a>
+      <button type="button" id="dash-drawer-close" class="drawer-close-btn" aria-label="{% trans 'Close menu' %}"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-3" data-dash-nav-scroll>
+      {% include "dashboard/includes/_sidebar_nav.html" %}
+    </div>
+  </aside>
+
+  {# ===== Main column ===== #}
+  <div class="dash-main">
+    <header class="dash-topbar">
+      <button type="button" id="dash-drawer-open" class="dash-icon-btn lg:hidden" aria-label="{% trans 'Open menu' %}" aria-controls="dash-drawer" aria-expanded="false">
+        <i class="bi bi-list text-2xl" aria-hidden="true"></i>
+      </button>
+
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-semibold text-ink">{% block topbar_title %}{% trans "Dashboard" %}{% endblock %}</p>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <a href="{% url 'home' %}" class="dash-icon-btn" title="{% trans 'View website' %}" aria-label="{% trans 'View website' %}" target="_blank" rel="noopener">
+          <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+        </a>
+
+        {% include "dashboard/includes/_notification_bell.html" %}
+
+        <div class="relative">
+          <button type="button" class="dash-icon-btn" data-dropdown-toggle="user-menu" aria-haspopup="true" aria-expanded="false" aria-label="{% trans 'Account menu' %}">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary-dark">{{ user.name|default:user.email|slice:":1"|upper }}</span>
+          </button>
+          <div id="user-menu" data-dropdown-menu class="dash-menu" hidden>
+            <div class="dash-menu-header flex-col items-start gap-0">
+              <span class="font-semibold text-ink">{{ user.name|default:user.email }}</span>
+              <span class="text-xs font-normal text-ink-light" lang="en">{{ user.email }}</span>
+            </div>
+            <a href="{% url 'dashboard' %}" class="dash-menu-link"><i class="bi bi-speedometer2"></i>{% trans "Dashboard" %}</a>
+            <a href="{% url 'home' %}" class="dash-menu-link"><i class="bi bi-house-door"></i>{% trans "View website" %}</a>
+            <form method="post" action="{% url 'logout' %}" class="border-t border-border/60">
+              {% csrf_token %}
+              <button type="submit" class="dash-menu-link w-full text-left text-danger"><i class="bi bi-box-arrow-right"></i>{% trans "Log out" %}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {% if messages %}
+    <div class="px-4 pt-4 sm:px-6 lg:px-8" aria-live="polite">
+      <div class="space-y-2">
+        {% for message in messages %}
+        {% include "includes/ui/alerts/_alert.html" with message=message %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <main id="dash-main" class="dash-content">
+      {% block dashboard_content %}{% endblock %}
+    </main>
+  </div>
+
+  <script src="{% static 'js/drawer-scroll-lock.js' %}"></script>
+  <script src="{% static 'js/dashboard-shell.js' %}?v=20260810-navpreserve"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

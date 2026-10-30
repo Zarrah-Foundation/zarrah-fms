@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n i18n_extras %}
+
+{% block title %}{% zf_label "Payment Successful" %} - {{ site_settings.localized_name }}{% endblock %}
+
+{% block content %}
+<section class="section container-app">
+  <div class="card mx-auto max-w-xl text-center">
+    <i class="bi bi-check-circle text-4xl text-success" aria-hidden="true"></i>
+    <h1 class="mt-4 text-h2 text-primary-dark">{% zf_label "Payment Successful" %}</h1>
+    <p class="mt-2 text-ink-light">
+      {% zf_label "Thank you. The membership fee payment was completed successfully." %}
+    </p>
+
+    <dl class="mt-8 space-y-3 border-t border-border/60 pt-6 text-left text-sm">
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-light">{% zf_label "Member" %}</dt>
+        <dd class="font-semibold text-ink text-right">{{ display_name }}</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-light">{% zf_label "Membership ID" %}</dt>
+        <dd class="font-semibold text-ink text-right" lang="en">{{ member_id }}</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-light">{% zf_label "Fee Period" %}</dt>
+        <dd class="font-semibold text-ink text-right">{{ period_label }}</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-light">{% zf_label "Amount" %}</dt>
+        <dd class="font-semibold text-ink text-right" lang="en">৳{{ amount|floatformat:0 }}</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-light">{% zf_label "Transaction ID" %}</dt>
+        <dd class="font-semibold text-ink text-right break-all" lang="en">{{ tran_id }}</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-light">{% zf_label "Payment Status" %}</dt>
+        <dd class="font-semibold text-success text-right">{% zf_label "Success" %}</dd>
+      </div>
+    </dl>
+
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href="{% url 'public-membership-fee-payment' %}" class="btn-secondary">
+        {% zf_label "Pay another fee" %}
+      </a>
+      <a href="{% url 'login' %}" class="btn-primary">
+        {% zf_label "Login to your account" %}
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

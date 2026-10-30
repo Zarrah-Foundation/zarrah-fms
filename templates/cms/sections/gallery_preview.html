@@ -1,0 +1,90 @@
+{% load i18n i18n_extras %}
+{% with slides=section.gallery_images.all settings=section.gallery_settings %}
+{% if slides %}
+<section class="zf-home-section zf-gallery" aria-labelledby="home-gallery-title">
+  <div class="container-app">
+    {% if section.title_en or section.title_bn %}
+    <div class="zf-home-heading mx-auto mb-8 max-w-2xl text-center">
+      <h2 id="home-gallery-title" class="zf-home-title">
+        {% with t=section|bl:"title" %}{% if t %}{{ t }}{% else %}{% trans "Gallery" %}{% endif %}{% endwith %}
+      </h2>
+      {% if section.content_en or section.content_bn %}
+      <p class="zf-home-lead mt-3">{{ section|bl:"content" }}</p>
+      {% endif %}
+    </div>
+    {% else %}
+    <h2 id="home-gallery-title" class="sr-only">{% trans "Gallery" %}</h2>
+    {% endif %}
+
+    <div
+      class="zf-slider"
+      data-zf-slider
+      data-autoplay="{% if settings.autoplay %}1{% else %}0{% endif %}"
+      data-interval="{{ settings.autoplay_interval }}"
+      data-show-arrows="{% if settings.show_arrows %}1{% else %}0{% endif %}"
+      data-show-dots="{% if settings.show_dots %}1{% else %}0{% endif %}"
+    >
+      <div class="zf-slider__viewport">
+        <ul class="zf-slider__track" data-zf-track>
+          {% for img in slides %}
+          {% if img.is_active and img.media and img.media.image %}
+          <li class="zf-slider__slide" data-zf-slide {% if not forloop.first %}aria-hidden="true"{% endif %}>
+            <figure class="zf-slider__figure">
+              <img
+                src="{{ img.media.image.url }}"
+                alt="{% if LANGUAGE_CODE == 'bn' %}{{ img.resolved_alt_bn|default:img.resolved_alt_en }}{% else %}{{ img.resolved_alt_en|default:img.resolved_alt_bn }}{% endif %}"
+                class="zf-slider__img"
+                width="1280"
+                height="720"
+                {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+              >
+              {% if settings.show_captions %}
+              {% if LANGUAGE_CODE == 'bn' %}
+                {% with cap=img.resolved_caption_bn|default:img.resolved_caption_en %}
+                {% if cap %}<figcaption class="zf-slider__caption">{{ cap }}</figcaption>{% endif %}
+                {% endwith %}
+              {% else %}
+                {% with cap=img.resolved_caption_en|default:img.resolved_caption_bn %}
+                {% if cap %}<figcaption class="zf-slider__caption">{{ cap }}</figcaption>{% endif %}
+                {% endwith %}
+              {% endif %}
+              {% endif %}
+            </figure>
+          </li>
+          {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+
+      {% if settings.show_arrows %}
+      <div class="zf-slider__controls" data-zf-controls hidden>
+        <button type="button" class="zf-slider__btn" data-zf-prev aria-label="{% trans 'Previous image' %}">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+          <span class="sr-only">{% trans "Previous image" %}</span>
+        </button>
+        <button type="button" class="zf-slider__btn" data-zf-next aria-label="{% trans 'Next image' %}">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+          <span class="sr-only">{% trans "Next image" %}</span>
+        </button>
+      </div>
+      {% endif %}
+
+      {% if settings.show_dots %}
+      <div class="zf-slider__dots" data-zf-dots role="tablist" aria-label="{% trans 'Gallery slides' %}" hidden></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% elif section.image %}
+<section class="zf-home-section" aria-labelledby="home-gallery-title">
+  <div class="container-app">
+    {% if section.title_en or section.title_bn %}
+    <div class="zf-home-heading mx-auto mb-8 max-w-2xl text-center">
+      <h2 id="home-gallery-title" class="zf-home-title">{{ section|bl:"title" }}</h2>
+    </div>
+    {% endif %}
+    <img src="{{ section.image.url }}" alt="" class="mx-auto max-h-96 w-full max-w-4xl rounded-xl object-cover">
+  </div>
+</section>
+{% endif %}
+{% endwith %}

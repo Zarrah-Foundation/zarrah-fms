@@ -1,0 +1,64 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Donation Reports" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Donation Reports" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <h1 class="dash-page-title"><i class="bi bi-graph-up mr-2 text-primary"></i>{% trans "Donation Reports" %}</h1>
+</div>
+
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  {% trans "Grand total" as l1 %}{% trans "Total donations" as l2 %}{% trans "Anonymous total" as l3 %}
+  {% with gv=grand.total|default:0 %}{% include "dashboard/includes/_stat_card.html" with label=l1 value=gv icon="bi-cash-stack" tone="success" sub="BDT" %}{% endwith %}
+  {% include "dashboard/includes/_stat_card.html" with label=l2 value=grand.count|default:0 icon="bi-receipt" tone="primary" %}
+  {% with av=anonymous.total|default:0 %}{% include "dashboard/includes/_stat_card.html" with label=l3 value=av icon="bi-incognito" tone="accent" sub="BDT" %}{% endwith %}
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "By Category" %}</h2>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>{% trans "Category" %}</th><th>{% trans "Count" %}</th><th>{% trans "Total" %}</th></tr></thead>
+      <tbody>
+        {% for row in by_category %}<tr><td>{{ row.category__name_en }}</td><td>{{ row.count }}</td><td>{{ row.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-center text-ink-light">{% trans "No data" %}</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "By Month" %}</h2>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>{% trans "Month" %}</th><th>{% trans "Count" %}</th><th>{% trans "Total" %}</th></tr></thead>
+      <tbody>
+        {% for row in by_month %}<tr><td>{{ row.period|date:"M Y" }}</td><td>{{ row.count }}</td><td>{{ row.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-center text-ink-light">{% trans "No data" %}</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "By Year" %}</h2>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>{% trans "Year" %}</th><th>{% trans "Count" %}</th><th>{% trans "Total" %}</th></tr></thead>
+      <tbody>
+        {% for row in by_year %}<tr><td>{{ row.period|date:"Y" }}</td><td>{{ row.count }}</td><td>{{ row.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-center text-ink-light">{% trans "No data" %}</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-4 text-h4">{% trans "Recent Days" %}</h2>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>{% trans "Day" %}</th><th>{% trans "Count" %}</th><th>{% trans "Total" %}</th></tr></thead>
+      <tbody>
+        {% for row in by_day %}<tr><td>{{ row.period|date:"M d, Y" }}</td><td>{{ row.count }}</td><td>{{ row.total|floatformat:0 }}</td></tr>
+        {% empty %}<tr><td colspan="3" class="text-center text-ink-light">{% trans "No data" %}</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+</div>
+{% endblock %}

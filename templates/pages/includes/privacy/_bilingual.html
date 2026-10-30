@@ -1,0 +1,20 @@
+{% comment %}
+Privacy page bilingual block. Params: bn, en, size (body|lead|sm)
+{% endcomment %}
+{% with text_size=size|default:"body" %}
+<div class="privacy-bilingual">
+  {% if bn %}
+  <div class="privacy-lang" lang="bn">
+    <span class="privacy-lang-label" aria-hidden="true">বাংলা</span>
+    <p class="privacy-lang-text{% if text_size == 'lead' %} privacy-lang-text--lead{% elif text_size == 'sm' %} privacy-lang-text--sm{% endif %}">{{ bn }}</p>
+  </div>
+  {% endif %}
+  {% if bn and en %}<div class="privacy-lang-divider" role="separator" aria-hidden="true"></div>{% endif %}
+  {% if en %}
+  <div class="privacy-lang privacy-lang--en" lang="en">
+    <span class="privacy-lang-label" aria-hidden="true">English</span>
+    <p class="privacy-lang-text{% if text_size == 'lead' %} privacy-lang-text--lead{% elif text_size == 'sm' %} privacy-lang-text--sm{% endif %}">{{ en }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endwith %}

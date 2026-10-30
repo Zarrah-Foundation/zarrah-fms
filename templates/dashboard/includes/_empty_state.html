@@ -1,0 +1,9 @@
+{% load i18n %}
+{% comment %}Empty state. Params: icon (bi-*), title, message (optional),
+action_url + action_label (optional).{% endcomment %}
+<div class="dash-empty">
+  <span class="dash-empty-icon"><i class="bi {{ icon|default:'bi-inbox' }}"></i></span>
+  <p class="text-lg font-semibold text-ink">{% if title %}{{ title }}{% else %}{% trans "Nothing here yet" %}{% endif %}</p>
+  {% if message %}<p class="max-w-md text-sm text-ink-light">{{ message }}</p>{% endif %}
+  {% if action_url %}<a href="{{ action_url }}" class="btn-primary btn-sm mt-2">{% if action_label %}{{ action_label }}{% else %}{% trans "Create" %}{% endif %}</a>{% endif %}
+</div>

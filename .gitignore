@@ -1,0 +1,48 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Django
+staticfiles/
+media/
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archives & local junk
+*.zip
+cy
+full_test_output.txt
+_seed_out.txt
+_seed_pos_out.txt
+_tmp_*.py
+tmp/

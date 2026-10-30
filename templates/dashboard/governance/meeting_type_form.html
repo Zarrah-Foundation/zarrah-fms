@@ -1,0 +1,25 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% if is_create %}{% trans "New meeting type" %}{% else %}{% trans "Edit meeting type" %}{% endif %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% if is_create %}{% trans "New meeting type" %}{% else %}{% trans "Edit meeting type" %}{% endif %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mx-auto max-w-3xl">
+  <div class="dash-page-header">
+    <h1 class="dash-page-title">{% if is_create %}{% trans "New meeting type" %}{% else %}{% trans "Edit meeting type" %}{% endif %}</h1>
+  </div>
+  <form method="post" class="card-flat space-y-5">
+    {% csrf_token %}
+    <div class="dash-form-grid">
+      {% for field in form %}
+      {% include "dashboard/includes/_form_field.html" with field=field %}
+      {% endfor %}
+    </div>
+    <div class="flex justify-end gap-3 border-t border-border/60 pt-5">
+      <a href="{% url 'dashboard-meeting-types' %}" class="btn-ghost">{% trans "Cancel" %}</a>
+      <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% load i18n %}
+{% comment %}Reusable page header.
+Params: title (required), subtitle (optional), back_url + back_label (optional).
+For right-aligned actions, render them in the page after including this, or
+use the `dash-page-header` layout directly.{% endcomment %}
+<div class="dash-page-header">
+  <div class="min-w-0">
+    {% if back_url %}
+    <a href="{{ back_url }}" class="mb-1 inline-flex items-center gap-1 text-sm text-ink-light hover:text-primary"><i class="bi bi-arrow-left"></i>{% if back_label %}{{ back_label }}{% else %}{% trans "Back" %}{% endif %}</a>
+    {% endif %}
+    <h1 class="dash-page-title">{{ title }}</h1>
+    {% if subtitle %}<p class="mt-1 text-sm text-ink-light">{{ subtitle }}</p>{% endif %}
+  </div>
+  {% if actions %}<div class="flex flex-wrap items-center gap-2">{{ actions }}</div>{% endif %}
+</div>

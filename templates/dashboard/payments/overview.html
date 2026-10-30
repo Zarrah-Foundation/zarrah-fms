@@ -1,0 +1,66 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment Management" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Payment Management" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "Payment Management" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Gateway health, recurring status, and operational controls." %}</p>
+  </div>
+  {% if can_configure %}
+  <a href="{% url 'dashboard-payments-settings' %}" class="btn-secondary btn-sm">{% trans "Settings" %}</a>
+  {% endif %}
+</div>
+
+<div class="mb-6 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
+  <strong>{% trans "LIVE VALIDATION PENDING" %}</strong>
+  — {% trans "Automated tests do not prove production gateway readiness. Public HTTPS staging is required." %}
+</div>
+
+<div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Transactions completed" %}</p>
+    <p class="text-2xl font-semibold">{{ txn_stats.completed }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Active recurring" %}</p>
+    <p class="text-2xl font-semibold">{{ sub_stats.active }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Due / overdue" %}</p>
+    <p class="text-2xl font-semibold">{{ due_count }}</p>
+  </div>
+  <div class="rounded-card border border-border/60 bg-surface p-4">
+    <p class="text-xs uppercase text-ink-light">{% trans "Open refunds" %}</p>
+    <p class="text-2xl font-semibold">{{ refunds_open }}</p>
+  </div>
+</div>
+
+<h2 class="mb-4 text-lg font-semibold">{% trans "Gateway health" %}</h2>
+<div class="space-y-4">
+  {% for p in providers %}
+  <article class="rounded-card border border-border/60 bg-surface p-5">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h3 class="text-lg font-semibold">{{ p.label }}</h3>
+      <span class="text-xs text-ink-light">{% if p.sandbox %}{% trans "Sandbox" %}{% elif p.sandbox == False %}{% trans "Production" %}{% else %}—{% endif %}</span>
+    </div>
+    <dl class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+      <div><dt class="text-xs text-ink-light">{% trans "Connection" %}</dt><dd class="font-medium">{{ p.connection.status }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "One-time" %}</dt><dd class="font-medium">{{ p.one_time.status }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Recurring" %}</dt><dd class="font-medium">{{ p.recurring.status }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Refund" %}</dt><dd class="font-medium">{{ p.refund.status }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "IPN / Webhook" %}</dt><dd class="font-medium">{{ p.webhook.status }}</dd></div>
+      <div><dt class="text-xs text-ink-light">{% trans "Validate" %}</dt><dd class="font-medium">{{ p.validate.status }}</dd></div>
+    </dl>
+    {% if p.notes %}
+    <ul class="mt-3 list-disc pl-5 text-xs text-ink-light">
+      {% for n in p.notes %}<li>{{ n }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

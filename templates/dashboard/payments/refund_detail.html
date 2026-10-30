@@ -1,0 +1,25 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Refund" %}{% endblock %}
+{% block topbar_title %}{% trans "Refund" %}{% endblock %}
+{% block dashboard_content %}
+<div class="dash-page-header"><h1 class="dash-page-title">৳{{ refund.amount|floatformat:0 }} — {{ refund.get_status_display }}</h1>
+<a href="{% url 'dashboard-payments-refunds' %}" class="btn-secondary btn-sm">{% trans "Back" %}</a></div>
+<div class="rounded-card border border-border/60 bg-surface p-5 space-y-2 text-sm">
+<p><span class="text-ink-light">{% trans "Reason" %}:</span> {{ refund.reason }}</p>
+<p><span class="text-ink-light">{% trans "Transaction" %}:</span> <a class="text-primary" href="{% url 'dashboard-payments-transaction-detail' refund.transaction_id %}">{{ refund.transaction.tran_id }}</a></p>
+<p><span class="text-ink-light">{% trans "Provider" %}:</span> {{ refund.provider }}</p>
+<p><span class="text-ink-light">{% trans "Provider ref" %}:</span> {{ refund.provider_reference|default:"—" }}</p>
+<p><span class="text-ink-light">{% trans "Provider message" %}:</span> {{ refund.provider_message|default:"—" }}</p>
+<p><span class="text-ink-light">{% trans "Requested by" %}:</span> {{ refund.requested_by }}</p>
+<p><span class="text-ink-light">{% trans "Approved by" %}:</span> {{ refund.approved_by|default:"—" }} {% if refund.approved_at %}@ {{ refund.approved_at }}{% endif %}</p>
+</div>
+{% if can_approve and refund.status == "REQUESTED" %}
+<div class="mt-6 flex flex-wrap gap-3">
+<form method="post" action="{% url 'dashboard-payments-refund-approve' refund.pk %}">{% csrf_token %}<button class="btn-primary">{% trans "Approve (Super Admin)" %}</button></form>
+<form method="post" action="{% url 'dashboard-payments-refund-reject' refund.pk %}" class="flex gap-2">{% csrf_token %}
+<input class="form-input" name="reason" placeholder="{% trans 'Rejection reason' %}">
+<button class="btn-secondary text-danger">{% trans "Reject" %}</button></form>
+</div>
+{% endif %}
+{% endblock %}

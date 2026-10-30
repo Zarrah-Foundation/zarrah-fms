@@ -1,0 +1,35 @@
+# Zarrah Foundation — CloudLinux / cPanel Passenger
+# Adjust PassengerPython / paths to your account. Do NOT open-alias private media.
+
+PassengerEnabled on
+# PassengerAppRoot /home/ACCOUNT/zarrah-foundation
+# PassengerBaseURI /
+# PassengerPython /home/ACCOUNT/virtualenv/zarrah-foundation/3.x/bin/python
+
+# If the host already maps the app root, leave PassengerAppRoot unset.
+# Static files: prefer a server Alias to STATIC_ROOT after collectstatic
+# (see docs/PASSENGER_DEPLOYMENT.md). Fallback rewrite only if Alias is unavailable:
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Never expose private member/application uploads via a /media alias.
+    RewriteRule ^media/members/ - [F,L]
+
+    # Optional: serve collected static files from STATIC_ROOT when present.
+    # Uncomment and set the absolute filesystem path for your account:
+    # RewriteCond %{REQUEST_URI} ^/static/(.*)$
+    # RewriteCond /home/ACCOUNT/zarrah-foundation/staticfiles/%1 -f
+    # RewriteRule ^static/(.*)$ /staticfiles/$1 [L]
+</IfModule>
+
+# Deny listing
+Options -Indexes
+
+# Block access to sensitive project files if the docroot is the app root
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^(manage\.py|passenger_wsgi\.py|\.gitignore)$">
+    Require all denied
+</FilesMatch>

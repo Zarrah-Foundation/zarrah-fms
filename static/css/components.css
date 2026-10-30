@@ -1,0 +1,106 @@
+/* Mobile drawer: body scroll lock (paired with static/js/drawer-scroll-lock.js) */
+.drawer-lock-scroll {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Membership fees admin table — column resize */
+.fee-resizable-table {
+  table-layout: fixed;
+  min-width: 960px;
+}
+.fee-resizable-table th,
+.fee-resizable-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fee-resizable-table th .col-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
+}
+.fee-resizable-table th .col-resize-handle:hover,
+body.col-resizing .fee-resizable-table th .col-resize-handle {
+  background: rgba(11, 107, 58, 0.25);
+}
+body.col-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* Public document cards — Transparency / Reports */
+.zf-doc-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  padding: 1.5rem 1.4rem 1.45rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 1.15rem;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.035);
+}
+@media (min-width: 768px) {
+  .zf-doc-card {
+    padding: 1.85rem 1.85rem 1.7rem;
+  }
+}
+.zf-doc-card__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary, #0b6b3a);
+}
+.zf-doc-card__title {
+  margin: 0.95rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 750;
+  line-height: 1.4;
+  color: #1f2937;
+  overflow-wrap: anywhere;
+}
+.zf-doc-card__summary {
+  margin: 0.9rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #6b7280;
+  overflow-wrap: anywhere;
+}
+.zf-doc-card__meta {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1.25rem 0 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  font-size: 0.8rem;
+}
+.zf-doc-card__meta > div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+.zf-doc-card__meta dt {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #94a3b8;
+}
+.zf-doc-card__meta dd {
+  margin: 0;
+  color: #334155;
+}
+.zf-doc-card__cta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 1.25rem;
+}
+

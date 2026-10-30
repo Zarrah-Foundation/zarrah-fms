@@ -1,0 +1,92 @@
+{% extends "dashboard/_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Site Settings" %} · {{ site_settings.localized_name }}{% endblock %}
+{% block topbar_title %}{% trans "Site Settings" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash-page-header">
+  <div>
+    <h1 class="dash-page-title">{% trans "Site Settings" %}</h1>
+    <p class="mt-1 text-sm text-ink-light">{% trans "Branding, contact, social links, SEO and footer — used across the public site." %}</p>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="space-y-6">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+  <div class="alert-danger">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <div class="card-flat">
+    <h2 class="mb-5 text-h4">{% trans "Identity" %}</h2>
+    <div class="dash-form-grid">
+      {% for f in form %}{% if f.name in "foundation_name_bn,foundation_name_en,short_name,tagline_bn,tagline_en" %}
+      {% include "dashboard/includes/_form_field.html" with field=f %}
+      {% endif %}{% endfor %}
+    </div>
+    <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+      {% include "dashboard/includes/_form_field.html" with field=form.site_logo %}
+      {% include "dashboard/includes/_form_field.html" with field=form.site_logo_white %}
+      {% include "dashboard/includes/_form_field.html" with field=form.site_favicon %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-5 text-h4">{% trans "Contact" %}</h2>
+    <div class="dash-form-grid">
+      {% for f in form %}{% if f.name in "primary_email,secondary_email,primary_phone,secondary_phone,whatsapp,website_url,address_bn,address_en,google_maps_url,google_maps_embed_url,maps_latitude,maps_longitude" %}
+      {% include "dashboard/includes/_form_field.html" with field=f %}
+      {% endif %}{% endfor %}
+    </div>
+    <p class="mt-4 text-xs text-ink-light">
+      {% trans "Google Maps URL: public share link. Embed URL: iframe src only (https://www.google.com/maps/embed…). Latitude/Longitude: optional fallback when embed URL is empty. Never paste full iframe HTML." %}
+    </p>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-5 text-h4">{% trans "Social Links" %}</h2>
+    <div class="dash-form-grid">
+      {% for f in form %}{% if f.name in "facebook_url,youtube_url,linkedin_url,instagram_url,twitter_url,telegram_url,github_url" %}
+      {% include "dashboard/includes/_form_field.html" with field=f %}
+      {% endif %}{% endfor %}
+    </div>
+  </div>
+<div class="card-flat">
+  <h2 class="mb-5 text-h4">{% trans "Foundation" %}</h2>
+  <div class="dash-form-grid">
+    {% for f in form %}
+      {% if f.name in "foundation_description_bn,foundation_description_en,registration_number,registration_date,office_hours,brand_primary_color,brand_secondary_color,dark_logo,twitter_card_image" %}
+        {% include "dashboard/includes/_form_field.html" with field=f %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+  <div class="card-flat">
+    <h2 class="mb-5 text-h4">{% trans "SEO" %}</h2>
+    <div class="dash-form-grid">
+      {% for f in form %}{% if f.name in "meta_title,meta_description,meta_keywords,og_image" %}
+      {% include "dashboard/includes/_form_field.html" with field=f %}
+      {% endif %}{% endfor %}
+    </div>
+  </div>
+
+  <div class="card-flat">
+    <h2 class="mb-5 text-h4">{% trans "Footer" %}</h2>
+    <div class="dash-form-grid">
+      {% for f in form %}{% if f.name in "footer_text_bn,footer_text_en,copyright_text" %}
+      {% include "dashboard/includes/_form_field.html" with field=f %}
+      {% endif %}{% endfor %}
+    </div>
+  </div>
+
+  {% if can_edit %}
+  <div class="flex justify-end gap-3">
+    <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i>{% trans "Save changes" %}</button>
+  </div>
+  {% else %}
+  <p class="text-sm text-ink-light">{% trans "You have read-only access to these settings." %}</p>
+  {% endif %}
+</form>
+{% endblock %}

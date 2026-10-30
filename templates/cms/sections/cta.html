@@ -1,0 +1,37 @@
+{% load i18n i18n_extras %}
+{% with link=section.button_link|default:'' %}
+<section class="zf-home-section {% if 'donation' in link %}zf-cta--donate{% else %}zf-cta--member{% endif %}" aria-labelledby="home-cta-{{ section.order }}-title">
+  <div class="container-app">
+    <div class="zf-cta-panel {% if 'donation' in link %}zf-cta-panel--accent{% endif %}">
+      <div class="zf-cta-panel__inner">
+        <h2 id="home-cta-{{ section.order }}-title" class="zf-home-title text-inherit">
+          {{ section|bl:"title" }}
+        </h2>
+        {% if section.content_en or section.content_bn %}
+        <p class="zf-cta-panel__lead">{{ section|bl:"content" }}</p>
+        {% endif %}
+        <div class="zf-cta-panel__actions">
+          {% if link %}
+          <a href="{{ link }}" class="{% if 'donation' in link %}btn-accent{% else %}btn-primary{% endif %}"{% if link|slice:":4" == "http" %} target="_blank" rel="noopener noreferrer"{% endif %}>
+            {% if section.button_text_en or section.button_text_bn %}
+              {{ section|bl:"button_text" }}
+            {% else %}
+              {% trans "Get Started" %}
+            {% endif %}
+            {% if link|slice:":4" == "http" %}
+            <span class="sr-only">{% zf_label "(opens in a new tab)" %}</span>
+            <i class="bi bi-box-arrow-up-right ml-1" aria-hidden="true"></i>
+            {% endif %}
+          </a>
+          {% endif %}
+          {% if 'membership' in link %}
+          <a href="{% url 'membership-status' %}" class="btn zf-cta-panel__ghost">
+            {% trans "Check Application Status" %}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endwith %}

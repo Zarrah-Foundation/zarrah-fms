@@ -8,6 +8,10 @@ Views never talk to a provider SDK directly — they go through ``get_gateway()`
 class PaymentGatewayError(Exception):
     """Raised when a gateway cannot initialise or validate a payment."""
 
+    def __init__(self, message="", *, code=""):
+        super().__init__(message)
+        self.code = code
+
 
 class PaymentGateway:
     """Minimal adapter surface shared by every provider."""

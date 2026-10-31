@@ -11,6 +11,13 @@
 <p><span class="text-ink-light">{% trans "Customer" %}:</span> {{ txn.cus_name }} {% if txn.cus_email %}· {{ txn.cus_email }}{% endif %}</p>
 <p><span class="text-ink-light">{% trans "Bank ref" %}:</span> {{ txn.bank_tran_id|default:"—" }}</p>
 </div>
+{% if can_reconcile_bkash %}
+<form method="post" action="{% url 'dashboard-payments-bkash-reconcile' txn.pk %}" class="mt-4">
+  {% csrf_token %}
+  <button class="btn-secondary btn-sm" type="submit">{% trans "Query bKash status" %}</button>
+  <p class="mt-2 text-xs text-ink-light">{% trans "Completes the payment only when bKash reports Completed. Closing the browser leaves the payment pending." %}</p>
+</form>
+{% endif %}
 {% if can_refund and txn.status == "COMPLETED" %}
 <form method="post" action="{% url 'dashboard-payments-refund-request' txn.pk %}" class="mt-6 max-w-md space-y-3">
   {% csrf_token %}

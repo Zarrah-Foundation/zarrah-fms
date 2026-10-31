@@ -202,6 +202,11 @@ class PaymentSettingsGateTests(TestCase):
     SSLCOMMERZ_SALT_KEY="SALT-SECRET-VALUE-DO-NOT-LEAK",
     SSLCOMMERZ_RECURRING_PLAN_REFER="plan-public-ref",
     SITE_URL="https://staging.example.org",
+    BKASH_ENV="sandbox",
+    BKASH_USERNAME="",
+    BKASH_PASSWORD="",
+    BKASH_APP_KEY="",
+    BKASH_APP_SECRET="",
 )
 class RecurringSetupCenterTests(TestCase):
     def setUp(self):
@@ -241,7 +246,7 @@ class RecurringSetupCenterTests(TestCase):
             self.assertNotIn("DO-NOT-LEAK", blob)
             if card["method"] == PaymentMethod.BKASH:
                 self.assertEqual(card["recurring_state"], "NOT_IMPLEMENTED")
-                self.assertEqual(card["one_time_state"], "NOT_IMPLEMENTED")
+                self.assertEqual(card["one_time_state"], "NOT_CONFIGURED")
                 self.assertFalse(card["accepting_new_subscriptions"])
                 self.assertTrue(card["has_api_secret"])
             if card["method"] == PaymentMethod.NAGAD:

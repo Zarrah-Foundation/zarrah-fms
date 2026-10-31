@@ -1,6 +1,6 @@
 from django.urls import path
 
-from donations import recurring_views, views
+from donations import bkash_flow, recurring_views, views
 
 urlpatterns = [
     path("donation/", views.DonationListView.as_view(), name="donation"),
@@ -9,6 +9,7 @@ urlpatterns = [
     path("donation/fail/", views.DonationFailView.as_view(), name="donation-fail"),
     path("donation/cancel/", views.DonationCancelView.as_view(), name="donation-cancel"),
     path("donation/ipn/", views.donation_ipn, name="donation-ipn"),
+    path("payments/bkash/callback/", bkash_flow.bkash_callback, name="bkash-callback"),
     path(
         "donation/recurring/",
         recurring_views.RecurringDonationCreateView.as_view(),

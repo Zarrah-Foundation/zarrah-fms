@@ -91,7 +91,29 @@ def method_capabilities(method):
             "credentials": creds,
             "label_note": "Hosted checkout (may include cards/wallets enabled on the SSLCommerz store).",
         }
-    if method in (PaymentMethod.BKASH, PaymentMethod.NAGAD, PaymentMethod.ROCKET):
+    if method == PaymentMethod.BKASH:
+        from donations.bkash_config import bkash_readiness
+
+        ready = bkash_readiness()
+        return {
+            "method": method,
+            "implemented": True,
+            "channel_kind": "ONLINE_DIRECT",
+            "hosted_via": None,
+            "supports_one_time": bool(ready["api_callable"]),
+            "supports_recurring": False,
+            "credentials": {
+                "configured": bool(ready["api_callable"]),
+                "sandbox": ready["environment"] == "sandbox" and bool(ready["api_callable"]),
+                "status": ready["connection"],
+            },
+            "label_note": (
+                "Tokenized Checkout v2 sandbox. Live payments are disabled. "
+                "Automatic recurring is not implemented because each agreement "
+                "charge still requires the customer PIN."
+            ),
+        }
+    if method in (PaymentMethod.NAGAD, PaymentMethod.ROCKET):
         return {
             "method": method,
             "implemented": False,
@@ -130,6 +152,10 @@ def method_capabilities(method):
 
 def online_checkout_allowed(method=PaymentMethod.SSLCOMMERZ, purpose=TransactionPurpose.DONATION):
     """Return (ok, error_message) for online checkout by payment purpose."""
+    if method == PaymentMethod.BKASH:
+        from donations.bkash_config import bkash_checkout_allowed
+
+        return bkash_checkout_allowed(purpose)
     if method != PaymentMethod.SSLCOMMERZ:
         return False, "Online checkout is only available via SSLCommerz hosted checkout."
     caps = method_capabilities(method)

@@ -270,7 +270,7 @@ def _assert_token_still_authoritative(payload: dict, member: Member) -> PublicFe
 
 
 @transaction.atomic
-def initiate_public_current_month_checkout(*, token: str, request):
+def initiate_public_current_month_checkout(*, token: str, request, method=None):
     """
     Validate signed token, re-check server authority, start SSLCommerz checkout
     for the current month only via existing initiate_fee_checkout.
@@ -297,7 +297,7 @@ def initiate_public_current_month_checkout(*, token: str, request):
     months = [{"year": snapshot.year, "month": snapshot.month}]
     try:
         payment, url = initiate_fee_checkout(
-            member, months, request=request, actor=None
+            member, months, request=request, actor=None, method=method
         )
     except ValueError as exc:
         msg = str(exc)

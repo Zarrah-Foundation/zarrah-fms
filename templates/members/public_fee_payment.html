@@ -60,16 +60,27 @@
         </div>
       </dl>
 
-      <div class="mt-6 rounded-xl border border-border/70 bg-canvas p-4">
-        <p class="text-sm font-semibold text-ink">{% zf_label "Payment method" %}</p>
-        <p class="mt-1 text-sm text-ink-light">
-          {% zf_label "Secure online payment via SSLCommerz (cards and wallets enabled on the merchant store)." %}
-        </p>
-      </div>
-
       <form id="public-fee-pay-form" method="post" action="{% url 'public-membership-fee-pay' %}" class="mt-6 space-y-4">
         {% csrf_token %}
         <input type="hidden" name="checkout_token" value="{{ confirmed.token }}">
+        <div class="rounded-xl border border-border/70 bg-canvas p-4">
+          <p class="text-sm font-semibold text-ink">{% zf_label "Payment method" %}</p>
+          {% if bkash_checkout_available %}
+          <label class="mt-3 flex items-center gap-2 text-sm">
+            <input type="radio" name="payment_method" value="SSLCOMMERZ" checked>
+            <span>SSLCommerz</span>
+          </label>
+          <label class="mt-2 flex items-center gap-2 text-sm">
+            <input type="radio" name="payment_method" value="BKASH">
+            <span>bKash sandbox</span>
+          </label>
+          <p class="mt-2 text-xs text-ink-light">{% zf_label "bKash sandbox checkout is for testing. It is not a live merchant payment." %}</p>
+          {% else %}
+          <p class="mt-1 text-sm text-ink-light">
+            {% zf_label "Secure online payment via SSLCommerz (cards and wallets enabled on the merchant store)." %}
+          </p>
+          {% endif %}
+        </div>
         <button type="submit" id="public-fee-pay-btn" class="btn-primary w-full justify-center">
           <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
           <span data-default-label>{% zf_label "Pay Now" %}</span>

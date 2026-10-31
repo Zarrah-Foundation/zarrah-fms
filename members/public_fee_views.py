@@ -111,6 +111,13 @@ def public_fee_payment_verify(request):
             status=400,
         )
 
+    from core.choices import PaymentMethod
+    from donations.gateway_capabilities import online_checkout_allowed
+    from donations.models import TransactionPurpose
+
+    bkash_ok, _bkash_err = online_checkout_allowed(
+        PaymentMethod.BKASH, TransactionPurpose.MEMBERSHIP_FEE
+    )
     return render(
         request,
         "members/public_fee_payment.html",
@@ -118,6 +125,7 @@ def public_fee_payment_verify(request):
             "stage": "confirm",
             "confirmed": confirmed,
             "member_id_value": confirmed["member_id"],
+            "bkash_checkout_available": bkash_ok,
         },
     )
 
@@ -136,9 +144,14 @@ def public_fee_payment_pay(request):
         messages.error(request, _("Please verify your Membership ID first."))
         return redirect("public-membership-fee-payment")
 
+    from core.choices import PaymentMethod
+
+    method = (request.POST.get("payment_method") or PaymentMethod.SSLCOMMERZ).strip()
+    if method not in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH):
+        method = PaymentMethod.SSLCOMMERZ
     try:
         _payment, url, _snapshot = initiate_public_current_month_checkout(
-            token=token, request=request
+            token=token, request=request, method=method
         )
     except PublicFeeError as exc:
         if exc.code == "already_paid":

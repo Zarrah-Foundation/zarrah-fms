@@ -302,9 +302,11 @@ def complete_donation(donation, val_id=None, validation_data=None):
         _post_donation_income(locked)
         return locked
 
-    if locked.payment_method == PaymentMethod.SSLCOMMERZ or (
-        locked.transaction
-        and locked.transaction.gateway == PaymentMethod.SSLCOMMERZ
+    gateway_name = locked.payment_method
+    if locked.transaction_id:
+        gateway_name = locked.transaction.gateway or gateway_name
+    if gateway_name in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH) or (
+        locked.payment_method in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH)
     ):
         _assert_gateway_validation(
             locked, val_id=val_id, validation_data=validation_data

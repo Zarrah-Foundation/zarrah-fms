@@ -106,15 +106,15 @@ Capability states used on that page:
 
 `NOT_IMPLEMENTED` · `NOT_CONFIGURED` · `CONFIGURED` · `PENDING_MERCHANT_APPROVAL` · `VERIFIED_IN_SANDBOX` · `VERIFIED_IN_PRODUCTION` · `ENABLED` · `DISABLED` · `FAILED`
 
-bKash and Nagad recurring stay `NOT_IMPLEMENTED` until the Foundation receives the official merchant API contract and approval. Direct one-time bKash/Nagad checkout is also not wired; public online checkout remains SSLCommerz.
+bKash one-time checkout uses Tokenized Checkout v2 in sandbox only (`BKASH_ENV=sandbox`). Live checkout stays refused. bKash and Nagad automatic recurring stay `NOT_IMPLEMENTED`. Nagad direct checkout is not wired. Public checkout defaults to SSLCommerz. bKash sandbox appears only when sandbox credentials resolve.
 
 ### Provider matrix (honest states)
 
 | Provider | One-time | Recurring | Refund |
 |----------|----------|-----------|--------|
 | SSLCommerz | Configured when store credentials exist; Verified only after live proof | Requires SALT + plan refer + merchant enablement; never Active without config | Not configured until `refunds_enabled` + provider confirmation path |
-| bKash | Adapter exists; **Not configured** without merchant credentials | **Not implemented** — not offered as recurring | **Not implemented** |
-| Nagad | Same as bKash | **Not implemented** | **Not implemented** |
+| bKash | Sandbox Tokenized Checkout v2 when credentials resolve. States: `NOT_CONFIGURED`, `SANDBOX_CONFIGURED`, `SANDBOX_VERIFIED`, `LIVE_CREDENTIALS_REQUIRED`. `LIVE_VERIFIED` is not set by this release | **Not implemented** — agreement checkout still requires the customer PIN | Sandbox refund API; `REFUNDED` only after `refundTransactionStatus=Completed` |
+| Nagad | **Not implemented** — direct checkout is not wired | **Not implemented** | **Not implemented** |
 
 Never claim production readiness from unit tests alone. Banner: **LIVE VALIDATION PENDING**.
 
@@ -135,6 +135,14 @@ Statuses used in Payment Management → Capabilities:
 SSLCOMMERZ_SALT_KEY=
 SSLCOMMERZ_RECURRING_PLAN_REFER=
 # Optional DB storage via Payment Methods → Configure (write-only SALT)
+
+# bKash sandbox only. Do not set BKASH_ENV=production. Live checkout is refused.
+BKASH_ENV=sandbox
+BKASH_BASE_URL=https://tokenized.sandbox.bka.sh/v2/tokenized-checkout
+BKASH_USERNAME=
+BKASH_PASSWORD=
+BKASH_APP_KEY=
+BKASH_APP_SECRET=
 ```
 
 After deploy: `python manage.py seed_rbac` then `python manage.py migrate`.
@@ -337,7 +345,8 @@ Confirm:
 ### bKash / Nagad
 
 - [ ] Only test capabilities that are **actually implemented and configured**
-- [ ] Recurring must remain **Not implemented** until merchant agreement APIs are wired and verified
+- [ ] bKash automatic recurring remains **Not implemented** (agreement payment still needs the customer PIN)
+- [ ] Do not switch `BKASH_ENV` to production until the merchant approves live credentials
 - [ ] Public UI must not offer unsupported recurring options
 
 ### Evidence to retain

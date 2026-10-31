@@ -244,6 +244,16 @@ SSLCOMMERZ_IS_SANDBOX = env("SSLCOMMERZ_IS_SANDBOX")
 # Recurring EasyCheckout (optional). Without both, recurring checkout stays unavailable.
 SSLCOMMERZ_SALT_KEY = env("SSLCOMMERZ_SALT_KEY", default="")
 SSLCOMMERZ_RECURRING_PLAN_REFER = env("SSLCOMMERZ_RECURRING_PLAN_REFER", default="")
+# bKash Tokenized Checkout v2. Live checkout is refused even if these are set to production.
+BKASH_ENV = env("BKASH_ENV", default="sandbox")
+BKASH_BASE_URL = env(
+    "BKASH_BASE_URL",
+    default="https://tokenized.sandbox.bka.sh/v2/tokenized-checkout",
+)
+BKASH_USERNAME = env("BKASH_USERNAME", default="")
+BKASH_PASSWORD = env("BKASH_PASSWORD", default="")
+BKASH_APP_KEY = env("BKASH_APP_KEY", default="")
+BKASH_APP_SECRET = env("BKASH_APP_SECRET", default="")
 RECURRING_DONATION_FAILURE_THRESHOLD = env.int(
     "RECURRING_DONATION_FAILURE_THRESHOLD", default=3
 )

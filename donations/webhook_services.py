@@ -38,6 +38,13 @@ def sanitize_ipn_payload(data: dict) -> dict:
         "value_c",
         "value_d",
         "purpose",
+        "paymentID",
+        "paymentId",
+        "signature",
+        "agreementId",
+        "trxId",
+        "merchantInvoiceNumber",
+        "merchantInvoice",
     }
     out = {}
     for key in allowed:
@@ -50,7 +57,7 @@ def sanitize_ipn_payload(data: dict) -> dict:
 
 
 def external_event_id(data: dict) -> str:
-    for key in ("val_id", "bank_tran_id", "tran_id"):
+    for key in ("val_id", "paymentID", "paymentId", "bank_tran_id", "tran_id", "trxId"):
         if data.get(key):
             return f"{key}:{data.get(key)}"
     digest = hashlib.sha256(repr(sorted((str(k), str(v)) for k, v in data.items())).encode("utf-8")).hexdigest()

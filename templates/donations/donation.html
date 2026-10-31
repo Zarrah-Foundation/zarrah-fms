@@ -115,6 +115,21 @@
         {% endfor %}
       </div>
 
+      {% if bkash_checkout_available %}
+      <fieldset class="space-y-2">
+        <legend class="text-sm font-semibold text-ink">{% zf_label "Payment method" %}</legend>
+        <label class="flex items-center gap-2 text-sm">
+          <input type="radio" name="payment_method" value="SSLCOMMERZ" checked>
+          <span>SSLCommerz</span>
+        </label>
+        <label class="flex items-center gap-2 text-sm">
+          <input type="radio" name="payment_method" value="BKASH">
+          <span>bKash sandbox</span>
+        </label>
+        <p class="text-xs text-ink-light">{% zf_label "bKash sandbox checkout is for testing. It is not a live merchant payment." %}</p>
+      </fieldset>
+      {% endif %}
+
       <div class="form-group form-group-checkbox">
         <label class="form-checkbox-label" for="{{ donation_form.is_anonymous.id_for_label }}">
           {{ donation_form.is_anonymous }}

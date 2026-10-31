@@ -220,6 +220,11 @@ def payment_method_configure(request, pk):
     else:
         form = form_cls(instance=config)
 
+    bkash_readiness = None
+    if config.method == PaymentMethod.BKASH:
+        from donations.bkash_config import bkash_readiness as bkash_readiness_fn
+
+        bkash_readiness = bkash_readiness_fn()
     status = public_credential_status(config) if config.method == PaymentMethod.SSLCOMMERZ else {
         "configured": bool(config.api_app_key and config.encrypted_api_secret),
         "is_sandbox": config.is_sandbox,
@@ -241,6 +246,7 @@ def payment_method_configure(request, pk):
             "provider_health": health,
             "page_title": title,
             "live_validation_pending": True,
+            "bkash_readiness": bkash_readiness,
         },
     )
 
@@ -257,13 +263,28 @@ def payment_method_test_connection(request, pk):
     from donations.credential_service import test_sslcommerz_connection
     from django.http import JsonResponse
 
+    if config.method == PaymentMethod.BKASH:
+        from donations.bkash_config import test_bkash_connection
+
+        status, message = test_bkash_connection()
+        safe = {"ok": status == "SUCCESS", "status": status, "message": message}
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse(safe)
+        if status == "SUCCESS":
+            messages.success(request, _("Sandbox connection test: SUCCESS — %(msg)s") % {"msg": message})
+        elif status == "NOT_CONFIGURED":
+            messages.warning(request, _("Connection test: NOT CONFIGURED — %(msg)s") % {"msg": message})
+        else:
+            messages.error(request, _("Connection test: FAILED — %(msg)s") % {"msg": message})
+        return redirect("dashboard-payment-method-configure", pk=config.pk)
+
     if config.method != PaymentMethod.SSLCOMMERZ:
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse(
                 {"ok": False, "status": "FAILED", "message": "Not implemented."},
                 status=400,
             )
-        messages.error(request, _("Test connection is only available for SSLCommerz."))
+        messages.error(request, _("Test connection is only available for SSLCommerz and bKash sandbox."))
         return redirect("dashboard-payment-methods")
 
     status, message = test_sslcommerz_connection(actor=request.user)

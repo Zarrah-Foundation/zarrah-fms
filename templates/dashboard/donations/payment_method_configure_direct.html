@@ -10,7 +10,20 @@
   </div>
   <a href="{% url 'dashboard-payment-methods' %}" class="btn-secondary btn-sm">{% trans "Back" %}</a>
 </div>
-<div class="mb-4 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm"><strong>LIVE VALIDATION PENDING</strong></div>
+<div class="mb-4 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm"><strong>LIVE VALIDATION PENDING</strong> — sandbox readiness is not live merchant activation.</div>
+{% if bkash_readiness %}
+<dl class="mb-6 grid gap-3 sm:grid-cols-2 text-sm">
+  <div><dt class="text-xs text-ink-light">{% trans "Connection" %}</dt><dd class="font-medium">{{ bkash_readiness.connection }}</dd></div>
+  <div><dt class="text-xs text-ink-light">{% trans "One-time" %}</dt><dd class="font-medium">{{ bkash_readiness.one_time }}</dd></div>
+  <div><dt class="text-xs text-ink-light">{% trans "Automatic recurring" %}</dt><dd class="font-medium">{{ bkash_readiness.recurring }}</dd></div>
+  <div><dt class="text-xs text-ink-light">{% trans "Live payments" %}</dt><dd class="font-medium">{{ bkash_readiness.live }}</dd></div>
+</dl>
+<p class="mb-4 text-sm text-ink-light">{% trans "Saved secrets are not shown. A sandbox token test does not create a payment and does not enable live checkout." %}</p>
+<form method="post" action="{% url 'dashboard-payment-method-test' config.pk %}" class="mb-6">
+  {% csrf_token %}
+  <button type="submit" class="btn-secondary">{% trans "Test sandbox connection" %}</button>
+</form>
+{% endif %}
 {% if provider_health %}
 <dl class="mb-6 grid gap-3 sm:grid-cols-3 text-sm">
   <div><dt class="text-xs text-ink-light">{% trans "One-time" %}</dt><dd>{{ provider_health.one_time.status }}</dd></div>

@@ -266,7 +266,90 @@ def _ssl_card() -> dict:
     }
 
 
+def _bkash_sandbox_card() -> dict:
+    """bKash one-time sandbox states. Automatic recurring stays unimplemented."""
+    from donations.bkash_config import (
+        LIVE_CREDENTIALS_REQUIRED,
+        NOT_IMPLEMENTED as BKASH_NOT_IMPLEMENTED,
+        bkash_readiness,
+    )
+
+    cfg = PaymentMethodConfig.objects.filter(method=PaymentMethod.BKASH).first()
+    ready = bkash_readiness()
+    has_app_key = bool(cfg and (cfg.api_app_key or "").strip())
+    has_secret = bool(cfg and has_encrypted_password(cfg.encrypted_api_secret))
+    has_username = bool(cfg and (cfg.api_username or "").strip())
+    has_password = bool(cfg and has_encrypted_password(cfg.encrypted_api_password))
+    checklist = [
+        {"step": 1, "label": "Sandbox credentials available (env or encrypted database)", "done": bool(ready["api_callable"])},
+        {"step": 2, "label": "Username present", "done": has_username or ready["source"] == "environment"},
+        {"step": 3, "label": "API password saved", "done": has_password or ready["source"] == "environment"},
+        {"step": 4, "label": "Tokenized Checkout v2 sandbox adapter implemented", "done": True},
+        {"step": 5, "label": "Connection test granted a sandbox token", "done": ready["connection"] == "SANDBOX_VERIFIED"},
+        {"step": 6, "label": "Sandbox payment verified with the provider", "done": bool(cfg and cfg.one_time_verified_at)},
+        {"step": 7, "label": "Live merchant activation", "done": False},
+    ]
+    return {
+        "method": PaymentMethod.BKASH,
+        "title": "bKash Tokenized Checkout (sandbox)",
+        "summary": (
+            "Direct bKash sandbox checkout uses Tokenized Checkout v2. "
+            "A successful sandbox test is not live merchant activation. "
+            "Automatic recurring stays unavailable because each agreement charge still requires the customer PIN."
+        ),
+        "one_time_state": ready["one_time"],
+        "recurring_state": BKASH_NOT_IMPLEMENTED,
+        "refund_state": ready["refund"],
+        "cancel_state": BKASH_NOT_IMPLEMENTED,
+        "connection_state": ready["connection"],
+        "environment": "Live (disabled)" if ready["environment"] == "live" else "Sandbox",
+        "credential_source": ready["source"],
+        "store_id_masked": "",
+        "has_store_password": False,
+        "has_saved_database_password": has_password,
+        "has_app_key": has_app_key or ready["source"] == "environment",
+        "has_api_secret": has_secret or ready["source"] == "environment",
+        "has_username": has_username or ready["source"] == "environment",
+        "has_salt": False,
+        "salt_source": "",
+        "has_plan": False,
+        "plan_refer": "",
+        "merchant_recurring_enabled": False,
+        "cms_recurring_enabled": False,
+        "cms_autopay_enabled": False,
+        "accepting_new_subscriptions": False,
+        "accepting_new_reason": "bKash automatic recurring is NOT IMPLEMENTED. Agreement checkout still requires the customer PIN.",
+        "ipn_url": _abs("bkash-callback"),
+        "one_time_ipn_url": _abs("bkash-callback"),
+        "membership_ipn_url": _abs("bkash-callback"),
+        "last_tested_at": cfg.last_tested_at if cfg else None,
+        "last_test_status": ready["last_test_status"],
+        "last_test_message": ready["last_test_message"],
+        "recurring_auth_verified_at": None,
+        "recurring_charge_verified_at": None,
+        "ipn_verified_at": cfg.ipn_verified_at if cfg else None,
+        "configure_url_name": "dashboard-payment-method-configure" if cfg else "dashboard-payment-methods",
+        "configure_pk": cfg.pk if cfg else None,
+        "test_available": bool(cfg),
+        "checklist": checklist,
+        "merchant_must_supply": [
+            "Sandbox username, password, app key, and app secret from bKash.",
+            "Official merchant credentials later, via the same environment variables or encrypted fields.",
+            "A public HTTPS callback URL registered with bKash before a real sandbox payment.",
+            "Separate merchant approval before any live activation. This release refuses live checkout.",
+        ],
+        "notes": [
+            "Saved secrets are never shown.",
+            f"Live state remains {LIVE_CREDENTIALS_REQUIRED}. LIVE_VERIFIED is not set by sandbox tests.",
+            "Automatic recurring and Membership Autopay stay NOT_IMPLEMENTED for bKash.",
+        ],
+        "readiness": ready,
+    }
+
+
 def _direct_wallet_card(*, method: str, title: str, recurring_supported: bool) -> dict:
+    if method == PaymentMethod.BKASH:
+        return _bkash_sandbox_card()
     cfg = PaymentMethodConfig.objects.filter(method=method).first()
     has_app_key = bool(cfg and (cfg.api_app_key or "").strip())
     has_secret = bool(cfg and has_encrypted_password(cfg.encrypted_api_secret))
@@ -285,33 +368,18 @@ def _direct_wallet_card(*, method: str, title: str, recurring_supported: bool) -
     else:
         connection_state = NOT_CONFIGURED
 
-    if method == PaymentMethod.BKASH:
-        must_supply = [
-            "bKash merchant App Key, App Secret, username, and password from the official merchant portal.",
-            "Written merchant approval for Tokenized Checkout (create, execute, query).",
-            "Sandbox and production base URLs supplied by bKash for this merchant.",
-            "Callback URL registered with bKash for this site.",
-            "Separate Subscription Payment API approval if automatic recurring is required.",
-            "Refund API approval if provider refunds are required.",
-        ]
-        summary = (
-            "Direct bKash checkout is not wired to a verified merchant API. "
-            "A bKash button inside SSLCommerz hosted checkout is not this integration. "
-            "Subscription recurring stays unavailable until bKash grants the Subscription Payment API."
-        )
-    else:
-        must_supply = [
-            "Nagad merchant ID and the official key material from Nagad merchant onboarding.",
-            "Current official checkout, verify, and callback contract for this merchant.",
-            "Sandbox credentials and the public callback URL Nagad must call.",
-            "A written Nagad product that supports automatic recurring, if recurring is required. "
-            "One-time checkout does not imply recurring.",
-            "Refund API documentation if provider refunds are required.",
-        ]
-        summary = (
-            "Direct Nagad checkout is not wired to a verified merchant contract. "
-            "Recurring is not implemented. Nagad must not be offered as a recurring provider."
-        )
+    must_supply = [
+        "Nagad merchant ID and the official key material from Nagad merchant onboarding.",
+        "Current official checkout, verify, and callback contract for this merchant.",
+        "Sandbox credentials and the public callback URL Nagad must call.",
+        "A written Nagad product that supports automatic recurring, if recurring is required. "
+        "One-time checkout does not imply recurring.",
+        "Refund API documentation if provider refunds are required.",
+    ]
+    summary = (
+        "Direct Nagad checkout is not wired to a verified merchant contract. "
+        "Recurring is not implemented. Nagad must not be offered as a recurring provider."
+    )
 
     checklist = [
         {"step": 1, "label": "Merchant credentials saved (write-only secrets)", "done": creds_present},
@@ -389,11 +457,17 @@ def recurring_setup_cards() -> list[dict]:
 
 
 def _purpose_one_time_state(card: dict, *, purpose_enabled: bool) -> str:
-    """SSLCommerz purpose gate. Direct wallets stay unimplemented."""
-    if card["method"] != PaymentMethod.SSLCOMMERZ:
+    """Purpose gate. Nagad stays unimplemented. bKash uses its sandbox state."""
+    if card["method"] not in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH):
         return NOT_IMPLEMENTED
     state = card["one_time_state"]
-    if state in (NOT_CONFIGURED, DISABLED, FAILED):
+    if state in (
+        NOT_CONFIGURED,
+        DISABLED,
+        FAILED,
+        NOT_IMPLEMENTED,
+        "LIVE_CREDENTIALS_REQUIRED",
+    ):
         return state
     if not purpose_enabled:
         return DISABLED
@@ -462,7 +536,7 @@ def purpose_capability_rows() -> list[dict]:
                 "membership_autopay_live": gateway_autopay,
                 "autopay_mode": autopay_mode,
                 "refund": card["refund_state"],
-                "code_implemented": method == PaymentMethod.SSLCOMMERZ,
+                "code_implemented": method in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH),
                 "credentials_configured": card["connection_state"]
                 not in (NOT_CONFIGURED, NOT_IMPLEMENTED, DISABLED),
                 "merchant_approval": card["recurring_state"]

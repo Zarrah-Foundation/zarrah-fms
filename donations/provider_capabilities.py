@@ -153,17 +153,26 @@ def sslcommerz_health() -> ProviderHealth:
 
 
 def bkash_health() -> ProviderHealth:
+    from donations.bkash_config import bkash_readiness
+
     cfg = PaymentMethodConfig.objects.filter(method=PaymentMethod.BKASH).first()
-    has_creds = bool(cfg and cfg.api_app_key and cfg.encrypted_api_secret and cfg.is_enabled)
+    ready = bkash_readiness()
+    api = bool(ready["api_callable"])
+    refund_configured = api and (cfg is None or cfg.refunds_enabled)
     one_time = _cap(
         code=True,
-        configured=has_creds,
-        merchant=bool(cfg and cfg.enabled_for_donation) if has_creds else False,
+        configured=api,
+        merchant=bool(not cfg or (cfg.is_enabled and cfg.enabled_for_donation)) if api else False,
         verified=bool(cfg and cfg.one_time_verified_at),
-        available=False,  # not live-verified
-        detail="" if has_creds else "bKash is not configured.",
+        available=api,
+        detail=(
+            "Sandbox Tokenized Checkout v2. Live payments are disabled."
+            if api
+            else ready["reason"] or "bKash is not configured."
+        ),
     )
-    # Recurring agreement/charge APIs are not implemented — never "Configured".
+    # Automatic recurring is not a documented silent charge. Agreement checkout
+    # still requires the customer PIN, so it must not show as Configured.
     recurring = CapabilityFlag(
         False,
         False,
@@ -171,28 +180,46 @@ def bkash_health() -> ProviderHealth:
         False,
         False,
         "Not implemented",
-        "bKash recurring: NOT IMPLEMENTED (adapter refuses; no merchant agreement API wired).",
+        "bKash recurring: NOT IMPLEMENTED (agreement checkout still requires the customer PIN; no scheduled charge).",
+    )
+    connection = _cap(
+        code=True,
+        configured=api,
+        verified=bool(cfg and cfg.last_test_status == "SUCCESS"),
+        available=api,
+        detail=ready["connection"],
     )
     return ProviderHealth(
         method=PaymentMethod.BKASH,
         label="bKash",
         implemented=True,
-        connection=_cap(code=True, configured=has_creds, verified=bool(cfg and cfg.last_test_status == "SUCCESS")),
+        connection=connection,
         one_time=one_time,
         recurring=recurring,
-        refund=CapabilityFlag(
-            False, False, False, False, False, "Not implemented", "bKash refund: NOT IMPLEMENTED."
+        refund=_cap(
+            code=True,
+            configured=refund_configured,
+            merchant=refund_configured,
+            verified=bool(cfg and cfg.refund_verified_at),
+            available=False,
+            detail=(
+                "Sandbox refund API is implemented. REFUNDED requires refundTransactionStatus Completed. "
+                "Live refunds are disabled."
+                if refund_configured
+                else "bKash refund: Not configured."
+            ),
         ),
         cancel_recurring=CapabilityFlag(
             False, False, False, False, False, "Not implemented",
-            "bKash cancel recurring: NOT IMPLEMENTED.",
+            "bKash automatic recurring cancel: NOT IMPLEMENTED.",
         ),
-        webhook=_cap(code=True, configured=has_creds, verified=bool(cfg and cfg.ipn_verified_at)),
-        validate=_cap(code=True, configured=has_creds, verified=False),
-        sandbox=None if not cfg else cfg.is_sandbox,
+        webhook=_cap(code=True, configured=api, verified=bool(cfg and cfg.ipn_verified_at), available=api),
+        validate=_cap(code=True, configured=api, verified=bool(cfg and cfg.one_time_verified_at), available=api),
+        sandbox=True if api else (None if not cfg else cfg.is_sandbox),
         notes=[
-            "bKash must not appear as an operational recurring provider.",
-            "LIVE VALIDATION PENDING.",
+            "Sandbox readiness is not live merchant activation.",
+            "bKash automatic recurring stays NOT IMPLEMENTED.",
+            "LIVE payments are disabled in this release.",
         ],
     )
 

@@ -31,12 +31,18 @@ class GatewayCapabilityTests(TestCase):
         self.assertNotIn("store_passwd", blob)
         self.assertNotIn("store_password", blob)
 
-    def test_bkash_nagad_not_implemented(self):
-        for method in (PaymentMethod.BKASH, PaymentMethod.NAGAD):
-            caps = method_capabilities(method)
-            self.assertFalse(caps["implemented"])
-            self.assertFalse(caps["supports_recurring"])
-            self.assertIn("not implemented", caps["label_note"].lower())
+    def test_bkash_sandbox_one_time_and_nagad_not_implemented(self):
+        nagad = method_capabilities(PaymentMethod.NAGAD)
+        self.assertFalse(nagad["implemented"])
+        self.assertFalse(nagad["supports_recurring"])
+        self.assertIn("not implemented", nagad["label_note"].lower())
+
+        bkash = method_capabilities(PaymentMethod.BKASH)
+        self.assertTrue(bkash["implemented"])
+        self.assertFalse(bkash["supports_one_time"])
+        self.assertFalse(bkash["supports_recurring"])
+        self.assertIn("not implemented", bkash["label_note"].lower())
+        self.assertIn("sandbox", bkash["label_note"].lower())
 
     def test_visa_mc_hosted_not_direct(self):
         channels = hosted_card_channels()

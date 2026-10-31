@@ -26,6 +26,26 @@ from members.fee_summary import summarize_member_fees
 from members.models import MembershipFee, MembershipRegistrationFee
 
 
+def _posted_checkout_method(request):
+    from core.choices import PaymentMethod
+
+    method = (request.POST.get("payment_method") or PaymentMethod.SSLCOMMERZ).strip()
+    if method not in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH):
+        return PaymentMethod.SSLCOMMERZ
+    return method
+
+
+def _bkash_fee_checkout_available():
+    from core.choices import PaymentMethod
+    from donations.gateway_capabilities import online_checkout_allowed
+    from donations.models import TransactionPurpose
+
+    ok, _err = online_checkout_allowed(
+        PaymentMethod.BKASH, TransactionPurpose.MEMBERSHIP_FEE
+    )
+    return ok
+
+
 def _member_or_redirect(request):
     member = getattr(request.user, "member_profile", None)
     if member is None:
@@ -67,6 +87,7 @@ def my_fees(request):
             "is_due": is_due_for_current_month(member),
             "is_prepaid": is_prepaid_beyond_current(member),
             "unpaid_fees": [f for f in fees if f.status == DonationStatus.PENDING],
+            "bkash_checkout_available": _bkash_fee_checkout_available(),
         },
     )
 
@@ -92,7 +113,11 @@ def my_fees_pay(request):
 
     try:
         _payment, url = initiate_fee_checkout(
-            member, months, request=request, actor=request.user
+            member,
+            months,
+            request=request,
+            actor=request.user,
+            method=_posted_checkout_method(request),
         )
     except Exception as exc:
         messages.error(request, str(exc) or _("Could not start payment."))
@@ -108,7 +133,10 @@ def my_fees_pay_registration(request):
         return redirect("dashboard")
     try:
         _reg, url = initiate_registration_fee_checkout(
-            member, request=request, actor=request.user
+            member,
+            request=request,
+            actor=request.user,
+            method=_posted_checkout_method(request),
         )
     except Exception as exc:
         messages.error(request, str(exc) or _("Could not start registration payment."))

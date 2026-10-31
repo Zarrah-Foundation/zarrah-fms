@@ -46,6 +46,11 @@ urlpatterns = [
         name="dashboard-payments-transaction-detail",
     ),
     path(
+        "payments/transactions/<uuid:pk>/bkash-reconcile/",
+        views_payments.payments_bkash_reconcile,
+        name="dashboard-payments-bkash-reconcile",
+    ),
+    path(
         "payments/transactions/<uuid:txn_pk>/refund/",
         views_payments.payments_refund_request,
         name="dashboard-payments-refund-request",

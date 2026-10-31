@@ -1,8 +1,8 @@
 """Payment gateway factory.
 
-SSLCommerz is the only fully operational hosted checkout today.
-bKash / Nagad adapters exist but refuse operations until credentials + live
-verification are in place — they never silently route to SSLCommerz or MOCK.
+SSLCommerz remains the hosted checkout used for live-style one-time payments.
+bKash Tokenized Checkout v2 runs in sandbox only and refuses live hosts.
+Nagad still refuses every operation. Adapters never fall back to MOCK.
 """
 
 from core.choices import PaymentMethod

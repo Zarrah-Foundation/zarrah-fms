@@ -53,9 +53,16 @@ def _quick_amounts_payload(categories, lang):
 
 
 def _donation_page_extras():
-    from donations.gateway_capabilities import public_recurring_option_visible
+    from donations.gateway_capabilities import online_checkout_allowed, public_recurring_option_visible
+    from donations.models import TransactionPurpose
 
-    return {"show_recurring_option": public_recurring_option_visible()}
+    bkash_ok, _bkash_err = online_checkout_allowed(
+        PaymentMethod.BKASH, TransactionPurpose.DONATION
+    )
+    return {
+        "show_recurring_option": public_recurring_option_visible(),
+        "bkash_checkout_available": bkash_ok,
+    }
 
 
 class DonationListView(ListView):
@@ -115,9 +122,10 @@ class DonationCreateView(FormView):
         from donations.gateway_capabilities import online_checkout_allowed
         from donations.models import TransactionPurpose
 
-        ok, err = online_checkout_allowed(
-            PaymentMethod.SSLCOMMERZ, purpose=TransactionPurpose.DONATION
-        )
+        method = (self.request.POST.get("payment_method") or PaymentMethod.SSLCOMMERZ).strip()
+        if method not in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH):
+            method = PaymentMethod.SSLCOMMERZ
+        ok, err = online_checkout_allowed(method, purpose=TransactionPurpose.DONATION)
         if not ok:
             messages.error(self.request, err)
             return redirect("donation")
@@ -125,7 +133,7 @@ class DonationCreateView(FormView):
         kwargs = form.build_donation_kwargs()
         if self.request.user.is_authenticated:
             kwargs["user"] = self.request.user
-        kwargs["payment_method"] = PaymentMethod.SSLCOMMERZ
+        kwargs["payment_method"] = method
 
         tran_id = generate_tran_id()
         session_id = str(uuid.uuid4())
@@ -136,15 +144,17 @@ class DonationCreateView(FormView):
             cus_name=kwargs["donor_name"],
             cus_email=kwargs.get("donor_email"),
             cus_phone=kwargs.get("donor_phone"),
-            gateway=PaymentMethod.SSLCOMMERZ,
+            gateway=method,
         )
         donation = Donation.objects.create(transaction=transaction, **kwargs)
         try:
-            gateway_url = init_payment(donation, self.request)
+            gateway_url = init_payment(donation, self.request, method=method)
             return redirect(gateway_url)
         except Exception as e:
+            from donations.gateways.bkash import safe_gateway_message
+
             transaction.status = DonationStatus.FAILED
-            transaction.error = str(e)
+            transaction.error = safe_gateway_message(e) if method == PaymentMethod.BKASH else str(e)[:300]
             transaction.save()
             donation.status = DonationStatus.FAILED
             donation.save(update_fields=["status", "updated_at"])

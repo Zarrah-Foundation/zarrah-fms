@@ -186,8 +186,39 @@ def payments_transaction_detail(request, pk):
             "txn": txn,
             "refunds": refunds,
             "can_refund": _can(request, "payments", "refunds_request"),
+            "can_reconcile_bkash": (
+                txn.gateway == PaymentMethod.BKASH
+                and txn.status == DonationStatus.PENDING
+                and bool(txn.val_id)
+                and _can(request, "payments", "manage")
+            ),
         },
     )
+
+
+@login_required
+@require_POST
+@require_action("payments", "manage")
+def payments_bkash_reconcile(request, pk):
+    """Query bKash for a pending payment. Does not mark success from the browser."""
+    txn = get_object_or_404(Transaction, pk=pk)
+    from donations.bkash_flow import reconcile_bkash_transaction
+    from donations.gateways.base import PaymentGatewayError
+    from donations.gateways.bkash import safe_gateway_message
+
+    if txn.gateway != PaymentMethod.BKASH:
+        messages.error(request, _("Only a pending bKash payment can be reconciled here."))
+        return redirect("dashboard-payments-transaction-detail", pk=txn.pk)
+    try:
+        reconcile_bkash_transaction(txn)
+    except PaymentGatewayError as exc:
+        messages.error(request, safe_gateway_message(exc))
+    txn.refresh_from_db()
+    if txn.status == DonationStatus.COMPLETED:
+        messages.success(request, _("bKash query confirmed this payment."))
+    elif txn.status == DonationStatus.PENDING:
+        messages.warning(request, _("bKash has not confirmed this payment. It stays pending."))
+    return redirect("dashboard-payments-transaction-detail", pk=txn.pk)
 
 
 @login_required

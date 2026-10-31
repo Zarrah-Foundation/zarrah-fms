@@ -8,7 +8,7 @@
 <div class="dash-page-header">
   <div>
     <h1 class="dash-page-title">{% trans "Membership Fees" %}</h1>
-    <p class="mt-1 text-sm text-ink-light">{% trans "Select unpaid months below to pay with SSLCommerz." %}</p>
+    <p class="mt-1 text-sm text-ink-light">{% if bkash_checkout_available %}{% trans "Select unpaid months, then choose SSLCommerz or bKash sandbox." %}{% else %}{% trans "Select unpaid months below to pay with SSLCommerz." %}{% endif %}</p>
   </div>
 </div>
 
@@ -47,8 +47,12 @@
       </p>
     </div>
     {% if registration_fee.status != "COMPLETED" %}
-    <form method="post" action="{% url 'dashboard-my-fees-pay-registration' %}">
+    <form method="post" action="{% url 'dashboard-my-fees-pay-registration' %}" class="space-y-2">
       {% csrf_token %}
+      {% if bkash_checkout_available %}
+      <label class="flex items-center gap-2 text-sm"><input type="radio" name="payment_method" value="SSLCOMMERZ" checked> SSLCommerz</label>
+      <label class="flex items-center gap-2 text-sm"><input type="radio" name="payment_method" value="BKASH"> bKash sandbox</label>
+      {% endif %}
       <button type="submit" class="btn-primary btn-sm"><i class="bi bi-credit-card"></i>{% trans "Pay registration fee" %}</button>
     </form>
     {% endif %}
@@ -81,11 +85,16 @@
   </div>
   <div class="card-flat">
     <h2 class="mb-3 text-h4">{% trans "Pay selected months" %}</h2>
-    <p class="mb-3 text-sm text-ink-light">{% blocktrans with fee=monthly_fee|floatformat:0 %}Total uses each selected month’s amount (current monthly fee ৳{{ fee }}). Checkout uses SSLCommerz one-time hosted payment.{% endblocktrans %}</p>
+    <p class="mb-3 text-sm text-ink-light">{% blocktrans with fee=monthly_fee|floatformat:0 %}Total uses each selected month’s amount (current monthly fee ৳{{ fee }}). The server decides the amount.{% endblocktrans %}</p>
     <form method="post" action="{% url 'dashboard-my-fees-pay' %}" id="fee-pay-form">
       {% csrf_token %}
+      {% if bkash_checkout_available %}
+      <label class="mb-2 flex items-center gap-2 text-sm"><input type="radio" name="payment_method" value="SSLCOMMERZ" checked> SSLCommerz</label>
+      <label class="mb-2 flex items-center gap-2 text-sm"><input type="radio" name="payment_method" value="BKASH"> bKash sandbox</label>
+      <p class="mb-2 text-xs text-ink-light">{% trans "bKash sandbox is not a live merchant payment." %}</p>
+      {% endif %}
       <p class="mb-2 text-sm font-semibold" id="fee-total">{% trans "Total" %}: ৳0</p>
-      <button type="submit" class="btn-primary btn-sm"><i class="bi bi-credit-card"></i>{% trans "Pay with SSLCommerz" %}</button>
+      <button type="submit" class="btn-primary btn-sm"><i class="bi bi-credit-card"></i>{% if bkash_checkout_available %}{% trans "Pay selected months" %}{% else %}{% trans "Pay with SSLCommerz" %}{% endif %}</button>
     </form>
   </div>
 </div>

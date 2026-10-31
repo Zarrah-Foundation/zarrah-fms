@@ -310,16 +310,15 @@ def deactivate_autopay(member, *, actor=None, reason="", forced=False):
 
 
 @transaction.atomic
-def initiate_fee_checkout(member, months, *, request, actor=None):
-    """Create PENDING fee payment + Transaction and return SSLCommerz redirect URL."""
+def initiate_fee_checkout(member, months, *, request, actor=None, method=None):
+    """Create PENDING fee payment + Transaction and return the provider redirect URL."""
     from donations.gateway_capabilities import online_checkout_allowed
     from donations.models import Transaction, TransactionPurpose
     from donations.services import generate_tran_id
     from donations.gateways import get_gateway
 
-    ok, err = online_checkout_allowed(
-        PaymentMethod.SSLCOMMERZ, purpose=TransactionPurpose.MEMBERSHIP_FEE
-    )
+    method = method or PaymentMethod.SSLCOMMERZ
+    ok, err = online_checkout_allowed(method, purpose=TransactionPurpose.MEMBERSHIP_FEE)
     if not ok:
         raise ValueError(err)
 
@@ -362,7 +361,7 @@ def initiate_fee_checkout(member, months, *, request, actor=None):
         amount=amount,
         currency="BDT",
         status=DonationStatus.PENDING,
-        gateway=PaymentMethod.SSLCOMMERZ,
+        gateway=method,
         purpose=TransactionPurpose.MEMBERSHIP_FEE,
         cus_name=f"{member.first_name} {member.last_name}".strip() or member.member_id,
         cus_email=getattr(member.user, "email", None),
@@ -374,7 +373,7 @@ def initiate_fee_checkout(member, months, *, request, actor=None):
         amount=amount,
         currency="BDT",
         status=DonationStatus.PENDING,
-        payment_method=PaymentMethod.SSLCOMMERZ,
+        payment_method=method,
         months=months,
         source=FeePaymentSource.GATEWAY,
     )
@@ -385,7 +384,7 @@ def initiate_fee_checkout(member, months, *, request, actor=None):
         message=f"Checkout for {len(months)} month(s), ৳{amount:g}",
         metadata={"payment_id": str(payment.pk), "months": months, "tran_id": txn.tran_id},
     )
-    gateway = get_gateway(PaymentMethod.SSLCOMMERZ)
+    gateway = get_gateway(method)
     url = gateway.init_payment(payment, request)
     return payment, url
 
@@ -404,8 +403,8 @@ def complete_fee_payment(payment, *, val_id=None, validation_data=None):
 
     txn = payment.transaction
     # Gateway SSLCommerz completions require validated payload (same invariant as donations).
-    if payment.payment_method == PaymentMethod.SSLCOMMERZ or (
-        txn and txn.gateway == PaymentMethod.SSLCOMMERZ
+    if payment.payment_method in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH) or (
+        txn and txn.gateway in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH)
     ):
         if not validation_data or not isinstance(validation_data, dict):
             raise ValueError(
@@ -654,21 +653,22 @@ def ensure_registration_fee(member, *, actor=None):
 
 
 @transaction.atomic
-def initiate_registration_fee_checkout(member, *, request, actor=None):
-    """Create PENDING registration fee + Transaction; return SSLCommerz URL."""
+def initiate_registration_fee_checkout(member, *, request, actor=None, method=None):
+    """Create PENDING registration fee + Transaction and return the provider URL."""
     from donations.gateway_capabilities import online_checkout_allowed
     from donations.gateways import get_gateway
     from donations.models import Transaction, TransactionPurpose
     from donations.services import generate_tran_id
     import uuid
 
+    method = method or PaymentMethod.SSLCOMMERZ
     ok, err = online_checkout_allowed(
-        PaymentMethod.SSLCOMMERZ, purpose=TransactionPurpose.MEMBERSHIP_REGISTRATION
+        method, purpose=TransactionPurpose.MEMBERSHIP_REGISTRATION
     )
-    if not ok:
+    if not ok and method == PaymentMethod.SSLCOMMERZ:
         # Fall back to membership-fee toggle if registration-specific gate is unused.
         ok, err = online_checkout_allowed(
-            PaymentMethod.SSLCOMMERZ, purpose=TransactionPurpose.MEMBERSHIP_FEE
+            method, purpose=TransactionPurpose.MEMBERSHIP_FEE
         )
     if not ok:
         raise ValueError(err)
@@ -683,14 +683,14 @@ def initiate_registration_fee_checkout(member, *, request, actor=None):
         amount=reg.amount,
         currency=reg.currency or "BDT",
         status=DonationStatus.PENDING,
-        gateway=PaymentMethod.SSLCOMMERZ,
+        gateway=method,
         purpose=TransactionPurpose.MEMBERSHIP_REGISTRATION,
         cus_name=f"{member.first_name} {member.last_name}".strip() or member.member_id,
         cus_email=getattr(member.user, "email", None),
         cus_phone=member.phone,
     )
     reg.transaction = txn
-    reg.payment_method = PaymentMethod.SSLCOMMERZ
+    reg.payment_method = method
     reg.source = FeePaymentSource.GATEWAY
     reg.status = DonationStatus.PENDING
     reg.save(
@@ -709,7 +709,7 @@ def initiate_registration_fee_checkout(member, *, request, actor=None):
         message=f"Registration fee checkout ৳{reg.amount:g}",
         metadata={"registration_fee_id": str(reg.pk), "tran_id": txn.tran_id},
     )
-    gateway = get_gateway(PaymentMethod.SSLCOMMERZ)
+    gateway = get_gateway(method)
     url = gateway.init_payment(reg, request)
     return reg, url
 
@@ -727,8 +727,8 @@ def complete_registration_fee_payment(reg_fee, *, val_id=None, validation_data=N
         return reg_fee
 
     txn = reg_fee.transaction
-    if reg_fee.payment_method == PaymentMethod.SSLCOMMERZ or (
-        txn and txn.gateway == PaymentMethod.SSLCOMMERZ
+    if reg_fee.payment_method in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH) or (
+        txn and txn.gateway in (PaymentMethod.SSLCOMMERZ, PaymentMethod.BKASH)
     ):
         if not validation_data or not isinstance(validation_data, dict):
             raise ValueError(
